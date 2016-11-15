@@ -1,0 +1,26 @@
+#==================================================
+# AUTO commands for MK (modified-Klausmeier) model 
+#==================================================
+# This Python script file contains a few commands to analyze the MK model.
+# This is done using a Periodic Orbit (PO) setup, with spatial dynamics
+# By running these commands, either separately or at once (by writing: auto POMK.auto)
+# You will get a few result files for later analysis in the RDM tutorial
+
+#=============================================
+
+# Get uniform solutions
+unf = run(e='POMK',c='POMK',NMX=3000,NPR=50,DSMAX=0.000343,DS=-0.000001)
+save(unf,'MK_unf')
+
+# Get periodic solutions
+per=run(unf('HB1'),IPS=2,ISP=1,ICP=['a','dummy','L'],UZR={'a':1.01},DSMAX=0.004,NMX=500,NPR=20)
+save(per,'MK_per')
+
+# Changing wavelength
+onl = run(per('UZ1'),ICP=['L','dummy','a'],UZR={'L':200},DSMAX=0.01,DS=0.0001)
+
+# Finding a snaking solution
+snk = run(onl('UZ1'),ICP=['a','dummy','L'],DS=0.00001,DSMAX=0.002,NMX=2000,NPR=20)
+save(snk,'MK_snk')
+
+
