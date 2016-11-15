@@ -18,7 +18,7 @@ else		% Normal run
    dsm2 = Ps.SpaMat{1};   
    dsm4 = Ps.SpaMat{2};
    
-   if(~isfield(Es,'fmod') || (Es.fmod==0))	% Model equation
+   if(~isfield(Es,'JacMode') || (Es.JacMode==0))	% Model equation
         MatOut = 0.5*(Ps.L^2 - B).*(dsm2*B) - 0.125*B.*(dsm4*B) ;
    else             % Jacobian of equation
 	

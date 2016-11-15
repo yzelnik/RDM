@@ -1,11 +1,13 @@
 function [state,T,Y] = FindODESS(InitVals,Ps,Es,varargin)
-% Find an ODE (uniform) Steady State
+% Find an ODE (uniform) Steady-State
 % state = FindODESS(InitVals,Ps,Es)
 
+Es=InsertDefaultValues(Es,'TimeDst',0);
+
 slowchange = 0.01;  % Used to test that a solution is converging. 
-deftime = max(100,Es.Tdest);
-if( (isfield(Es,'ODEtime')) && Es.ODEtime)
-    deftime=Es.ODEtime;
+deftime = max(100,Es.TimeDst);
+if((isfield(Es,'OdeTime')) && Es.OdeTime)
+    deftime=Es.OdeTime;
 end;
 
 Es.InitActive = 1;      % make sure we don't have endless loops 
@@ -14,10 +16,10 @@ Es.InitActive = 1;      % make sure we don't have endless loops
 [~,Ps,Es]=UpdateParameters([],Ps,Es,varargin{:});
 
 if(isempty(InitVals))
-	InitVals = zeros(1,Ps.Vnum);
+	InitVals = zeros(1,Ps.VarNum);
 end;
-Es.fmod=0;
-%size(InitVals)
+Es.JacMode=0;
+
 % Go over each set of initial values, and run the ODE integration
 for ind = 1:size(InitVals,1)
     % run ODE integration
@@ -33,6 +35,6 @@ for ind = 1:size(InitVals,1)
     end;
 	state(ind,:) = Y(5,:);
 end;
-disp(state)
+%disp(state)
 end
 

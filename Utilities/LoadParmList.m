@@ -1,11 +1,11 @@
 function vallist=LoadParmList(Vs,Ps,Es,namelist)
 % Loads a list of parameters from Ps/Es into vallist
-% vallist=LoadParmList(Vs,Ps,Es,namelist)
-% namelist is a cell array of parameter names (otherwise Es.BFpar is used)
+% vallist=LoadPrmList(Vs,Ps,Es,namelist)
+% namelist is a cell array of parameter names (otherwise Es.BfPrm is used)
 % A proper text name is assumed to be a Ps variable (unless it is "Vs")
 % A numerical value acts as a pointer in the Ps structure (offset by +3)
 % Anything else is directly evaluated using eval (not as safe) such as: Ds(2)
-if(nargin<4) namelist = Es.BFpar; end;
+if(nargin<4) namelist = Es.BfPrm; end;
 
 for jj=1:length(namelist)
 	if(isnumeric(namelist{jj})) % Allow access to model-parameters by index

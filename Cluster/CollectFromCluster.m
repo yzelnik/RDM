@@ -37,11 +37,17 @@ else
     if(strcmp(FileType,'.mat'))
         for ii=1:length(list)
             tmp=load(list(ii).name);
+        
             %inds = tmp.Es.RunsChoice;
             Es=SortOutBfParameters(tmp.Es);
-            totvals = Es.BFparvals; % list of parameter-combinations
+            totvals = Es.BfVal; % list of parameter-combinations
             inds = ceil(size(totvals,1)*(Es.RunsChoice(1)-1)/Es.RunsChoice(2))+1 : ceil(size(totvals,1)*Es.RunsChoice(1)/Es.RunsChoice(2));
-            datalen=min(size(tmp.StData,1),size(tmp.BfData,1));
+            if(isfield(tmp,'StData')) 
+                datalen=min(size(tmp.StData,1),size(tmp.BfData,1));
+            else
+                datalen=size(tmp.BfData,1);
+            end;
+            
             if(datalen<length(inds))
                 warning('Could not load all data from %s, only %d out of %d run-results available.',list(ii).name,datalen,length(inds));
                 %if(isempty(PartsCollected))
@@ -50,7 +56,9 @@ else
                 %PartsCollected(size(TotBf,1)+(1:datalen))=1;
             end;
             PartsCollected(inds(1:datalen))=1; % mark parts are correctly read
-            TotSt(inds(1:datalen))=tmp.StData(1:datalen);
+            if(isfield(tmp,'StData') && (~isempty(tmp.StData)))
+                TotSt(inds(1:datalen))=tmp.StData(1:datalen);
+            end;
             TotBf(inds(1:datalen),1:size(tmp.BfData,2))=tmp.BfData(1:datalen,:);
         end;
         Ps = tmp.Ps;

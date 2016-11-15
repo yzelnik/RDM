@@ -14,7 +14,7 @@ B=Vs(:,1);
 W=Vs(:,2); 
 H=Vs(:,3); 
 
-if(Es.fmod==0)      % Model equations
+if(Es.JacMode==0)      % Model equations
 
     dB = B.*W./(1 + W) - Ps.mu.*B;
     dW = Ps.alpha.*H.*(B + Ps.f)./(B + 1) - Ps.ni.*W - Ps.gamma.*B.*W./(1 + W);

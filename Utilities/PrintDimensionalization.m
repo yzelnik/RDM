@@ -1,7 +1,7 @@
 function PrintDimensionalization(Ps,NewParDef,VarNames)
 % Print out the dimensionalization info from a matrix
 if(nargin<3)
-    for ii=1:Ps.Vnum
+    for ii=1:Ps.VarNum
         VarNames{ii}=sprintf('v%d',ii);
     end;
 end;
@@ -36,7 +36,7 @@ for ii=1:plen
      end;
 end;
 
-for ii=1:Ps.Vnum
+for ii=1:Ps.VarNum
     fprintf('%s_new = \t',VarNames{ii});
     PrintRelations([VarNames(ii),parmnames],[1 NewParDef(plen+ii,:)])
     %fprintf('%s_new = %s * ',VarNames{ii},VarNames{ii});
@@ -46,10 +46,10 @@ end;
 
    % PrintRelations([VarNames(ii),parmnames],[1 NewParDef(plen+ii,:)])
 fprintf('x_new = \t');
-PrintRelations([{'x'},parmnames],[1 NewParDef(plen+Ps.Vnum+1,:)])
+PrintRelations([{'x'},parmnames],[1 NewParDef(plen+Ps.VarNum+1,:)])
 fprintf('t_new = \t');
-PrintRelations([{'t'},parmnames],[1 NewParDef(plen+Ps.Vnum+2,:)])
-%(parmnames,NewParDef(plen+Ps.Vnum+2,:))
+PrintRelations([{'t'},parmnames],[1 NewParDef(plen+Ps.VarNum+2,:)])
+%(parmnames,NewParDef(plen+Ps.VarNum+2,:))
 
 end
 

@@ -18,13 +18,13 @@ if( (isfield(Es,'EigNum')) && Es.EigNum)
     eignum=Es.EigNum;
 end;
 
-if(~isfield(Es,'NumJac'))
-    Es.NumJac=0;
+if(~isfield(Es,'JacNum'))
+    Es.JacNum=0;
 end;
 
-if(~Es.NumJac)
-    Es.Jcob = 1;	% Delete this line soon, old version (still needs change across the board)
-    Es.fmod = 1;	% Request a jacobian
+if(~Es.JacNum)
+    Es.JacMode = 1;	% Delete this line soon, old version (still needs change across the board)
+    Es.JacMode = 1;	% Request a jacobian
 end;
 
 % If Matlab crashes (because of eigs) - we can try to deal with this:
@@ -46,7 +46,7 @@ if( (isfield(Es,'AvoidErrors')) && Es.AvoidErrors)
 		flag=0;
 		opts.tol = tol;
 		try
-            if(~Es.NumJac)  % Use analytical jacobian?
+            if(~Es.JacNum)  % Use analytical jacobian?
     			evs=eigs(Ps.LocFunc(Vs,Ps,Es)+Ps.SpaFunc(Vs,Ps,Es),eignum,1,opts);
             else            % or numeric one?
                 evs=eigs(NumericJacobian(Vs,Ps,Es),eignum,1,opts);
@@ -69,7 +69,7 @@ if( (isfield(Es,'AvoidErrors')) && Es.AvoidErrors)
 	end;
     
 else	% Notmal run of eigs
-	if(~Es.NumJac)  % Use analytical jacobian?
+	if(~Es.JacNum)  % Use analytical jacobian?
         evs=eigs(Ps.LocFunc(Vs,Ps,Es)+Ps.SpaFunc(Vs,Ps,Es),eignum,1);
 	else            % or numeric one?
         evs=eigs(NumericJacobian(Vs,Ps,Es),eignum,1);
@@ -82,13 +82,13 @@ if(sum(abs(evs))==0)	% If the run was not successful, than return -1
 else	% eigs was successful, so return either 1 (stable) or 0 (unstable), using the second eigenvalue
 	temp = sort(real(evs));
     [~,zeromode] = min(abs(temp));
-    if(temp(zeromode)<abs(Es.LSAthresh))
+    if(temp(zeromode)<abs(Es.LsaThresh))
         %disp(sprintf('found mode at %d, with %f',zeromode,temp(zeromode)));
         temp(zeromode)=-inf;    % Ignore zero mode (chose to zero eigvalue)
     end;
     
     res = (1-sign(max(temp)))>0;
-	%res = temp(end-1)<Es.LSAthresh;
+	%res = temp(end-1)<Es.LsaThresh;
 end;
 
 iternum = ind;

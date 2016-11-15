@@ -10,8 +10,8 @@ function VsOut=L_EDGE2(Vs,Ps,Es,varargin)
 % Update online if necessary
 [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
 
-if(~isfield(Es,'fmod'))
-   Es.fmod=0;
+if(~isfield(Es,'JacMode'))
+   Es.JacMode=0;
 end;
 
 % Initialization
@@ -19,7 +19,7 @@ B=Vs(:,1);
 W=Vs(:,2); 
 E=Vs(:,3);
 
-if(Es.fmod==0)      % Model equations
+if(Es.JacMode==0)      % Model equations
 
     dB = Ps.lambda.*B.*W.*(1 + Ps.eta.*B).^2.*(1 - B./Ps.kappa) - Ps.mu.*B; 
     dW = Ps.P                                      - Ps.nu.*W./(1 + Ps.rho.*B./Ps.kappa) - Ps.gamma.*B.*W.*(1 + Ps.eta.*B).^2 - Ps.gamma2.*E.*W;

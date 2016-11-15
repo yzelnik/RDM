@@ -8,8 +8,8 @@ function VsOut=L_NDX(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-if(~isfield(Es,'fmod'))
-   Es.fmod=0;
+if(~isfield(Es,'JacMode'))
+   Es.JacMode=0;
 end;
 
 % Initialization
@@ -17,7 +17,7 @@ P=Vs(:,1);
 I=Vs(:,2); 
 X=Vs(:,3); 
 
-if(Es.fmod==0)      % Model equations
+if(Es.JacMode==0)      % Model equations
 
     dP = Ps.v.*(Ps.nu.*Ps.Sigma_f.*P - Ps.Sigma_a.*P - Ps.sigma_x.*X.*P);
     dI = Ps.gamma_I.*Ps.Sigma_f.*P - Ps.lambda_I.*I;

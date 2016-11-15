@@ -8,15 +8,15 @@ function VsOut=L_GKGS(Vs,Ps,Es,varargin)
 % Update online if necessary
 [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
 
-if(~isfield(Es,'fmod'))
-   Es.fmod=0;
+if(~isfield(Es,'JacMode'))
+   Es.JacMode=0;
 end;
 
 % Initilization
 B=Vs(:,1); 
 W=Vs(:,2); 
 
-if(Es.fmod==0)      % Model equations
+if(Es.JacMode==0)      % Model equations
     
     dB = W.*B.^2 - Ps.m.*B;
     dW = Ps.a - Ps.c*W - W.*B.^2;

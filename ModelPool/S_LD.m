@@ -25,14 +25,14 @@ end
 function SM=CalcSM(Ps,Es)
    len=Ps.Nx*Ps.Ny;
    % find the highest derivative and organize the Ds vector of derivatives coefficients
-   maxderv=ceil(length(Ps.Ds)/Ps.Vnum);
-   Ds=reshape([Ps.Ds(:); zeros(maxderv*Ps.Vnum-length(Ps.Ds),1)],Ps.Vnum,maxderv);
+   maxderv=ceil(length(Ps.Ds)/Ps.VarNum);
+   Ds=reshape([Ps.Ds(:); zeros(maxderv*Ps.VarNum-length(Ps.Ds),1)],Ps.VarNum,maxderv);
    
-   SM = sparse(len*Ps.Vnum,len*Ps.Vnum);	% Build the initial block-diagonal matrix
+   SM = sparse(len*Ps.VarNum,len*Ps.VarNum);	% Build the initial block-diagonal matrix
    for ii=1:maxderv
 	if(sum(abs(Ds(:,ii))))			% If there are non zero coefficients for this derivative order
 		base = DervSM(ii,Ps,Es);	% Get derivative spatial matrix
-		for jj=1:Ps.Vnum
+		for jj=1:Ps.VarNum
 			loc = (jj-1)*len+(1:len); 			% Find location for this block-diagonal part
 			SM(loc,loc) = SM(loc,loc) + base*Ds(jj,ii);	% Update this part
 		end;

@@ -29,7 +29,7 @@ else		% Normal run
    %nrm = dx/(2*pi);   % for 2d
    nrm = (dx/sqrt(2*pi))*repmat(1+Ps.eta.*Vs(:,1),1,pnum);    % for 1d
 
-   if(~isfield(Es,'fmod') || (Es.fmod==0))  % Model equations
+   if(~isfield(Es,'JacMode') || (Es.JacMode==0))  % Model equations
 	
         % Calculate a matrix of "connections" between each B and W in space
         coef = repmat((Ps.eta.*Vs(:,1))',pnum,1); 	% calculate the coefficient (eta*B) in a matrix form

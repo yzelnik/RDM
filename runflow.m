@@ -9,15 +9,17 @@ function [StData,BfData]=runflow(Vs,Ps,Es,varargin)
 %   3: function takes a state and returns bif data
 %   4: function takes a set of bif data and returns bif data
 
+% Default first extra input is for the list of functions to run
+if(~mod(nargin,2)) varargin = ['Es.FuncList' varargin]; end;
+    
 % Update online if necessary
 [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
-
-if(~isfield(Es,'MergeBfData') || isempty(Es.MergeBfData))
-	Es.MergeBfData = 0;
-end;
-if(~isfield(Es,'Tmode') || isempty(Es.Tmode))
-	Es.Tmode = 'none';
-end;
+% Make sure Ps parameters are properly setup
+[Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
+% Put in some default values of Es
+Es=InsertDefaultValues(Es,'MergeBfData',0,'TsMode','none');
+% Initilize state if necessary
+[Vs,Ps,Es]=InitilizeState(Vs,Ps,Es);
 
 
 if(~isfield(Es,'FuncList') || isempty(Es.FuncList))
@@ -65,7 +67,12 @@ if((size(Es.FuncSpec,1)==1) && (length(Es.FuncList)>1))
 end;
 if(size(Es.FuncSpec,2)<2)   % Need to add in default values of what information to save
     if(sum(Es.FuncSpec(:,1)==4))
-        Es.FuncSpec(:,2)=(Es.FuncSpec(:,1)==4);     % If we have Comparison functions, save only their output
+        Es.FuncSpec(:,2)=(Es.FuncSpec(:,1)==4);     % If we have Comparison functions, save only their output and tests coming after
+       
+        lastcalc = find(Es.FuncSpec(:,1)==4,1,'last');
+        if(lastcalc < find(Es.FuncSpec(:,1)==3,1,'last'))
+            Es.FuncSpec(find(Es.FuncSpec(lastcalc+1:end,1)==3)+lastcalc,2) = 1;
+        end;
     else
         if(sum(Es.FuncSpec(:,1)==3))
             Es.FuncSpec(:,2)=(Es.FuncSpec(:,1)==3); % Save output of Test functions
@@ -117,9 +124,18 @@ for ii=1:length(Es.FuncList)    % Go over functions in the flow
             %BfData(size(BfData,1)+(1:size(BfOut,1)),1:1+size(BfOut,2)) = [repmat(ii,size(BfOut,1),1) BfOut];
         end;
     elseif(Es.FuncSpec(ii,1)==4)    % Input bifdata, output bifdata
-        BfOut = Es.FuncList{ii}(BfOut,Ps,Es);
+        if(Es.FuncSpec(ii,2)<2)
+        	BfOut = Es.FuncList{ii}(BfOut,Ps,Es);
+        elseif (Es.FuncSpec(ii,2)<3)
+            [tmp1,tmp2] = Es.FuncList{ii}(BfOut,Ps,Es);
+            BfOut = [tmp1(:)' tmp2(:)'];
+        else
+            [tmp1,tmp2,tmp3] = Es.FuncList{ii}(BfOut,Ps,Es);
+            BfOut = [tmp1(:)' tmp2(:)'  tmp3(:)'];
+        end;
+        %BfOut = Es.FuncList{ii}(BfOut,Ps,Es);
         if(Es.FuncSpec(ii,2)>0)
-            BfData = CollectBfData(BfData,BfOut,Es.MergeBfData,ii);
+             BfData = CollectBfData(BfData,BfOut,Es.MergeBfData,ii);
 %            BfData(size(BfData,1)+(1:size(BfOut,1)),1:1+size(BfOut,2)) = [repmat(ii,size(BfOut,1),1) BfOut];
         end;
     end;    
@@ -128,7 +144,11 @@ end;
 if((~Es.MergeBfData) && (sum((Es.FuncSpec(:,1)>1).*(Es.FuncSpec(:,2)>0))==1))
     BfData = BfData(:,2:end);	% If only one function was used for creating bif data, don't add extra column
 end;
-
+% If we did not read anything into StData (due to the values of Es.FuncSpec),
+% then save the last state of the system, if anyone wants to see it
+if(isempty(StData))
+	StData = Vs;
+end;
 end
 
 %%%%%%%%%%%% AUX FUNCTIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

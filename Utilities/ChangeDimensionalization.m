@@ -43,19 +43,19 @@ end;
 
 % Rescale variables
 if(~isempty(Vs))
-    if(length(newparms)<length(tempparms)+Ps.Vnum)
+    if(length(newparms)<length(tempparms)+Ps.VarNum)
         warning('Could not rescale variables, Missing data in transform matrix.');
     else
-        for ii=1:Ps.Vnum
+        for ii=1:Ps.VarNum
             VsNew(:,ii,:)=Vs(:,ii,:)*newparms(length(tempparms)+ii);
         end;
     end;
 end;
 
 % Rescale space and time
-if(length(newparms)>length(tempparms)+Ps.Vnum)
-    PsNew.Lx = Ps.Lx * newparms(length(tempparms)+Ps.Vnum+1);
-    PsNew.Ly = Ps.Ly * newparms(length(tempparms)+Ps.Vnum+1);
+if(length(newparms)>length(tempparms)+Ps.VarNum)
+    PsNew.Lx = Ps.Lx * newparms(length(tempparms)+Ps.VarNum+1);
+    PsNew.Ly = Ps.Ly * newparms(length(tempparms)+Ps.VarNum+1);
 end;
 
 scaling = newparms./[tempparms; ones(length(newparms)-length(tempparms),1)];

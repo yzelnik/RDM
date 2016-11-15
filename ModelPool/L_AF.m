@@ -9,8 +9,8 @@ function VsOut=L_AF(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-if(~isfield(Es,'fmod'))
-   Es.fmod=0;
+if(~isfield(Es,'JacMode'))
+   Es.JacMode=0;
 end;
 
 % Initialization
@@ -18,7 +18,7 @@ B1=Vs(:,1);
 B2=Vs(:,2); 
 S1=Vs(:,3);
 S2=Vs(:,4);
-if(Es.fmod==0)      % Model equations
+if(Es.JacMode==0)      % Model equations
 
     dB1 = Ps.lamb1.*(1-(B2.^Ps.l_comp)./((Ps.k.*B1).^Ps.l_comp+B2.^Ps.l_comp+Ps.Br.^Ps.l_comp)).*B1.*S1.*(1 + Ps.eta1.*B1).^2.*(1 - B1) - B1;
     dB2 = Ps.lamb2.*(1-((Ps.k.*B1).^Ps.l_comp)./((Ps.k.*B1).^Ps.l_comp+B2.^Ps.l_comp+Ps.Br.^Ps.l_comp)).*B2.*S2.*(1 + Ps.eta2.*B2).^2.*(1 - B2) - Ps.mu2.*B2;

@@ -1,25 +1,25 @@
 function VsOut=M_InitFrontSt(Vs,Ps,Es,varargin)
 % Mix two states to form a front
-% Es.InitParms gives the relative part(s) of the two domains 
+% Es.InitPrm gives the relative part(s) of the two domains 
 % VsOut=M_InitFrontSt(Vs,Ps,Es)
 MinSysLen = 10;
 
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-if(~isfield(Es,'InitParms'))
-	Es.InitParms = [0.5];
+if(~isfield(Es,'InitPrm'))
+	Es.InitPrm = [0.5];
 end;
 
 % Make mask per variable
 mask=[];
-for ind=1:length(Es.InitParms)
-    tmpmask = BuildMask(Es.InitParms(ind),Ps);
+for ind=1:length(Es.InitPrm)
+    tmpmask = BuildMask(Es.InitPrm(ind),Ps);
     mask = [mask tmpmask];
 end;
-% If InitParms is not long enough, repeat the mask as necessary
-if(size(mask,2)<Ps.Vnum)
-    mask = [mask repmat(mask,1,Ps.Vnum-size(mask,2))];
+% If InitPrm is not long enough, repeat the mask as necessary
+if(size(mask,2)<Ps.VarNum)
+    mask = [mask repmat(mask,1,Ps.VarNum-size(mask,2))];
 end;
 
 % If only mean-field values are given for Vs

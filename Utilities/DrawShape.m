@@ -26,8 +26,8 @@ for ii=1:length(pnts)
 		if(ind>1)
 			if(wsmooth)
 				newx=(min(xs):ires:max(xs))';
-				bot=smooth(interp1(xs,mns,newx,'cubic'),ceil(wsmooth/ires));
-				top=smooth(interp1(xs,mxs,newx,'cubic'),ceil(wsmooth/ires));	
+				bot=smooth(interp1(xs,mns,newx,'PCHIP'),ceil(wsmooth/ires));
+				top=smooth(interp1(xs,mxs,newx,'PCHIP'),ceil(wsmooth/ires));	
 			else
 				newx=xs';
 				bot=mns';

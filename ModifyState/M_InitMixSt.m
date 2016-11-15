@@ -1,23 +1,23 @@
 function VsOut=M_InitMixSt(Vs,Ps,Es,varargin)
 % Mix two states to form a new initial conditions state
-% Es.InitParms should contain a full mask for this, or the parameters to form the mask
+% Es.InitPrm should contain a full mask for this, or the parameters to form the mask
 % VsOut=M_InitMixSt(Vs,Ps,Es)
 MinSysLen = 10;
 
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-if(~isfield(Es,'InitParms'))
-	Es.InitParms = [];
+if(~isfield(Es,'InitPrm'))
+	Es.InitPrm = [];
 end;
 
-% If InitParms is long enough, assume its a full ready mask, otherwise build a mask
-if(length(Es.InitParms)>MinSysLen)
-	mask = Es.InitParms;	
+% If InitPrm is long enough, assume its a full ready mask, otherwise build a mask
+if(length(Es.InitPrm)>MinSysLen)
+	mask = Es.InitPrm;	
 else
-	mask = BuildMask(Es.InitParms,Ps);
+	mask = BuildMask(Es.InitPrm,Ps);
 end;
-mask = repmat(mask,1,Ps.Vnum);
+mask = repmat(mask,1,Ps.VarNum);
 
 % If only mean-field values are given for Vs
 if(size(Vs,1)<MinSysLen)

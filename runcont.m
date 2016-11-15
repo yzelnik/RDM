@@ -1,65 +1,67 @@
 function [VsOut,BfData]=runcont(Vs,Ps,Es,varargin)
 % Follow points along a branch 
 % [BfData,VsOut]=runcont(Vs,Ps,Es)
-% Use some steady-state finding function (Es.SSfunc), with NewtonLoop as default
+% Use some steady-state finding function (Es.SsFunc), with NewtonLoop as default
 % Use a test function (Es.TestFunc) to get a measure/norm along the branch
-% Branch is followed along parameter Es.BFpar, in points specificed by Es.BFrange
+% Branch is followed along parameter Es.BfPrm, in points specificed by Es.BfRange
 
+if(~mod(nargin,2)) error('No default extra-input exists for runcont.'); end;
+    
 % Update online if necessary
-[~,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
+[Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
+% Make sure Ps parameters are properly setup
+[Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
+% Put in some default values of Es
+Es=InsertDefaultValues(Es,'BfMaxDiff',0,'TestFunc',@T_L2Norm);
+
+% In case we want to run several test functions
+if(iscell(Es.TestFunc))  
+    Es.TestList=Es.TestFunc;
+    Es.TestFunc=@T_GetStats;
+end;
+% Check if output should be continously written out to file
+WriteFlag = 0;
+if(isfield(Es,'BfOut') & Es.BfOut)
+	WriteFlag = 1;
+end;
 
 DefBifPoints = 100;
 
-if(isfield(Es,'TestFunc') && iscell(Es.TestFunc))  % Allow a lazy-access to GetStats
-	Es.TestList=Es.TestFunc;
-	Es.TestFunc=@T_GetStats;
-end;
-
-
-% Check if output should be continously written out to file
-WriteFlag = 0;
-if(isfield(Es,'BFout') & Es.BFout)
-	WriteFlag = 1;
-end;
-if(~isfield(Es,'BfMaxDiff') || isempty(Es.BfMaxDiff))
-	Es.BfMaxDiff = 0;   % max diff to stop continuation
-end;
-
-% get rid of grid-cells for Es.BFpar
-if(iscell(Es.BFpar)) 
-    parname=Es.BFpar{1};
-    % Assume we want to use the other BFpar's for further analysis inside each run
-    Es.BFpar=Es.BFpar(2:end);    
+% get rid of grid-cells for Es.BfPrm
+if(iscell(Es.BfPrm)) 
+    parname=Es.BfPrm{1};
+    % Assume we want to use the other BfPrm's for further analysis inside each run
+    Es.BfPrm=Es.BfPrm(2:end);    
 else
-    parname = Es.BFpar;
-    Es.BFpar= {};
+    parname = Es.BfPrm;
+    Es.BfPrm= {};
 end;
 
 
-% get rid of grid-cells for Es.BFrange
-if(iscell(Es.BFrange))  
-    if(length(Es.BFrange)>1)
-        error('Mult-parameter continuation (%s , %s) not supported',Es.BFrange{1},Es.BFrange{2});
+% get rid of grid-cells for Es.BfRange
+if(iscell(Es.BfRange))  
+    if(length(Es.BfRange)>1)
+        error('Mult-parameter continuation (%s , %s) not supported',Es.BfRange{1},Es.BfRange{2});
     else
-        Es.BFrange=Es.BFrange{1};
+        Es.BfRange=Es.BfRange{1};
     end;
 end;
 
-if(size(Es.BFrange,2)>4)
-    parrange = Es.BFrange(:);
-elseif (size(Es.BFrange,2)<3) % assume we only got first and last value
-    if(isfield(Es,'BFsmall') & Es.BFsmall)
-        parrange = (Es.BFrange(1):Es.BFsmall*((diff(Es.BFrange)>0)*2-1):Es.BFrange(2))';
+if(size(Es.BfRange,2)>4)
+    parrange = Es.BfRange(:);
+elseif (size(Es.BfRange,2)<3) % assume we only got first and last value
+    if(isfield(Es,'BfSmall') & Es.BfSmall)
+        parrange = (Es.BfRange(1):Es.BfSmall*((diff(Es.BfRange)>0)*2-1):Es.BfRange(2))';
     else % Or use some arbitary default value
-        parrange = (Es.BFrange(1):(Es.BFrange(2)-Es.BFrange(1))/(DefBifPoints-1):Es.BFrange(2))';
+        parrange = (Es.BfRange(1):(Es.BfRange(2)-Es.BfRange(1))/(DefBifPoints-1):Es.BfRange(2))';
     end;
 else % Or, we got first&last point, and total-number of points
-    parrange = (Es.BFrange(1):(Es.BFrange(2)-Es.BFrange(1))/(Es.BFrange(3)-1):Es.BFrange(2))';
+    parrange = (Es.BfRange(1):(Es.BfRange(2)-Es.BfRange(1))/(Es.BfRange(3)-1):Es.BfRange(2))';
 end;
 
-if(~isfield(Es,'SSfunc') || isempty(Es.SSfunc))
-	Es.SSfunc = @NewtonLoop;
-	Es.OLdraw = 0;
+if(~isfield(Es,'SsFunc') || isempty(Es.SsFunc))
+	Es.SsFunc = @runnewt;
+	Es.OlDraw = 0;
 end;
 
 
@@ -67,16 +69,14 @@ BfData=[];
 ii=1;
 stopflag=0;
 
+
 while((ii<=length(parrange)) && (~stopflag))
-    %disp(ii);
-    %disp([Es.BFpar '=' num2str(Es.BFrange(ii))]);
-	Vs = Vs + rand(size(Vs))*Es.STsmall;
+    %disp([Es.BfPrm '=' num2str(Es.BfRange(ii))]);
+	Vs = Vs + rand(size(Vs))*Es.StSmall*1e-3;
 	% Update paramater
 	Ps.(parname) = parrange(ii);
-    
-	% Run the system to SS
-	[VsOut,ExtData] = Es.SSfunc(Vs,Ps,Es);
-    
+  	% Run the system to SS
+	[VsOut,ExtData] = Es.SsFunc(Vs,Ps,Es);
     if(isempty(VsOut))
         BfData = [BfData; Ps.(parname) ExtData(:)'];
     else
@@ -99,13 +99,13 @@ while((ii<=length(parrange)) && (~stopflag))
         if(~isempty(VsOut))
             Vs = VsOut;
         else
-            if(~isempty(Es.BFpar))
-                [Vs,Ps,Es]=SaveParmList(Vs,Ps,Es,ExtData(1:length(Es.BFpar)));
+            if(~isempty(Es.BfPrm))
+                [Vs,Ps,Es]=SavePrmList(Vs,Ps,Es,ExtData(1:length(Es.BfPrm)));
             end;
         end;
     end;
 	if(WriteFlag)
-		dlmwrite(Es.BFout,BfData,'precision',5);
+		dlmwrite(Es.BfOut,BfData,'precision',5);
 	end;
     ii=ii+1;
 end;

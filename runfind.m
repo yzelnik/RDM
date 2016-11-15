@@ -3,20 +3,21 @@ function [StData,BfData]=runfind(Vs,Ps,Es,varargin)
 % and get it close to Es.FindVal(1) (default is 0) 
 % [StData,BfData]=runfind(Vs,Ps,Es)
 
+% Default first extra input is for search-function to use
+if(~mod(nargin,2)) varargin = ['Es.FindFunc' varargin]; end;
+    
 % Update online if necessary
-[~,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
+[Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
+% Make sure Ps parameters are properly setup
+[Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
+% Put in some default values of Es
+Es=InsertDefaultValues(Es,'FindFunc',@runflow,'FindVal',0);
+
 Es.InitActive  = 0; % Allow states to be updated if necessary
 
-if(~isfield(Es,'FindFunc') || isempty(Es.FindFunc))
-    Es.FindFunc = @runflow;      % By default use runflow for each scenario
-end;
-
-if(~isfield(Es,'FindVal') || isempty(Es.FindVal))
-    Es.FindVal = 0;         % By default get value as close to zero as possible
-end;
 if(length(Es.FindVal)<2)   % Define threshold value for search on the Bf-parameter(s)
-    if(isfield(Es,'BFsmall') && ~isempty(Es.BFsmall))
-        Es.FindVal(2)= Es.BFsmall;
+    if(isfield(Es,'BfSmall') && ~isempty(Es.BfSmall))
+        Es.FindVal(2)= Es.BfSmall;
     else
         Es.FindVal(2)= 1e-4;
     end;
@@ -32,8 +33,8 @@ if((Es.FindVal(2)==inf)&&(Es.FindVal(3)==inf))
 	error('Both thresholds cannot be infinity');
 end;
         
-if(~iscell(Es.BFpar))   % Wrap in cell array if not already in one
-    Es.BFpar={Es.BFpar};
+if(~iscell(Es.BfPrm))   % Wrap in cell array if not already in one
+    Es.BfPrm={Es.BfPrm};
 end;
 
 % Load initial values from the available values at Ps
@@ -41,8 +42,8 @@ initvals = LoadParmList(Vs,Ps,Es);
 
 if(isnan(Es.FindVal(3)))
     % Run a heuristic minimization (no derivatives assumed)
-    if(isfield(Es,'BFsmall') && Es.BFsmall>0)
-        stepsize = Es.BFsmall*10;
+    if(isfield(Es,'BfSmall') && Es.BfSmall>0)
+        stepsize = Es.BfSmall*10;
     else
         stepsize = 1e-3;
     end;
@@ -146,16 +147,16 @@ end
 
 %%%%%%%%%%%  TO DELETE
 
-%for jj=1:length(Es.BFpar)
+%for jj=1:length(Es.BfPrm)
 %	tmpval=curpars(jj);
-%    if(isnumeric(Es.BFpar{jj})) % Allow access to model-parameters by index
+%    if(isnumeric(Es.BfPrm{jj})) % Allow access to model-parameters by index
 %        tmpfield=fieldnames(Ps);
-%        Ps.(tmpfield{3+Es.BFpar{jj}})=tmpval;
+%        Ps.(tmpfield{3+Es.BfPrm{jj}})=tmpval;
 %    else
-%        if(isempty(strfind(Es.BFpar{jj},'.')) && ~strcmp(Es.BFpar{jj},'Vs'))
-%            Ps.(Es.BFpar{jj}) = tmpval;  % for parameters in Ps (Prefereable)
+%        if(isempty(strfind(Es.BfPrm{jj},'.')) && ~strcmp(Es.BfPrm{jj},'Vs'))
+%            Ps.(Es.BfPrm{jj}) = tmpval;  % for parameters in Ps (Prefereable)
 %        else
-%            eval(sprintf('%s=tmpval;',Es.BFpar{jj}));
+%            eval(sprintf('%s=tmpval;',Es.BfPrm{jj}));
 %        end;
 %    end;
 %end;
@@ -165,16 +166,16 @@ end
 
 %function initvals=GetInitVals(Vs,Ps,Es) 
 
-%for jj=1:length(Es.BFpar)
+%for jj=1:length(Es.BfPrm)
 	
- %   if(isnumeric(Es.BFpar{jj})) % Allow access to model-parameters by index
+ %   if(isnumeric(Es.BfPrm{jj})) % Allow access to model-parameters by index
   %      tmpfield=fieldnames(Ps);
-  %      tmpval=Ps.(tmpfield{3+Es.BFpar{jj}});
+  %      tmpval=Ps.(tmpfield{3+Es.BfPrm{jj}});
   %  else
-  %      if(isempty(strfind(Es.BFpar{jj},'.')) && ~strcmp(Es.BFpar{jj},'Vs'))
-  %          tmpval=Ps.(Es.BFpar{jj});  % for parameters in Ps (Prefereable)
+  %      if(isempty(strfind(Es.BfPrm{jj},'.')) && ~strcmp(Es.BfPrm{jj},'Vs'))
+  %          tmpval=Ps.(Es.BfPrm{jj});  % for parameters in Ps (Prefereable)
   %      else
-  %          eval(sprintf('tmpval=%s;',Es.BFpar{jj}));
+  %          eval(sprintf('tmpval=%s;',Es.BfPrm{jj}));
   %      end;
   %  end;
   %  initvals(jj)=tmpval;

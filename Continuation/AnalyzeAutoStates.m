@@ -7,14 +7,14 @@ function points=AnalyzeAutoStates(filename,Ps,Es,AnlFunc,ExtFunc,inds,updates,va
 % Update online if necessary
 [Vs,Ps,Es]=UpdateParameters([],Ps,Es,varargin{:});
 
-if(~isfield(Es,'AUTO'))
-	Es.AUTO=[];
+if(~isfield(Es,'Auto'))
+	Es.Auto=[];
 end;
 
 % Read AUTO states file
 [states,tags]=ReadAutoStates(sprintf('s.%s',filename),Ps,Es,0);
 
-if strcmp(Es.AUTO,'notags')
+if strcmp(Es.Auto,'notags')
 	tmppoints=ReadAutoBif(sprintf('b.%s',filename),[0 inds(:)']);
 	tags = find(tmppoints(:,1));
 	tmppoints = tmppoints(:,2:end);

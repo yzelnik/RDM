@@ -8,8 +8,8 @@ function VsOut=L_MK(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-if(~isfield(Es,'fmod'))
-   Es.fmod=0;
+if(~isfield(Es,'JacMode'))
+   Es.JacMode=0;
 end;
 
 % Initilization
@@ -17,7 +17,7 @@ end;
 B=Vs(:,1); 
 W=Vs(:,2); 
 
-if(Es.fmod==0)      % Model equations
+if(Es.JacMode==0)      % Model equations
 
     dB = W.*B.*B - Ps.m.*B;
     dW = Ps.a - W - W.*B.*B;

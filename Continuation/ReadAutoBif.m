@@ -1,9 +1,9 @@
-function points=ReadAutoBif(filename,inds,mult,badtext)
+function points=ReadAutoBif(filename,inds,mult,BadText)
 % Read AUTO Bifurication file (usually b.name or fort.7)
 % points=ReadAutoBif(filename,inds)
 % Return the values of fields given in inds of all the points in the file
 if(nargin<3) mult=0; end; % seperate to branches?
-if(nargin<4) badtext=0; end; % try to repair bad-text?
+if(nargin<4) BadText=0; end; % try to repair bad-text?
 
 % Initialization
 if(nargin<2)
@@ -31,11 +31,12 @@ while (tline~=-1)
     
 	% If this line has info (first number not zero)
 	if(flag~=0)
-        if(badtext>0)  % Fix up the problems with the missing "E"
+        if(BadText>0)  % Fix up the problems with the missing "E"
             tline=RepairLine(tline,max(inds)); 
         end;
 		% Scan line and take in the fields specified in inds
 		tmp = sscanf(tline,inform);
+
 		points = [points;tmp(inds+4)'];
 	end;
     counter = [counter;flag];

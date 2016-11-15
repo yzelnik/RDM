@@ -14,7 +14,7 @@ B1=Vs(:,1);
 B2=Vs(:,2); 
 W =Vs(:,3); 
 
-if(Es.fmod==0)      % Model equations
+if(Es.JacMode==0)      % Model equations
 
     dB1 = Ps.ni.*B1.*(1 + Ps.eta1.*B1).*(1 - B1./Ps.K1).*(1 - B2./(B1 + B2 + Ps.xhi)).*W - Ps.mu.*B1; 
     dB2 = Ps.ni.*B2.*(1 + Ps.eta2.*B2).*(1 - B2./Ps.K2).*(1 - B1./(B1 + B2 + Ps.xhi)).*W - Ps.mu.*B2; 

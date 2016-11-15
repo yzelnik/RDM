@@ -2,7 +2,7 @@ function regmax=T_LargestRegions(Vs,Ps,Es,varargin)
 % Returns the size of the largest regions in a given state 
 % The first is of the positive region, the second of the negative one
 % The size of both is given as the fraction of the whole system
-% Region segmentation is done on the variable given by Es.Vind
+% Region segmentation is done on the variable given by Es.VarInd
 % A threshold of the average of max and min values of the variable is used
 
 % Update online if necessary

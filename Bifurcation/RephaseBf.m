@@ -1,6 +1,6 @@
 function newbf=RephaseBf(bfdst,bforg,Es,varargin)
 % Add in "fake" phase values for one bif file (bfdst) based on another bif file (bforg)
-% Using Es.fmod=1 can help results significantly (but may be slow)
+% Using Es.RephaseMode=1 can help results significantly (but may be slow)
 % newbf=RephaseBf(bfdst,bforg,Es)
 
 if(nargin<3)
@@ -13,8 +13,8 @@ if(~isfield(Es,'BfFields'))
  	Es.BfFields=[1,2];
 end;
 
-if(~isfield(Es,'fmod'))
-   Es.fmod=0;
+if(~isfield(Es,'RephaseMode'))
+   Es.RephaseMode=0;
 end;
 
 
@@ -41,9 +41,9 @@ for ii=1:length(bforg)	% Go over each bf array
 	org2dst_dist=pdist2(bforg{ii}(:,Es.BfFields),bfdst{ii}(:,Es.BfFields),'seuclidean');	% calculate dist between points
     %imagesc(org2dst_dist);
     %pause;
-    if(Es.fmod==0)  % simple straight-forward method: find min distance per point
-    	[minval,minind]=min(org2dst_dist);	% Find min dist per pair
-        imagesc(org2dst_dist)
+    if(Es.RephaseMode==0)  % simple straight-forward method: find min distance per point
+    	[~,minind]=min(org2dst_dist);	% Find min dist per pair
+        %imagesc(org2dst_dist)
     else            % find consecutive (monotonic) points
         clear minind;
         dstind=1;
@@ -63,12 +63,7 @@ for ii=1:length(bforg)	% Go over each bf array
         %pause;
        
     end;
-    %size(minind)
-    %[minval,minind]=min(org2dst_dist);	
-    %plot(minind);
-    %pause;
-    %size(minind)
-
+ 
 	newphs = bforg{ii}(minind,end);		% Get "fake" phases from min-pairs
 	newbf{ii} = [bfdst{ii} newphs];		% Add fake phases to dstbf
 end;

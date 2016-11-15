@@ -6,7 +6,7 @@ function VsOut = M_InitRndSt(Vs,Ps,Es,varargin)
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
 if(~isfield(Es,'StNoise'))	
-	Es.StNoise = Es.STsmall;
+	Es.StNoise = Es.StSmall;
 end;
 Es.StNoise = [Es.StNoise(:)' 0 0];
  
@@ -22,7 +22,7 @@ end;
 VsOut = VsTmp + (rand(size(VsTmp))*2-1)*Es.StNoise(1); 
 
 % If we know variables are positive, make sure they remain so	
-if((isfield(Es,'posflag')) & (Es.posflag))
+if((isfield(Es,'NonNeg')) & (Es.NonNeg))
 	VsOut = max(0,VsOut);
 end;
 

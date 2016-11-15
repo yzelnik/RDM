@@ -1,19 +1,20 @@
 function regsize=T_ZeroStateSize(Vs,Ps,Es,varargin)
 % Returns the size of the (largest) zero-domain in a given state 
 % The size is given as the fraction of the whole system
-% Region segmentation is done on the variable given by Es.Vind
-% A threshold used is the geometric mean of Es.STsmall and max(abs) value of state
+% Region segmentation is done on the variable given by Es.VarInd
+% A threshold used is the geometric mean of Es.StSmall and max(abs) value of state
 
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
 
-if (~isfield(Es,'Vind'))
-    Es.Vind = 1;
+if (~isfield(Es,'VarInd'))
+    Es.VarInd = 1;
 end;
 
+% Calculate the geometric mean of the following:
+thresh = sqrt(Es.StSmall * max(abs(Vs(:,Es.VarInd))));
 
-thresh = geomean([Es.STsmall max(abs(Vs(:,Es.Vind)))]);
 % Segment the state into positive and negative regions
 regs = SegmentRegions(abs(Vs),Ps,Es,'Es.SegThresh',thresh);
 
@@ -31,6 +32,6 @@ else
 end;
 
 % Alternative (simpler) version, just return precentage that's close to 0
-%regsize = mean(abs(Vs(:,Es.Vind))<thresh);
+%regsize = mean(abs(Vs(:,Es.VarInd))<thresh);
 
 end

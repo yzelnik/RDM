@@ -13,7 +13,7 @@ function VsOut=L_TMM(Vs,Ps,Es,varargin)
 U=Vs(:,1); 
 V=Vs(:,2); 
 
-if(Es.Jcob==0)
+if(Es.JacMode==0)
 % Model equations
 
 dU = Ps.a - U - Ps.rho.*U.*V./(1 + U + Ps.K.*U.^2);

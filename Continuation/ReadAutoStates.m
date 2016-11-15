@@ -6,8 +6,8 @@ function [states, indx]=ReadAutoStates(filename,Ps,Es,pnts,varargin)
 % Update online if necessary
 [~,Ps,Es]=UpdateParameters([],Ps,Es,varargin{:});
 
-if(~isfield(Es,'badtext')) % fix AUTO's bad-text problem (for very small/big values)
-   Es.badtext=0;
+if(~isfield(Es,'BadText')) % fix AUTO's bad-text problem (for very small/big values)
+   Es.BadText=0;
 end;
 
 % Initialization
@@ -16,7 +16,7 @@ if(nargin<4)
 end;
 abit    = 0.001;        % a very small value, used for interpolation
 linelen = 16;           % the number of parms in an info line (before each state)
-vrnum   = Ps.Vnum;      % how many variables to read per row
+vrnum   = Ps.VarNum;      % how many variables to read per row
 fsize   = Ps.Nx;        % how many points to interpolate into
 maxpnt  = max(pnts);    % how many different states to try and read
 
@@ -39,7 +39,7 @@ indx   = [];
 while((length(infoline)==linelen) && ((pnts(1)==0)||(ind<maxpnt)))
 	indx = [indx infoline(2)]; % Add this state's index
     % read data of state
-    if(Es.badtext==0)
+    if(Es.BadText==0)
     	[tmpst(:),~] = fscanf(fin,'%f',rsz*wid);    % Faster better method
     else
         tmpst = ReadSingleState(fin,rsz,wid)';  % Much slower, but works with bad files
@@ -50,7 +50,7 @@ while((length(infoline)==linelen) && ((pnts(1)==0)||(ind<maxpnt)))
 	states = cat(3,states,interp1(Xs,Ys,(0:(fsize-1))'/fsize));
 	
     % read through data that comes at the end of each state, that we do not use
-    if(Es.badtext==0)
+    if(Es.BadText==0)
     	 fscanf(fin,'%f',rsz*(wid-1)+extra);
     else
         for ii=1:(rsz+lines) fgetl(fin); end;

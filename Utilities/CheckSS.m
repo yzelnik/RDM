@@ -9,9 +9,9 @@ function [Out,Score]=CheckSS(Vs,Ps,Es,varargin)
 V1 = Vs(:,:,1);
 V2 = Vs(:,:,2);
 
-Score = max(max(abs((V2-V1))));%./max(abs(V2),Es.STsmall))));
-%disp([max(abs(V2(1)),Es.STsmall)])% Score mean(mean(abs((V2-V1)./max(abs(V2),Es.STsmall))))])
-if Score<Es.SSthresh
+Score = max(max(abs((V2-V1))));%./max(abs(V2),Es.StSmall))));
+%disp([max(abs(V2(1)),Es.StSmall)])% Score mean(mean(abs((V2-V1)./max(abs(V2),Es.StSmall))))])
+if Score<Es.SsThresh
     Out=1;
 else
     Out=0;

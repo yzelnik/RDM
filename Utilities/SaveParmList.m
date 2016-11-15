@@ -1,18 +1,21 @@
 function [Vs,Ps,Es]=SaveParmList(Vs,Ps,Es,vallist,namelist)
 % Save a list of parameters into Ps/Es
-% [Vs,Ps,Es]=SaveParmList(Vs,Ps,Es,vallist,namelist)
-% vallist is a vector of parameter values (otherwise Es.ParmList is used)
-% namelist is a cell array of parameter names (otherwise Es.BFpar is used)
-% If Es.ParInCell exists and is non-zero, then it points to values as Es.CellData
+% [Vs,Ps,Es]=SavePrmList(Vs,Ps,Es,vallist,namelist)
+% vallist is a vector of parameter values (otherwise Es.PrmList is used)
+% namelist is a cell array of parameter names (otherwise Es.BfPrm is used)
+% If Es.PrmInCell exists and is non-zero, then it points to values as Es.CellData
 % A proper text name is assumed to be a Ps variable (unless it is "Vs")
 % A numerical value acts as a pointer in the Ps structure (offset by +3)
-% Anything else is directly evaluated using eval (not as safe) such as: Ds(2)
-if(nargin<4) vallist = Es.ParmList; end;
-if(nargin<5) namelist = Es.BFpar; end;
+% Anything else is directly evaluated using eval (not as safe) such as: Ps.Ds(2)
+if(nargin<4) vallist = Es.PrmList; end;
+if(nargin<5) namelist = Es.BfPrm; end;
+
+% Do we have parameters who's values are given in cell-arrays?
+Es=InsertDefaultValues(Es,'PrmInCell',zeros(length(Es.BfPrm),1));
 
 for jj=1:length(namelist)
-	if(isfield(Es,'ParInCell') && Es.ParInCell(jj))
-        tmpval=Es.CellData{Es.ParInCell(jj)}{vallist(jj)};
+	if(Es.PrmInCell(jj))
+        tmpval=Es.CellData{Es.PrmInCell(jj)}{vallist(jj)};
     else
         tmpval=vallist(jj);
 	end;

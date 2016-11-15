@@ -8,7 +8,7 @@ MaxNewtonIter = 1000;    % Arbitary limit for newton loop
 tic;
 
 %%% Variable transformation
-if(Ps.Vnum==1) && (~isfield(Es,'TransDef'))
+if(Ps.VarNum==1) && (~isfield(Es,'TransDef'))
 % If no transformation is defined, but we have only 1 variable, 
 % then assume a SH-like model, so transform it to a 2-variable system (u,v) where u=v''
     Es.TransDef = [1 3]; 
@@ -16,11 +16,11 @@ end;
 
 if isfield(Es,'TransDef')   % Transform to a new variable set if needed
     Vs = TransformVar(Vs,Ps,Es,Es.TransDef);
-    Ps.Vnum = length(Es.TransDef);
+    Ps.VarNum = length(Es.TransDef);
 end;
 
 %figure(55);
-%plotst(Vs(:,2),Ps,Es,1,'Ps.Vnum',1);
+%plotst(Vs(:,2),Ps,Es,1,'Ps.VarNum',1);
 %pause;
 
 %%% Deal with p2p init function
@@ -91,7 +91,7 @@ if(Ps_p2p.Nx~=Ps.Nx || Ps_p2p.Ny~=Ps.Ny)
 end;
 
 % Go over each variable, wrap it with the correct edges, and put it in 
-for ii=1:Ps_p2p.Vnum
+for ii=1:Ps_p2p.VarNum
     %size(reshape(Vs(:,ii),Ps_p2p.Nx,Ps_p2p.Ny))
     %size(Vs(1:Ps_p2p.Ny:end,ii))
     %size(Vs(1:Ps_p2p.Ny,ii)')

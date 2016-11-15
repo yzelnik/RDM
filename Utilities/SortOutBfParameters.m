@@ -1,7 +1,7 @@
 function Es=SortOutBfParameters(Es)
-% Deal with Es.BFpar and Es.BFrange, putting it in standard format
+% Deal with Es.BfPrm and Es.BfRange, putting it in standard format
 % This function is called by runpar
-% Three formats are supported for Es.BFrange, for parm # of N (in Es.BFpar):
+% Three formats are supported for Es.BfRange, for parm # of N (in Es.BfPrm):
 % 1) Specific points. N columns, each row is a point in parameter space
 % 2) N columns of size 3 or 4. Format is: [LowVal; HighVal; NumVal; Type]
 %    Where NumVal gives the number of evaluations, and Type is either:
@@ -13,56 +13,44 @@ function Es=SortOutBfParameters(Es)
 %    If NumVal=0, then no new points are formed for this parameter
 % 3) Cell array. N cell arrays, each per parameter, with format as 2) above
 
-
-% setup randomization issues (relevant if parameters are randomly chosen)
-if(~isfield(Es,'RandSeed'))
-    Es.RandSeed=0;
-end;
-if(Es.RandSeed(1)==0)   
-    rng('shuffle');         % Get unique (set by time) seed    
-else
-    rng(Es.RandSeed(1));	% Randomize with a pre-defined seed
-end;
-
 % Wrap in cell-array format for convenience 
-if(~iscell(Es.BFpar))  
-    Es.BFpar={Es.BFpar};
-end;
-if(~isfield(Es,'ParInCell')) % Do we have parameters who's values are given in cell-arrays?
-    Es.ParInCell=zeros(length(Es.BFpar),1);
+if(~iscell(Es.BfPrm))  
+    Es.BfPrm={Es.BfPrm};
 end;
 
+% Do we have parameters who's values are given in cell-arrays?
+Es=InsertDefaultValues(Es,'PrmInCell',zeros(length(Es.BfPrm),1));
 
-% If Es.BFrange is one row (not cell) that's probably just a mistake to fix
-if(~iscell(Es.BFrange) && size(Es.BFrange,1)==1)
-    Es.BFrange=Es.BFrange';
+% If Es.BfRange is one row (not cell) that's probably just a mistake to fix
+if(~iscell(Es.BfRange) && size(Es.BfRange,1)==1)
+    Es.BfRange=Es.BfRange';
 end;
 
-% If Es.BFrange is in (2) format, change it into (3) format for convenience 
-if(~iscell(Es.BFrange) && size(Es.BFrange,1)<5)
-    for ii=1:size(Es.BFrange,2)
-        tmp{ii}=Es.BFrange(:,ii);
+% If Es.BfRange is in (2) format, change it into (3) format for convenience 
+if(~iscell(Es.BfRange) && size(Es.BfRange,1)<5)
+    for ii=1:size(Es.BfRange,2)
+        tmp{ii}=Es.BfRange(:,ii);
     end;
-    Es.BFrange=tmp;
+    Es.BfRange=tmp;
 end;
 
 curnum=1; % number of different values of parameter  
 
-if(iscell(Es.BFrange))  % Now if we're in (3) format (or (2), in effect)
-    for ii=1:length(Es.BFrange)
-        if(iscell(Es.BFrange{ii}))  % if we got a cell-array within cell-array
+if(iscell(Es.BfRange))  % Now if we're in (3) format (or (2), in effect)
+    for ii=1:length(Es.BfRange)
+        if(iscell(Es.BfRange{ii}))  % if we got a cell-array within cell-array
             if(~isfield(Es,'CellData'))
                 Es.CellData={}; % Create the Es.CellData if needed
             end;
             curcel = length(Es.CellData)+1;
-            curlen = length(Es.BFrange{ii});
-            Es.CellData{curcel}=Es.BFrange{ii}; % move cell-arr into its proper place
-            Es.BFrange{ii}=[1;curlen;-curcel;0]; % now make the proper arangements in Es.BFrange.
+            curlen = length(Es.BfRange{ii});
+            Es.CellData{curcel}=Es.BfRange{ii}; % move cell-arr into its proper place
+            Es.BfRange{ii}=[1;curlen;-curcel;0]; % now make the proper arangements in Es.BfRange.
         end;
-        tmp = [Es.BFrange{ii}(:) ; 0]; % Padd with zero (for regular grid)
+        tmp = [Es.BfRange{ii}(:) ; 0]; % Padd with zero (for regular grid)
         
         if(tmp(3)<0) % This a "special" type of parameter, given in celldata (-tmp(3))
-            Es.ParInCell(ii)=-tmp(3); % "pointer" to where the data is located
+            Es.PrmInCell(ii)=-tmp(3); % "pointer" to where the data is located
             curnum=tmp(2);
         end
         if(tmp(3)>0) 
@@ -77,14 +65,15 @@ if(iscell(Es.BFrange))  % Now if we're in (3) format (or (2), in effect)
             % cuttoff at range edges, tmp(4)=0.5 is four std inside range
             parvals = ((randn(curnum,1)*tmp(4)+2)/4*(tmp(2)-tmp(1))+tmp(1));
             parvals = min(max(parvals,min(tmp(1:2))),max(tmp(1:2)));
-        elseif(tmp(4)>2)    
-            % logaritmic spacing (non-random), consecutive multplication = tmp(4)/tmp(3)
-            parvals = tmp(4).^(((1:tmp(3))./tmp(3)))/tmp(4)*(tmp(2)-tmp(1))+tmp(1);
+        elseif(tmp(4)>2)    % logaritmic spacing (non-random), consecutive multplication = tmp(4)/tmp(3)
+            % create series from 0 to 1, each jump larger than the last
+            zerotoone=tmp(4).^(((0:(tmp(3)-1))./(tmp(3)-1)))/(tmp(4)-1)-1/(tmp(4)-1);
+            parvals = zerotoone'*(tmp(2)-tmp(1))+tmp(1);
         elseif(isnan(tmp(4))) % each point follows seperation from previous parameter (same distances) 
-            tmpvals = (parvals-Es.BFrange{ii-1}(1))/(Es.BFrange{ii-1}(2)-Es.BFrange{ii-1}(1)); % normalize
+            tmpvals = (parvals-Es.BfRange{ii-1}(1))/(Es.BfRange{ii-1}(2)-Es.BfRange{ii-1}(1)); % normalize
             parvals = tmpvals*(tmp(2)-tmp(1))+tmp(1);
         else
-            error('Unidentified type of value distribution for param: "%s" given by %.2f.',Es.BFpar{ii},tmp(4));
+            error('Unidentified type of value distribution for param: "%s" given by %.2f.',Es.BfPrm{ii},tmp(4));
         end;  
         
         if(ii==1)
@@ -102,8 +91,8 @@ if(iscell(Es.BFrange))  % Now if we're in (3) format (or (2), in effect)
         
     end;
 else % Or if we're in (1) format
-    totvals = Es.BFrange;
+    totvals = Es.BfRange;
 end;
 
-Es.BFparvals = totvals;
+Es.BfVal = totvals;
 end

@@ -7,11 +7,11 @@ function [res,sm]=T_InOutPhase(Vs,Ps,Es,varargin)
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
 
-if( (~isfield(Es,'Vind')) | (Es.Vind<2) )
-	Es.Vind = [1 2];
+if( (~isfield(Es,'VarInd')) | (Es.VarInd<2) )
+	Es.VarInd = [1 2];
 end;
 
-sm = mean((normcol(Vs(:,Es.Vind(1),1))-0.5).*(normcol(Vs(:,Es.Vind(2),1))-0.5)); 
+sm = mean((normcol(Vs(:,Es.VarInd(1),1))-0.5).*(normcol(Vs(:,Es.VarInd(2),1))-0.5)); 
 res = sm>0;
 
 end

@@ -5,31 +5,31 @@ function Out=S_SG(Vs,Ps,Es)
 % The H variable is assumed to the be last one, unless specified with Ps.H2
 % The array Ps.Ds is assumed to contain the diffusion rates of the different reactants 
 
-if(~isfield(Ps,'NLD'))
-    Ps.NLD=0;
+if(~isfield(Ps,'Nld'))
+    Ps.Nld=0;
 end;
 if(~isfield(Ps,'H2') || Ps.H2==0)
-   Ps.H2=Ps.Vnum; % By defauly the H^2 field is assumed to be the last one
+   Ps.H2=Ps.VarNum; % By defauly the H^2 field is assumed to be the last one
 end;
 
 if(isfield(Es,'SetupMode') && Es.SetupMode)
     % Pre caclculate spatial matrix, for future use
    Out = Ps;
    Out.Derv2Mat = DervSM(2,Ps,Es);
-   if(Ps.NLD==0) % More direct way, just apply second derivative on H^2
+   if(Ps.Nld==0) % More direct way, just apply second derivative on H^2
 
    else          % Less direct, calculate SM including values of H
-       disp('NLD !');
+       disp('Nld !');
        
        %len=Ps.Nx*Ps.Ny;
        %Out.SpaMat = BuildDynamicSM(Out,Es);
        %dervh = Out.Derv2Mat*Vs(:,Ps.H2);
        %size(dervh)
        %Out.SpaMat((Ps.H2-1)*len+(1:len),(Ps.H2-1)*len+(1:len)) = dervh;
-       Es.fmod=1;
+       Es.JacMode=1;
        Es.SetupMode=0;
        Out.SpaMat=S_SG(Vs,Out,Es);
-       Es.fmod=0;
+       Es.JacMode=0;
        
    end;
 else            % Normal run
@@ -39,10 +39,10 @@ else            % Normal run
         Ps.Derv2Mat = DervSM(2,Ps,Es);
    end;
    
-   if(~isfield(Es,'fmod') || (Es.fmod==0))	% Model equations
-        if(Ps.NLD==0)
+   if(~isfield(Es,'JacMode') || (Es.JacMode==0))	% Model equations
+        if(Ps.Nld==0)
             Out = [];
-            for ind=1:Ps.Vnum
+            for ind=1:Ps.VarNum
                 if(ind==Ps.H2)
                     tmpout = Ps.Derv2Mat*(Vs(:,ind).^2).*Ps.Ds(ind);
                 else
@@ -51,15 +51,15 @@ else            % Normal run
             Out  = [Out tmpout];
             end;
         else % Use the jacobian as the SM
-            Es.fmod=1;
+            Es.JacMode=1;
             Out=S_SG(Vs,Ps,Es);
-            Es.fmod=0;
+            Es.JacMode=0;
         end;
    else			% Jacobian of equations
        
-        Out = sparse(len*Ps.Vnum,len*Ps.Vnum);
+        Out = sparse(len*Ps.VarNum,len*Ps.VarNum);
         d2    = Ps.Derv2Mat;
-        for ind=1:Ps.Vnum
+        for ind=1:Ps.VarNum
             if(ind==Ps.H2)
                 H     = Vs(:,ind);
                 d1    = DervSM(1,Ps,Es);
@@ -83,7 +83,7 @@ end
 
 function sm = BuildDynamicSM(Ps,Es)
 len=Ps.Nx*Ps.Ny;
-for ii=1:Ps.Vnum	
+for ii=1:Ps.VarNum	
     if(ii==Ps.H2)
         % Put in derivative sub-matrix in a block-diagonal fashion
         sm((ii-1)*len+(1:len),(ii-1)*len+(1:len)) = Ps.Derv2Mat*Ps.Ds(ii);

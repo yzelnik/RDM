@@ -16,7 +16,7 @@ N1 = Vs(:,1);
 N2 = Vs(:,2); 
 S  = Vs(:,3); 
 
-if(Es.Jcob==0)
+if(Es.JacMode==0)
 % Model equations
 
 dN1 = N1.*(Ps.p1.*(Ps.m./(Ps.m + S)) - Ps.a11.*N1 - Ps.a12.*N2);

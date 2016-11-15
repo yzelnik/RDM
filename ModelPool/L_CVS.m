@@ -24,7 +24,7 @@ else
     Ps.AlphaB = 0;
 end
 
-if(Es.Jcob==0)
+if(Es.JacMode==0)
 	% Model equations
 	g = 0.5.*(tanh(Ps.d.*(Ps.Vc-V))+1);
 

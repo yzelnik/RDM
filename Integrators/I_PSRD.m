@@ -1,8 +1,9 @@
 function VsOut=I_PSRD(Vs,Ps,Es,varargin)
-% Integrator - Pseudo-Spectral method for Reaction-Diffusion
+% Integrator - Pseudo-Spectral method for Reaction-Diffusion / Linear-Diffusion
 % Based on code by Aly-Khan Kassam (Solving reaction-diffusion equations 10 times faster)
 % VsOut=I_PSRD(Vs,Ps,Es)
-% The non-local part is assumed to be diffusion in periodic boundary conditions
+% The non-local part is assumed to be diffusion in periodic boundary conditions,
+% or (if length(Ps.Ds)>Ps.VarNum), linear derivatives up to the fourth order 
 
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
@@ -13,17 +14,17 @@ if(isfield(Es,'SetupMode') && Es.SetupMode)
     VsOut = Ps; % This is a "misuse" of the name, but we just want to return the "new" Ps struct
     
 else        % Normal run
-    if(~isfield(Ps,'SpaData') || isempty(Ps.SpaData) || ~isfield(Ps.SpaData,'h') || ~(Ps.SpaData.h==Es.Tstep) )  
+    if(~isfield(Ps,'SpaData') || isempty(Ps.SpaData) || ~isfield(Ps.SpaData,'h') || ~(Ps.SpaData.h==Es.TsSize) )  
         Ps=GetSpaData(Vs,Ps,Es);    % Run subfunction if needed (running this way is best avoided)
     end;
     
     % Initialization
-    Vnum = Ps.Vnum;
-    tmax = Es.Tdest;
+    VarNum = Ps.VarNum;
+    tmax = Es.TimeDst;
     nmax = round(tmax/Ps.SpaData.h);
     tlen = Ps.Nx*Ps.Ny;
     
-    for ii=1:Vnum
+    for ii=1:VarNum
         Us{ii}=fftn(reshape(Vs(:,ii),Ps.Nx,Ps.Ny)); 
     end;
     %==================== TIME STEPPING LOOP =======================
@@ -32,13 +33,13 @@ else        % Normal run
         t=n*Ps.SpaData.h;
         
         
-        for ii=1:Vnum   % Bring data back to real space and reshape
+        for ii=1:VarNum   % Bring data back to real space and reshape
             Ts(:,ii)=reshape(ifftn(Us{ii}),tlen,1); 
         end;
         % Run local part
         TTs=Ps.LocFunc(Ts,Ps,Es);
         % Run first spatial part
-        for ii=1:Vnum  
+        for ii=1:VarNum  
             Nvs{ii}=fftn(reshape(TTs(:,ii),Ps.Nx,Ps.Ny));		%Nonlinear evaluation. g(u,*)
             As{ii}=Ps.SpaData.EE1s{ii}.*Us{ii} + Ps.SpaData.Qs{ii}.*Nvs{ii};          %Coefficient 'a' in ETDRK formula 	
             Ts(:,ii)=reshape(ifftn(As{ii}),tlen,1);             % Reshape before running local part
@@ -46,7 +47,7 @@ else        % Normal run
         % Run local part
         TTs=Ps.LocFunc(Ts,Ps,Es);
         % Run second spatial part
-        for ii=1:Vnum
+        for ii=1:VarNum
             Nas{ii}=fftn(reshape(TTs(:,ii),Ps.Nx,Ps.Ny));		%Nonlinear evaluation. g(a,*)
             Bs{ii}=Ps.SpaData.EE1s{ii}.*Us{ii} + Ps.SpaData.Qs{ii}.*Nvs{ii};          %Coefficient 'b' in ETDRK formula
             Ts(:,ii)=reshape(ifftn(Bs{ii}),tlen,1);             % Reshape before running local part
@@ -54,7 +55,7 @@ else        % Normal run
         % Run local part
         TTs=Ps.LocFunc(Ts,Ps,Es);
         % Run third spatial part
-        for ii=1:Vnum
+        for ii=1:VarNum
             Nbs{ii}=fftn(reshape(TTs(:,ii),Ps.Nx,Ps.Ny));			%Nonlinear evaluation. g(b,*)
             Cs{ii}=Ps.SpaData.EE1s{ii}.*As{ii} + Ps.SpaData.Qs{ii}.*(2*Nbs{ii}-Nvs{ii});	%Coefficient 'c' in ETDRK formula
             Ts(:,ii)=reshape(ifftn(Cs{ii}),tlen,1);                 % Reshape before running local part
@@ -62,7 +63,7 @@ else        % Normal run
         % Run local part
         TTs=Ps.LocFunc(Ts,Ps,Es);
         % Run final spatial part
-        for ii=1:Vnum
+        for ii=1:VarNum
             Ncs{ii}=fftn(reshape(TTs(:,ii),Ps.Nx,Ps.Ny));			%Nonlinear evaluation. g(c,*)
             Us{ii}=Ps.SpaData.E1s{ii}.*Us{ii} + Nvs{ii}.*Ps.SpaData.f1s{ii} + (Nas{ii}+Nbs{ii}).*Ps.SpaData.f2s{ii} + Ncs{ii}.*Ps.SpaData.f3s{ii};	%update
             Us{ii}(Ps.SpaData.Dealias_ind) = 0;					% High frequency removal --- de-aliasing
@@ -70,7 +71,7 @@ else        % Normal run
     end
 
     % Bring back to real space
-    for ii=1:Vnum
+    for ii=1:VarNum
         VsOut(:,ii)=reshape(real(ifftn(Us{ii})),tlen,1); 
     end;
 
@@ -86,12 +87,12 @@ end
 %%%%%%%%%%%%%%%%%  AUX function to prep things before integration %%%%%%%%%%%%%%%%%  
 function Ps=GetSpaData(Vs,Ps,Es)
     %disp('running AUX GetSpaData function');
-    Ps.SpaData.h    = Es.Tstep;
+    Ps.SpaData.h    = Es.TsSize;
     % Dimensions
     resx = Ps.Lx/Ps.Nx;
     resy = Ps.Ly/Ps.Ny;
     if(Ps.Ly==0)  
-        resy  = rex; 
+        resy  = resx; 
         Ps.Ly = resy; 
     end;
 
@@ -101,21 +102,21 @@ function Ps=GetSpaData(Vs,Ps,Es)
     ky=[0:Ps.Ny/2-1 0 -Ps.Ny/2+1:-1]'/(Ps.Ly/(2*pi));
     [xi,eta]=ndgrid(kx,ky); 			%2D wave numbers. {[xi,eta,zeta]=ndgrid(k,k,k)}
 
-    if(length(Ps.Ds)==Ps.Vnum)          % Assume Ds contains only 2nd derivatives if the size of Ds is appropiate
+    if(length(Ps.Ds)==Ps.VarNum)          % Assume Ds contains only 2nd derivatives if the size of Ds is appropiate
         justdiffusion=1;
     else
         justdiffusion=0;
     end;
     Ds   = [Ps.Ds(:) ;zeros(16,1)];
-    for ii=1:Ps.Vnum
+    for ii=1:Ps.VarNum
         Us{ii}=fftn(reshape(Vs(:,ii),Ps.Nx,Ps.Ny));
         if(justdiffusion==1)
             Ls{ii}=-Ds(ii)*(eta.^2+xi.^2);
         else
-            Ls{ii}=Ds(ii)*i*xi;                                 %2D Grad(x)
-            Ls{ii}=Ls{ii} - Ds(Ps.Vnum+ii)*(eta.^2+xi.^2);         %2D Laplacian. {-D*(eta.^2+xi.^2+zeta.^2)}
-            Ls{ii}=Ls{ii} - Ds(Ps.Vnum*2+ii)*i*xi.*(eta.^2+xi.^2);	%2D Laplacian*Grad(x)
-            Ls{ii}=Ls{ii} + Ds(Ps.Vnum*3+ii)*(eta.^2+xi.^2).^2;	%2D Laplacian^2
+            Ls{ii}=Ds(ii)*1i*xi;                                 %2D Grad(x)
+            Ls{ii}=Ls{ii} - Ds(Ps.VarNum+ii)*(eta.^2+xi.^2);         %2D Laplacian. {-D*(eta.^2+xi.^2+zeta.^2)}
+            Ls{ii}=Ls{ii} - Ds(Ps.VarNum*2+ii)*1i*xi.*(eta.^2+xi.^2);	%2D Laplacian*Grad(x)
+            Ls{ii}=Ls{ii} + Ds(Ps.VarNum*3+ii)*(eta.^2+xi.^2).^2;	%2D Laplacian^2
         end;
     end;
 
@@ -128,10 +129,10 @@ function Ps=GetSpaData(Vs,Ps,Es)
 
     %=============== PRECOMPUTING ETDRK4 COEFFS =====================
     M=16; 							% no. of points for complex mean
-    r=exp(i*pi*((1:M)-0.5)/M); 				% roots of unity
+    r=exp(1i*pi*((1:M)-0.5)/M); 				% roots of unity
 
     % For each variable (with seperate diffusion rate) pre-compute coefficients:
-    for ii=1:Ps.Vnum
+    for ii=1:Ps.VarNum
         Ps.SpaData.E1s{ii}=exp(Ps.SpaData.h*Ls{ii}); 
         Ps.SpaData.EE1s{ii}=exp(Ps.SpaData.h*Ls{ii}/2);
         Ls{ii} =Ls{ii}(:); 

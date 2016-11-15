@@ -9,8 +9,7 @@ Es.InitActive = 1;	% If only the ODE state is given, don't look for more
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-Es.Jcob = 1;	% Delete this line soon, old version (still needs change across the board)
-Es.fmod = 1;	% Request a jacobian
+Es.JacMode = 1;	% Request a jacobian
 
 if(size(Vs,3)>1)    % We expect a set of uniform states, where the first axis runs through them.
     UnifStates = squeeze(Vs(1,:,:))';
@@ -26,7 +25,7 @@ Ps.Ny=1;
 
 for ii=1:size(UnifStates,1)
     locjac = full(Ps.LocFunc(UnifStates(ii,:),Ps,Es));
-    spadynmat = [zeros(Ps.Vnum) eye(Ps.Vnum) ; repmat(-1./Ps.Ds(:),1,Ps.Vnum).*locjac zeros(Ps.Vnum) ];
+    spadynmat = [zeros(Ps.VarNum) eye(Ps.VarNum) ; repmat(-1./Ps.Ds(:),1,Ps.VarNum).*locjac zeros(Ps.VarNum) ];
     eigvals(ii,:) = transpose(eigs(spadynmat));
 end;
 

@@ -10,15 +10,15 @@ function VsOut=L_GM(Vs,Ps,Es,varargin)
 % Update online if necessary
 [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
 
-if(~isfield(Es,'fmod'))
-   Es.fmod=0;
+if(~isfield(Es,'JacMode'))
+   Es.JacMode=0;
 end;
 
 % Initilization
 a=Vs(:,1); 
 h=Vs(:,2); 
 
-if(Es.fmod==0)      % Model equations
+if(Es.JacMode==0)      % Model equations
     
     da = Ps.rho + a.^2./(h.*(1+Ps.del.*a.^2)) - Ps.mu.*a;
     dh = Ps.eps + a.^2 - h;

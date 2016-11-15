@@ -4,16 +4,16 @@ function VsOut=M_InsertRegions(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-if ~isfield(Es,'RegsParms')  
-    Es.RegsParms = 1;       % By default, add one (positive) region
+if ~isfield(Es,'RegPrm')  
+    Es.RegPrm = 1;       % By default, add one (positive) region
 end;
 
-Es.RegsParms = [Es.RegsParms(:)' 0 0];  % buffer with zeros
-% Vind -> Main variable to work on
-if isfield(Es,'Vind')                  
-    Es.Vind = Es.Vind(1);
+Es.RegPrm = [Es.RegPrm(:)' 0 0];  % buffer with zeros
+% VarInd -> Main variable to work on
+if isfield(Es,'VarInd')                  
+    Es.VarInd = Es.VarInd(1);
 else
-    Es.Vind = 1;
+    Es.VarInd = 1;
 end;
 
 % What are the min and max values of all of this?
@@ -21,35 +21,35 @@ end;
 
 % How many peaks, and are they positive or negative?
 pospeak=1;
-regnum=Es.RegsParms(1);
+regnum=Es.RegPrm(1);
 if(regnum<0)
     pospeak=0;
     regnum=-regnum;
 end;
 
 % Set value of deleted peaks to?
-if(Es.RegsParms(2)==0)
+if(Es.RegPrm(2)==0)
     if(pospeak)
-        defval = mn(Es.Vind);
+        defval = mn(Es.VarInd);
     else
-        defval = mx(Es.Vind);
+        defval = mx(Es.VarInd);
     end;
 else
-    defval = Es.RegsParms(2);
+    defval = Es.RegPrm(2);
 end;
 
 
-st = Vs(:,Es.Vind);
+st = Vs(:,Es.VarInd);
 if(~pospeak)    % Negate there (and in the end) to simplify reg search
     st=-st;
     defval=-defval;
 end;
 
-stdel=M_DeleteRegions(st,Ps,Es,'Es.RegsParms',[1 0]); % Get state minus 1 peak
+stdel=M_DeleteRegions(st,Ps,Es,'Es.RegPrm',[1 0]); % Get state minus 1 peak
 stdif=M_CenterSt(st-stdel,Ps,Es);         % Single region (that will be added)
 
 
-defmin = min(Vs(:,Es.Vind))+md(Es.Vind)*1e-3;
+defmin = min(Vs(:,Es.VarInd))+md(Es.VarInd)*1e-3;
 nnsm=NeighborSM(1,Ps,Es);
 
 for ii=1:regnum         % Go over regions
@@ -64,7 +64,7 @@ for ii=1:regnum         % Go over regions
     %st(loc)
     %plotst(st,Ps,Es);
     %pause;
-    st = st+M_ShiftSt(stdif,Ps,Es,'Es.ShiftParms',[-loc+Ps.Nx/2 0]); 
+    st = st+M_ShiftSt(stdif,Ps,Es,'Es.ShiftPrm',[-loc+Ps.Nx/2 0]); 
     %bwreg(loc)=1;
     
     %while(sum(bwreg)>0)
@@ -86,6 +86,6 @@ if(~pospeak)    % Negate there (and before loop) to simplify reg search
 end;
 
 VsOut=Vs;
-VsOut(:,Es.Vind)=st;
+VsOut(:,Es.VarInd)=st;
 
 end

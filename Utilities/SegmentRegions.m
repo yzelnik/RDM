@@ -9,8 +9,8 @@ function regs=SegmentRegions(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-vmax = max(Vs(:,Es.Vind(1),1));
-vmin = min(Vs(:,Es.Vind(1),1));
+vmax = max(Vs(:,Es.VarInd(1),1));
+vmin = min(Vs(:,Es.VarInd(1),1));
 if(isfield(Es,'SegThresh'))
    thresh = Es.SegThresh;
 else
@@ -19,11 +19,11 @@ else
 end;
 
 regs=zeros(size(Vs));
-if((vmax-vmin)>Es.STsmall)
+if((vmax-vmin)>Es.StSmall)
     % Use threshold to seperate the state into positive and negative parts (segmentation into bw)
     
-    pos=(Vs(:,Es.Vind(1),1)>thresh);
-    neg=(Vs(:,Es.Vind(1),1)<thresh);
+    pos=(Vs(:,Es.VarInd(1),1)>thresh);
+    neg=(Vs(:,Es.VarInd(1),1)<thresh);
     % define nearest neighbor matrix
     nn=NeighborSM(1,Ps,Es);	
 
@@ -46,8 +46,8 @@ end
 
 
 % Side note: The main part after the definition of pos and neg, can be replaced by:
-%   pos=(reshape(Vs(:,Es.Vind(1),1),Ps.Ny,Ps.Nx)-vmin>thresh);
-%   neg=(vmax-reshape(Vs(:,Es.Vind(1),1),Ps.Ny,Ps.Nx)>thresh);
+%   pos=(reshape(Vs(:,Es.VarInd(1),1),Ps.Ny,Ps.Nx)-vmin>thresh);
+%   neg=(vmax-reshape(Vs(:,Es.VarInd(1),1),Ps.Ny,Ps.Nx)>thresh);
 %   regpos=bwlabel(pos,4);
 %   regneg=bwlabel(neg,4);
 %   regs=reshape(regpos-regneg,Ps.Ny*Ps.Nx,1);

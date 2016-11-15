@@ -5,8 +5,8 @@ function [K,Lambda,Phi] = T_CalcWL(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-if (~isfield(Es,'Vind'))
-    Es.Vind = 1;
+if (~isfield(Es,'VarInd'))
+    Es.VarInd = 1;
 end;
 
 if((Ps.Nx==1) || (Ps.Ny==1))
@@ -15,9 +15,9 @@ else
 	dim=2;
 end;
 
-vmax = max(Vs(:,Es.Vind(1),1));
-vmin = min(Vs(:,Es.Vind(1),1));
-if((vmax-vmin)<Es.STsmall)
+vmax = max(Vs(:,Es.VarInd(1),1));
+vmin = min(Vs(:,Es.VarInd(1),1));
+if((vmax-vmin)<Es.StSmall)
 	K=0;
 	Lambda=0;
 	Phi=zeros(1,dim);
@@ -25,13 +25,13 @@ else
 
 if(dim==1)
 	Phi = 0;		% For consistency with 2D
-	U1 = fft(Vs(:,Es.Vind(1),1));                                 % Fourier transform of Vs
+	U1 = fft(Vs(:,Es.VarInd(1),1));                                 % Fourier transform of Vs
 	
     K = FindProminentMax(abs(U1(2:Ps.Nx/2)))*(2*pi)/Ps.Lx;
     %plot(Uabs)
     Lambda = 2*pi/K;                                       % wavelength
 else	% dim==2
-	V2 = reshape(Vs(:,Es.Vind(1),1),Ps.Nx,Ps.Ny);		% Treating it as a 2D matrix
+	V2 = reshape(Vs(:,Es.VarInd(1),1),Ps.Nx,Ps.Ny);		% Treating it as a 2D matrix
 	U2 = fft2(V2);					% 2D FFT
 	U2(1,1) = 0;
 

@@ -4,14 +4,14 @@ function VsOut=L_EDGE(Vs,Ps,Es,varargin)
 % VsOut=L_EDGE(Vs,Ps,Es)
 % Given the state variables (Vs) and parameters (Ps), calculate the local terms of the model
 % Variables are: B(1), W(2), H(3) and E(4)
-% Ps = struct('LocFunc',@L_EDGE,'SpaFunc',@S_RD,'IntegFunc',@I_FDSIMP,'P',43,'eta',4.5,'kappa',0.5,'mu',0.25,'mu2',0.25,'nu',1.75,'lambda',0.005,'lambda2',0.005,'gamma',1.5,'gamma2',1.5,'rho',0.5,'Ds',[0.1 5 0.1],'Vnum',3,'Lx',160,'Ly',10,'Nx',160*5,'Ny',1,'BC',1);
+% Ps = struct('LocFunc',@L_EDGE,'SpaFunc',@S_RD,'IntegFunc',@I_FDSIMP,'P',43,'eta',4.5,'kappa',0.5,'mu',0.25,'mu2',0.25,'nu',1.75,'lambda',0.005,'lambda2',0.005,'gamma',1.5,'gamma2',1.5,'rho',0.5,'Ds',[0.1 5 0.1],'VarNum',3,'Lx',160,'Ly',10,'Nx',160*5,'Ny',1,'BC',1);
 % Parameters are: P,q,nu,alpha,eta,gamma,rho,f,DW,DH. (1,0.05 3.333 33.333 3.5 16.667  0.95 0.1,100,10000)
 
 % Update online if necessary
 [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
 
-if(~isfield(Es,'fmod'))
-   Es.fmod=0;
+if(~isfield(Es,'JacMode'))
+   Es.JacMode=0;
 end;
 
 % Initialization
@@ -20,7 +20,7 @@ W=Vs(:,2);
 H=Vs(:,3); 
 E=Vs(:,4); 
 
-if(Es.fmod==0)      % Model equations
+if(Es.JacMode==0)      % Model equations
     
     dB = Ps.lambda.*W.*B.*(1 + Ps.eta.*B).^2.*(1 - B./Ps.kappa) - Ps.mu.*B;
     dW = Ps.alpha.*(B*Ps.Y1 + E*Ps.Y2 + Ps.q.*Ps.f)./(B*Ps.Y1 + E*Ps.Y2 + Ps.q).*H - Ps.nu.*W./(1 + Ps.rho.*B./Ps.kappa) - Ps.gamma.*B.*W.*(1 + Ps.eta.*B).^2 - Ps.gamma2.*E.*W;

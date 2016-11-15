@@ -51,7 +51,7 @@ end;
 Vs=reshape(uxy,Ps.Nx*Ps.Ny,pp.nc.neq); % Set to the correct form
 
 if isfield(Es,'TransDef')               % Transform to a new variable set if needed
-    Ps.Vnum=pp.nc.neq;
+    Ps.VarNum=pp.nc.neq;
     Vs = TransformVar(Vs,Ps,Es,Es.TransDef);
 end;
 

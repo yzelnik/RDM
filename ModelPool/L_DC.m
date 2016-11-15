@@ -15,7 +15,7 @@ C=Vs(:,2);
 W=Vs(:,3); 
 H=Vs(:,4); 
 
-if(Es.fmod==0)
+if(Es.JacMode==0)
 % Model equations
 %II = Ps.A.*(Ps.QC+C.*Ps.fC)./(Ps.QC+C);
 II = Ps.A.*(Ps.QC+C.*Ps.fC)./(Ps.QC+C).*((B+Ps.QB*Ps.fB)./(B+Ps.QB));

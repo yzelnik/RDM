@@ -8,8 +8,8 @@ function VsOut=L_MKCC(Vs,Ps,Es,varargin)
 % Update online if necessary
 [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
 
-if(~isfield(Es,'fmod'))
-   Es.fmod=0;
+if(~isfield(Es,'JacMode'))
+   Es.JacMode=0;
 end;
 
 % Initilization
@@ -17,7 +17,7 @@ end;
 B=Vs(:,1); 
 W=Vs(:,2); 
 
-if(Es.fmod==0)      % Model equations
+if(Es.JacMode==0)      % Model equations
 
     dB = W.*B.*B.*(1-B./Ps.K) - Ps.m.*B;
     dW = Ps.a - W - W.*B.*B;

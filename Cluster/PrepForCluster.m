@@ -1,13 +1,12 @@
 function PrepForCluster(filename,varargin)
 % Prepare a .mat file for loading during cluster runs
-% first input is the filename to save
-% other inputs are for either matlab files to run/load (e.g. Data.mat)
-% or commands to run (e.g. ind = 3;)
+% First input is the filename to save, other inputs are for either matlab 
+% files to run/load (e.g. Data.mat) or commands to run (e.g. ind = 3;)
 
 % delete? Make sure the 3 basic variables exist, at the very least
-%Vs = [];
-%Ps = [];
-%Es = [];
+Vs = [];
+Ps = [];
+Es = [];
 
 varargin{nargin}=filename;  % adding filename to the end. Just a precaution
 
@@ -31,7 +30,6 @@ for ii=1:nargin-1
         %    loc = strfind(input, '=');
         %end;
     end;  
-    
 end;
 
 

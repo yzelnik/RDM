@@ -18,35 +18,35 @@ else            % Normal run
         [Vs,Ps,Es]=SetupSpatialData(Vs,Ps,Es);
     end;
     
-    if(~isfield(Ps,'SpaData') || isempty(Ps.SpaData) || ~isfield(Ps.SpaData,'Tstep') || ~(Ps.SpaData.Tstep==Es.Tstep) )  
+    if(~isfield(Ps,'SpaData') || isempty(Ps.SpaData) || ~isfield(Ps.SpaData,'TsSize') || ~(Ps.SpaData.TsSize==Es.TsSize) )  
         Ps=GetSpaData(Vs,Ps,Es);    % Run subfunction if needed (running this way is best avoided)
     end;
     
-    if(~Es.UseSM)
+    if(~Es.SmUse)
         error('Implicit integration is not possible without a matrix strucutre for the spatial part of the PDE.');
     end;
     
-    posflag = 0;		% If we know variables are positive, make sure they remain so	
-    if((isfield(Es,'posflag')) & (Es.posflag))
-        posflag = 1;
+    NonNeg = 0;		% If we know variables are positive, make sure they remain so	
+    if((isfield(Es,'NonNeg')) & (Es.NonNeg))
+        NonNeg = 1;
     end;
     
-    %tempmat = speye(size(Ps.SpaMat)) - Es.Tstep*Ps.SpaMat;
+    %tempmat = speye(size(Ps.SpaMat)) - Es.TsSize*Ps.SpaMat;
     syslen = Ps.Nx * Ps.Ny;
-    totsteps = ceil(Es.Tdest/Es.Tstep);
+    totsteps = ceil(Es.TimeDst/Es.TsSize);
     % Go through each time step
     for ii=1:totsteps 
         % Explicit step for local (non-linear) part
-        VsLocChange = reshape( Es.Tstep*Ps.LocFunc(Vs,Ps,Es) ,syslen*Ps.Vnum,1);	
+        VsLocChange = reshape( Es.TsSize*Ps.LocFunc(Vs,Ps,Es) ,syslen*Ps.VarNum,1);	
         % Implicit step for spatial (potentially linear) part
-        VsTemp = Ps.SpaData.InvIminusSM * ( Ps.SpaData.IplusSM*reshape(Vs,syslen*Ps.Vnum,1)  + VsLocChange );    
-        Vs     = reshape(VsTemp,syslen,Ps.Vnum);
+        VsTemp = Ps.SpaData.InvIminusSM * ( Ps.SpaData.IplusSM*reshape(Vs,syslen*Ps.VarNum,1)  + VsLocChange );    
+        Vs     = reshape(VsTemp,syslen,Ps.VarNum);
         
-        if Es.updateSM     % Use this if the spatial matrix needs to be updated online
+        if Es.SmUpdate     % Use this if the spatial matrix needs to be updated online
             Ps=GetSpaData(Vs,Ps,Es);    % update the necessary spatial information for this integration
         end;
         
-        if(posflag)  % consider deleting
+        if(NonNeg)  % consider deleting
             Vs = max(0,Vs);
         end;
     end; 
@@ -61,7 +61,7 @@ end
 %%%%%%%%%%%%%%%%%  AUX function to prep things before integration %%%%%%%%%%%%%%%%%  
 function Ps=GetSpaData(~,Ps,Es)
     %disp('running AUX GetSpaData function');
-    Ps.SpaData.IplusSM = speye(size(Ps.SpaMat)) + Es.Tstep/2*Ps.SpaMat;
-    Ps.SpaData.InvIminusSM = inv(speye(size(Ps.SpaMat)) - Es.Tstep/2*Ps.SpaMat);
-    Ps.SpaData.Tstep = Es.Tstep;
+    Ps.SpaData.IplusSM = speye(size(Ps.SpaMat)) + Es.TsSize/2*Ps.SpaMat;
+    Ps.SpaData.InvIminusSM = inv(speye(size(Ps.SpaMat)) - Es.TsSize/2*Ps.SpaMat);
+    Ps.SpaData.TsSize = Es.TsSize;
 end

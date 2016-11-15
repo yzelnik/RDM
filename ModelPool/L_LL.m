@@ -8,15 +8,15 @@ function VsOut=L_LL(Vs,Ps,Es,varargin)
 % Update online if necessary
 [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
 
-if(~isfield(Es,'fmod'))
-   Es.fmod=0;
+if(~isfield(Es,'JacMode'))
+   Es.JacMode=0;
 end;
 
 % Initialization
 
 B = Vs(:,1); 
 
-if(Es.fmod==0)      % Model equations
+if(Es.JacMode==0)      % Model equations
 
     dB = (1 - Ps.mu).*B + (Ps.Lambda - 1).*B.^2 - B.^3;
     VsOut = dB;

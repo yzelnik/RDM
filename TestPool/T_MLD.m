@@ -6,12 +6,12 @@ function [res,ratio]=T_MLD(Vs,Ps,Es,varargin)
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
 
-if( (~isfield(Es,'Vind')) | (Es.Vind<3) )
-	Es.Vind = [1 2 3];
+if( (~isfield(Es,'VarInd')) | (Es.VarInd<3) )
+	Es.VarInd = [1 2 3];
 end;
 
-dif12 = sum(abs(normcol(Vs(:,Es.Vind(1),1))-normcol(Vs(:,Es.Vind(2),1))));
-dif13 = sum(abs(normcol(Vs(:,Es.Vind(1),1))-normcol(Vs(:,Es.Vind(3),1))));
+dif12 = sum(abs(normcol(Vs(:,Es.VarInd(1),1))-normcol(Vs(:,Es.VarInd(2),1))));
+dif13 = sum(abs(normcol(Vs(:,Es.VarInd(1),1))-normcol(Vs(:,Es.VarInd(3),1))));
 
 ratio = log10(dif12/dif13);
 res = ratio>0;

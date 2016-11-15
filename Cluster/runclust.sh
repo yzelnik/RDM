@@ -4,7 +4,7 @@
 
 #matloc="storage/matlab/bin/matlab"
 #matloc="/usr/local/bin/matlab"  # For Linux
-#matloc="/Applications/MATLAB_R2014b.app/bin/matlab"
+#matloc="/Applications/MATLAB_R2016b.app/bin/matlab"
 
 sleeptime=2
 
@@ -102,9 +102,9 @@ for (( i=$from_part; i<=$to_part; i++ ));
 do
 	JOBNAME="rp_$i$projname"
 	
-	# load base file, setup which part to run, then use the runar function, and finally save data
+	# load base file, setup which part to run, then use the runpar function, and finally save data
 	matcom=" $pathcom load('$projname"_tmp.mat"'); Es.RunsChoice=[$i $totruns];  runpar(Vs,Ps,Es);"
-#Es.Tmax=20*$i; tmpout=run2ss(Vs,Ps,Es); save('"$projname"_part$i"of$totruns.mat"'); "
+#Es.TimeMax=20*$i; tmpout=run2ss(Vs,Ps,Es); save('"$projname"_part$i"of$totruns.mat"'); "
 	if [ -n "$input" ]; then
 	    # Actual run here
 	    if [ $queue -eq $queue 2> /dev/null ]; then	# if queue==0, run locally

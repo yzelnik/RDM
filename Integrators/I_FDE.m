@@ -6,38 +6,29 @@ function VsOut=I_FDE(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-if(~isfield(Es,'fmod'))
-   Es.fmod=0;
-end;
 
-if(Es.fmod<0)   % Setup variables for integration in the future
-    
-    Ps = Ps.SpaFunc(Vs,Ps,Es);    % Get spatial matrix for future integration
-    VsOut = Ps; % This is a "misuse" of the name, but we just want to return the "new" Ps struct
-    
-else            % Normal run
      % Setup the spatial matrix and auxiliary flags if not already done
-    if(~isfield(Es,'UseSM'))
+    if(~isfield(Es,'SmUse'))
         [Vs,Ps,Es]=SetupSpatialData(Vs,Ps,Es);
     end;
     
-    posflag = 0;		% If we know variables are positive, make sure they remain so	
-    if((isfield(Es,'posflag')) & (Es.posflag))
-        posflag = 1;
+    NonNeg = 0;		% If we know variables are positive, make sure they remain so	
+    if((isfield(Es,'NonNeg')) & (Es.NonNeg))
+        NonNeg = 1;
     end;
     
-    totsteps = ceil(Es.Tdest/Es.Tstep);
+    totsteps = ceil(Es.TimeDst/Es.TsSize);
     % Go through each time step
     for ii=1:totsteps
-        if(Es.UseSM)   % Integrate next time step
-            VsNew = Vs + Es.Tstep*(Ps.LocFunc(Vs,Ps,Es) + reshape(Ps.SpaMat*Vs(:),Ps.Nx*Ps.Ny,Ps.Vnum));
-            if Es.updateSM
+        if(Es.SmUse)   % Integrate next time step
+            VsNew = Vs + Es.TsSize*(Ps.LocFunc(Vs,Ps,Es) + reshape(Ps.SpaMat*Vs(:),Ps.Nx*Ps.Ny,Ps.VarNum));
+            if Es.SmUpdate
                 Ps.SpaMat = Ps.SpaFunc(Vs,Ps,Es);  % Use this if the spatial matrix needs to be updated online
             end;
         else        % if we don't use SM (spatial matrix) than use the spatial function directly
-            VsNew = Vs + Es.Tstep*(Ps.LocFunc(Vs,Ps,Es) + Ps.SpaFunc(Vs,Ps,Es));
+            VsNew = Vs + Es.TsSize*(Ps.LocFunc(Vs,Ps,Es) + Ps.SpaFunc(Vs,Ps,Es));
         end;
-    	if posflag  % consider deleting
+    	if NonNeg  % consider deleting
         	VsNew = max(0,VsNew);
         end;
     	Vs = VsNew;
@@ -45,6 +36,6 @@ else            % Normal run
 
     VsOut = Vs;
 
-end;        % End of normal run
+
 
 end

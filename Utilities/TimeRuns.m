@@ -8,19 +8,19 @@ if(~isfield(Es,'RunFunc') || isempty(Es.RunFunc))
 Es.RunFunc = @runflow;      % By default use runflow for each scenario
 end;
 
-if(~isfield(Es,'BFrange'))
-   Es.BFrange=[];
+if(~isfield(Es,'BfRange'))
+   Es.BfRange=[];
 end;
-runrep = max(1,length(Es.BFrange));
+runrep = max(1,length(Es.BfRange));
 
 for ii=1:length(timestepvec)
     for jj=1:runrep
-        Es.Tstep=timestepvec(ii);
-        if(~isempty(Es.BFrange))
-            if(iscell(Es.BFrange))
-                Ps.(Es.BFpar) = Es.BFrange{jj};
+        Es.TsSize=timestepvec(ii);
+        if(~isempty(Es.BfRange))
+            if(iscell(Es.BfRange))
+                Ps.(Es.BfPrm) = Es.BfRange{jj};
             else
-                Ps.(Es.BFpar) = Es.BFrange(jj);
+                Ps.(Es.BfPrm) = Es.BfRange(jj);
             end;
         end;
         tic;
