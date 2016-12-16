@@ -11,9 +11,9 @@ MinSysLen = 10;
 Es=InsertDefaultValues(Es,'InitActive',0,'InitFunc',@M_InitRndSt);
 
 % Deal with partial or missing Vs
-if((Es.InitActive==0) && (size(Vs,1)<MinSysLen) && (size(Vs,1)>0) && (~iscell(Vs)) && ~isempty(Vs))
+if((Es.InitActive==0) && ~isempty(Vs) && (size(Vs,1)<Ps.Nx*Ps.Ny) && (size(Vs,1)>0) && (~iscell(Vs)) )
 	Es.InitActive = 1;	% Mark flag so we don't go into an infinite loop
-	
+
 	if(size(Vs,2)<Ps.VarNum)	% Replicate values, for the lazy amongst us
 		tmp = repmat(Vs,1,Ps.VarNum);
 		Vs = tmp(:,1:Ps.VarNum);

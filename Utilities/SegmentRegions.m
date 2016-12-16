@@ -18,7 +18,7 @@ else
     thresh = (vmax+vmin)/2;
 end;
 
-regs=zeros(size(Vs));
+regs=zeros(Ps.Nx*Ps.Ny,1);
 if((vmax-vmin)>Es.StSmall)
     % Use threshold to seperate the state into positive and negative parts (segmentation into bw)
     

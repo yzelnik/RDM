@@ -16,13 +16,13 @@ N=Vs(:,1);
 
 if(Es.JacMode==0)      % Model equations
 
-    dN = Ps.r.*N.*(1-N./Ps.K).*(N./Ps.A-1);
+    dN = Ps.r.*N.*(1 - N./Ps.K);
     VsOut = dN;
 else                % Jacobian of equations
     
-    NdN = Ps.r .* ( -1+(2*N.*(Ps.A+Ps.K)-3*N.^2)./(Ps.A.*Ps.K) );
+    NdN = Ps.r.*(1 - 2*N./Ps.K);
     % written in a large sparse matrix format 
-    VsOut = spdiags(NdN,0,Ps.VarNum,Ps.VarNum);
+    VsOut = spdiags(NdN,0,1,1);
 end;
 
 end

@@ -22,7 +22,7 @@ end;
 % In case we want to run several test functions
 if(iscell(Es.TestFunc))  
     Es.TestList=Es.TestFunc;
-    Es.TestFunc=@T_GetStats;
+    Es.TestFunc=@T_MultiTest;
 end;
 % Calculate time step automatically if relevant
 if(strcmp(Es.TsMode,'auto'))

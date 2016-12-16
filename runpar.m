@@ -24,7 +24,7 @@ if(~mod(nargin,2)) error('No default extra-input exists for runpar.'); end;
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'WriteFreq',100,'RunFunc',@runflow,'RandSeed',0,'FileOut',0,'WriteSt',1);
+Es=InsertDefaultValues(Es,'WriteFreq',100,'RunFunc',@runflow,'RandSeed',0,'FileOut',[],'WriteSt',1);
 
 
 
@@ -50,6 +50,7 @@ Es=SortOutBfParameters(Es);
 
 % Deal with output to file issues (both .mat and .csv/.txt formats)
 [WriteFlag,FileName]= CheckOutput(Es,partrun);
+Es.FileOut=[];
 
 % Initilize before main loop
 BfData=[];
@@ -123,7 +124,7 @@ end
 function [WriteFlag,FileName]=CheckOutput(Es,partrun)
 % Deal with output to file issues (both .mat and .csv/.txt formats)
 WriteFlag = 0; % Check if output should be continously written out to file
-if(isfield(Es,'FileOut') & Es.FileOut)
+if(~isempty(Es.FileOut))
 	WriteFlag = 1;
     FileEnd='';
     if(isnumeric(Es.FileOut))

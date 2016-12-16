@@ -28,7 +28,9 @@ if(isfield(Es,'SetupMode') && Es.SetupMode)
        %Out.SpaMat((Ps.H2-1)*len+(1:len),(Ps.H2-1)*len+(1:len)) = dervh;
        Es.JacMode=1;
        Es.SetupMode=0;
+       disp(999)
        Out.SpaMat=S_SG(Vs,Out,Es);
+       size(Out.SpaMat)
        Es.JacMode=0;
        
    end;
@@ -81,13 +83,13 @@ end
 
 %%%%%%%%%%%%%%%%%% AUX FUNC %%%%%%%%%%%%%%%%%%
 
-function sm = BuildDynamicSM(Ps,Es)
-len=Ps.Nx*Ps.Ny;
-for ii=1:Ps.VarNum	
-    if(ii==Ps.H2)
-        % Put in derivative sub-matrix in a block-diagonal fashion
-        sm((ii-1)*len+(1:len),(ii-1)*len+(1:len)) = Ps.Derv2Mat*Ps.Ds(ii);
-    end;
-end;
+%function sm = BuildDynamicSM(Ps,Es)
+%len=Ps.Nx*Ps.Ny;
+%for ii=1:Ps.VarNum	
+%    if(ii==Ps.H2)
+%        % Put in derivative sub-matrix in a block-diagonal fashion
+%        sm((ii-1)*len+(1:len),(ii-1)*len+(1:len)) = Ps.Derv2Mat*Ps.Ds(ii);
+%    end;
+%end;
 
-end
+%end

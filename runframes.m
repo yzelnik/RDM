@@ -14,7 +14,7 @@ if(~mod(nargin,2)) varargin = ['Es.Frames' varargin]; end;
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'DynPrm',[],'RecurFunc',[],'OlDraw',0,'TestFunc',[],'TsMode','none');
+Es=InsertDefaultValues(Es,'DynPrm',[],'RecurFunc',[],'OlDraw',0,'TestFunc',[],'TsMode','none','FileOut',[]);
 % Initilize state if necessary
 [Vs,Ps,Es]=InitilizeState(Vs,Ps,Es);
 
@@ -26,10 +26,14 @@ end;
 if((~iscell(Es.DynPrm)) && ~isempty(Es.DynPrm))
 	Es.DynPrm = {Es.DynPrm};
 end;
+% Allow simple-dynamical variable setup (As row instead of column)
+if(~isempty(Es.DynPrm) && ~isempty(Es.DynVal) && (size(Es.DynVal,1)==1))
+    Es.DynVal=Es.DynVal';
+end;
 % In case we want to run several test functions
 if(iscell(Es.TestFunc))  
     Es.TestList=Es.TestFunc;
-    Es.TestFunc=@T_GetStats;
+    Es.TestFunc=@T_MultiTest;
 end;
 
 % Calculate any matrices and other auxiliary data before run
@@ -64,7 +68,7 @@ elseif (length(Es.FramesChoice) < num)
 end;
 
 % Setup a recurring function information (function that operates every-so-often)
-% Es.RecurFunc can be given as [1 1 0 0 1 0] or [1 2 5] for getting the first, second and fifth out of six frames
+% Es.RecurFrames can be given as [1 1 0 0 1 0] or [1 2 5] for getting the first, second and fifth out of six frames
 
 if(~isempty(Es.RecurFunc))
     if(~isfield(Es,'RecurFrames') || ((length(Es.RecurFrames)==1) && (Es.RecurFrames(1)==0)))
@@ -99,23 +103,30 @@ Vnow = Vs;
 for index=1:num
     % Deal with dynamic parameters if necessary
 	if(~isempty(Es.DynPrm))	
-		for indprm=1:length(Es.DynPrm)
-			if(iscell(Es.DynVal))  
-				tempval = Es.DynVal{index,indprm}; % Read from a cell-array
-            elseif(length(Es.DynPrm)==1)
-                tempval = Es.DynVal(index,:);      % Read the whole row
-            else
-				tempval = Es.DynVal(index,indprm); % Read from a single column
-			end;
-			if(ischar(Es.DynPrm{indprm}))
-				Ps.(Es.DynPrm{indprm})=tempval;
-			else
-				Ps.Ds(Es.DynPrm{indprm})=tempval;
-			end;
-		end;
+        % Allow for simple vector change if only 1 parameter is used
+        if(length(Es.DynPrm)==1) && (size(Es.DynVal,2)>1)
+            tempvals = {Es.DynVal(index,:)}; 
+        else
+            tempvals = Es.DynVal(index,:);
+        end;
+        [Vs,Ps,Es]=SaveParmList(Vs,Ps,Es,tempvals,Es.DynPrm);
+        
+		%for indprm=1:length(Es.DynPrm)
+	    %	 if(iscell(Es.DynVal))  
+		%		tempval = Es.DynVal{index,indprm}; % Read from a cell-array
+        %    elseif(length(Es.DynPrm)==1)
+        %        tempval = Es.DynVal(index,:);      % Read the whole row
+        %    else
+		%		tempval = Es.DynVal(index,indprm); % Read from a single column
+		%	end;
+		%	if(ischar(Es.DynPrm{indprm}))
+		%		Ps.(Es.DynPrm{indprm})=tempval;
+		%	else
+		%		Ps.Ds(Es.DynPrm{indprm})=tempval;
+		%	end;
+		%end;
 	end;
 	Es.TimeDst = jumps(index);
-    
     % Run a recurring function, if the time is right  
     if(~isempty(Es.RecurFunc))&&(Es.RecurFrames(index))   
         Vnext = Es.RecurFunc(Vnow,Ps,Es);
@@ -156,6 +167,9 @@ for index=1:num
            plot(history(:,1),history(:,Es.OlDraw+1));
            title(testtext); 
            drawnow; 
+    end;
+    if(~isempty(Es.FileOut))
+        save(Es.FileOut);
     end;
 end;
 

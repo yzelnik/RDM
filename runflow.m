@@ -24,9 +24,9 @@ Es=InsertDefaultValues(Es,'MergeBfData',0,'TsMode','none');
 
 if(~isfield(Es,'FuncList') || isempty(Es.FuncList))
     if(isfield(Es,'TestFunc') && ~isempty(Es.TestFunc))
-        if(iscell(Es.TestFunc))  % Allow a lazy-access to GetStats
+        if(iscell(Es.TestFunc))  % Allow a lazy-access to MultiTest
             Es.TestList=Es.TestFunc;
-            Es.TestFunc=@T_GetStats;
+            Es.TestFunc=@T_MultiTest;
         end;
         Es.FuncList={@run2ss,Es.TestFunc};  % By default run to steady-state and then run the test function
         Es.TestFunc = [];   % Run test just in the end, not throughout run2ss

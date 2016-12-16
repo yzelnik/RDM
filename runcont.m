@@ -17,7 +17,7 @@ Es=InsertDefaultValues(Es,'BfMaxDiff',0,'TestFunc',@T_L2Norm);
 % In case we want to run several test functions
 if(iscell(Es.TestFunc))  
     Es.TestList=Es.TestFunc;
-    Es.TestFunc=@T_GetStats;
+    Es.TestFunc=@T_MultiTest;
 end;
 % Check if output should be continously written out to file
 WriteFlag = 0;
@@ -47,6 +47,9 @@ if(iscell(Es.BfRange))
     end;
 end;
 
+if(size(Es.BfRange,2)==1)
+    Es.BfRange=Es.BfRange';
+end;
 if(size(Es.BfRange,2)>4)
     parrange = Es.BfRange(:);
 elseif (size(Es.BfRange,2)<3) % assume we only got first and last value
@@ -69,10 +72,11 @@ BfData=[];
 ii=1;
 stopflag=0;
 
+ExtData=[];
 
 while((ii<=length(parrange)) && (~stopflag))
-    %disp([Es.BfPrm '=' num2str(Es.BfRange(ii))]);
-	Vs = Vs + rand(size(Vs))*Es.StSmall*1e-3;
+    disp(sprintf('step %d: %s=%.4f, ext: %f',ii,parname,parrange(ii),ExtData(1)));
+	Vs = Vs + rand(size(Vs))*Es.StSmall*1e-4;
 	% Update paramater
 	Ps.(parname) = parrange(ii);
   	% Run the system to SS

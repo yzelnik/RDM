@@ -13,7 +13,28 @@ if(nargin>2) [~,~,Es]=UpdateParameters([],[],Es,varargin{:}); end;
 
 % Put in some default values of Es
 %Es=InsertDefaultValues(Es,'PrmSpace',0,'BfBalloon',0,'BfColor',[0,0,0 ; hsv(9)],'BfPattern',0);
-Es=InsertDefaultValues(Es,'BfFields',[1,2,3],'BfPhases',[0,1],'BfSmooth',0);
+Es=InsertDefaultValues(Es,'BfFields',[1,2,3],'BfPhases',[0,1],'BfFilter',[],'BfSmooth',0);
+
+if(isempty(bfs))
+    error('No data to plot.');
+end;
+
+if(~isempty(Es.BfFilter))
+    if(size(Es.BfFilter,2)<2) % set to horizontal vector if needbe
+        Es.BfFilter=Es.BfFilter';
+    end;
+    if(size(Es.BfFilter,2)<3) % padd in zeros if needbe
+        Es.BfFilter(1,3)=0;
+    end;
+    for ii=1:size(Es.BfFilter,1) % go over each field to filter
+        tmp = abs(bfs(:,Es.BfFilter(ii,1))-Es.BfFilter(ii,2))<=Es.BfFilter(ii,3);
+        bfs=bfs(tmp,:);
+    end;
+end;
+
+if(isempty(bfs))
+    error('No data to plot after filtering.');
+end;
 
 % Find the first point where the parameter Es.BfFields(1) changes direction
 tmp=diff(bfs(:,Es.BfFields(1)));

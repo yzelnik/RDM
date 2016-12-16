@@ -13,7 +13,7 @@ if(~mod(nargin,2)) error('No default extra-input exists for getrhs.'); end;
 % Setup the spatial matrix and auxiliary flags
 [Vs,Ps,Es]=SetupSpatialData(Vs,Ps,Es);		
 
-
+Ps.SpaMat=zeros(Ps.Nx*Ps.VarNum);
 % Calculate the right-hand-side
 rhs=RightHandSide(Vs,Ps,Es);
 

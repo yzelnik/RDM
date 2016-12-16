@@ -1,24 +1,30 @@
-function stats = T_GetStats(Vs,Ps,Es,varargin)
-% Get stat results from several functions combined
+function stats = C_MultiCalc(Vs,Ps,Es,varargin)
+% Run multiple calc-functions and combine output
+% Es.TestList should have a list of functions to run,
+% Or otherwise Es.TestFunc could hold such a list
+% Es.TestOuts can give the number of outputs to take from each function
 
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-if(~isfield(Es,'TestOuts'))
-	Es.TestOuts = [];
-end;
-if(~isfield(Es,'TestList') || isempty(Es.TestList))
-    if(~isfield(Es,'TestFunc') || isempty(Es.TestFunc))
+% Put in some default values of Es
+Es=InsertDefaultValues(Es,'TestFunc',[],'TestList',[],'TestOuts',[]);
+
+if(isempty(Es.TestList))
+    if(isempty(Es.TestFunc))
         error('Need a Es.TestList or Es.TestFunc to be defined');
     else
         Es.TestList=Es.TestFunc;
     end;
 end;
-if(~iscell(Es.TestList))
+if(~iscell(Es.TestList)) % Force test-list into a cell structure
     Es.TestList={Es.TestList};
 end;
 
-if(isempty(Es.TestOuts))  % Allow the test-outs to be put inside the testlist.
+% Allows the test-outs to be put inside the testlist.
+if(isempty(Es.TestOuts))  
+    % If inside the cell-array there are numbers following the function
+    % names, than assume these are the test-outs
     ind=0; temp={};
     for ii=1:length(Es.TestList)
 
@@ -67,7 +73,7 @@ for ii=1:num
 		stats = [stats o1(:)' o2(:)' ];
     else
         tmp = [];
-		warning('GetStats does not support more than 5 outputs per function');
+		warning('MultiTest does not support more than 5 outputs per function');
 	end;
     if(Es.TestOuts(ii,2)>0)  % Get only specific outsputs if requested
         tmp = tmp(nonzeros(Es.TestOuts(ii,2:end)));

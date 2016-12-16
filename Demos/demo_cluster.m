@@ -1,5 +1,5 @@
-%% Using RDM on a cluster
-%  The main aim to use runpar using the runclust.sh shell script
+%% DEMO: Using RDM on a cluster
+%  The main aim of this demo is to use runpar using the runclust.sh shell script
 
 %  In general, a good idea of how to do this is to do the following:
 %  1) run a single run-func (not using runpar) that you want to do

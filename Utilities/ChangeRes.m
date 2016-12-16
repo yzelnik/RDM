@@ -28,9 +28,9 @@ if((Ps.Nx==1) || (Ps.Ny==1))
     %VsNew = interp1(res*(1:Ps.Nx*Ps.Ny)',Vs,resNew*(1:PsNew.Nx*PsNew.Ny)'); 
     
 else
-    [xo,yo]=meshgrid((0:Ps.Nx-1)/(Ps.Nx-1)*Ps.Lx,(0:Ps.Ny-1)/(Ps.Ny-1)*Ps.Ly);
-    [xi,yi]=meshgrid((1:PsNew.Nx)/PsNew.Nx*PsNew.Lx,(1:PsNew.Ny)/PsNew.Ny*PsNew.Ly);
-    %size(yo),size(yi),size(reshape(Vs(:,1),Ps.Nx,Ps.Ny))
+    [xo,yo]=meshgrid((0:Ps.Ny-1)/(Ps.Ny-1)*Ps.Ly,(0:Ps.Nx-1)/(Ps.Nx-1)*Ps.Lx);
+    [xi,yi]=meshgrid((1:PsNew.Ny)/PsNew.Ny*PsNew.Ly,(1:PsNew.Nx)/PsNew.Nx*PsNew.Lx);
+    %size(yo),size(yi),size(reshape(Vs(:,1),Ps.Nx,Ps.Ny)')
     for ii=1:PsNew.VarNum
         ZI(:,:,ii) = interp2(xo,yo,reshape(Vs(:,ii),Ps.Nx,Ps.Ny),xi,yi);
     end;

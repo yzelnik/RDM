@@ -12,7 +12,7 @@ if(~isfield(Es,'SmUse') )
 end;
 
 if(~Es.SmUse)
-	error('Semi-Implicit integration is not possible without a matrix strucutre for the spatial part of the PDE.');
+	error('Semi-Implicit integration is not possible without a matrix structure for the spatial part of the PDE.');
 end;
 
 NonNeg = 0;		% If we know variables are positive, make sure they remain so	
