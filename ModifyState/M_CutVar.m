@@ -31,24 +31,39 @@ end;
 len = Ps.Nx*Ps.Ny;
 % how much to cut? 
 if(Es.ModPrm(1)>0)  % 
-    %[~,maxind]=max(Vs(:,Es.ModPrm(2)));
-    %odeval = getode(Vs(maxind,:),Ps,Es);
-    %cutval = - Es.ModPrm(1)*odeval(Es.ModPrm(2));
     cutval = - Es.ModPrm(1)*max(Vs(:,Es.ModPrm(2)));
 else
     cutval = Es.ModPrm(1);
 end;
-%initval = mean(Vs(:,Es.ModPrm(2),1));
-%finval  = initval*(1-Es.ModPrm(1))/round(Es.ModPrm(3)*len);
 
 
 VsOut=Vs;
 if(Es.ModPrm(3)>=1)
     VsOut(:,Es.ModPrm(2))= VsOut(:,Es.ModPrm(2)) + cutval;
 else
-    %nnsm=NeighborSM(1,Ps,Es);
+    nnsm=NeighborSM(1,Ps,Es);
+    sitenum = ceil(Es.ModPrm(3)*len);
+    mean(sum(nnsm));
+    % initilize vector of differnet-order neighbors
+    tmpvec  = zeros(size(Vs,1),1);
+    tmpvec(ceil(edge*len))=1;
     
-    locs = mod(round(edge*len)+(1:round(Es.ModPrm(3)*len))-1,len)+1;
+    counter = 1;
+    while counter<sitenum  % iteratively find neighboring sites
+        newvec = nnsm*tmpvec;
+        tmpvec = tmpvec + newvec;
+        counter = sum(tmpvec ~= 0);
+    end;
+   
+    if(counter>sitenum)  % make sure we have exactly sitenum sites
+        tmpvec = tmpvec-newvec;
+        inds = find((newvec>0)-(tmpvec>0));
+        tmpvec = tmpvec+newvec;
+        tmpvec(inds(1:(counter-sitenum)))=0;
+    end;
+    locs=logical(tmpvec);
+    %locs = mod(ceil(edge*len)+(1:ceil(Es.ModPrm(3)*len))-1,len)+1;
+    
     VsOut(locs,Es.ModPrm(2))= VsOut(locs,Es.ModPrm(2)) + cutval/Es.ModPrm(3);
 end;
 

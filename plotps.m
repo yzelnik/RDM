@@ -5,7 +5,7 @@ function varargout=plotps(bfs,Es,varargin)
 if(nargin<2)
 	Es=struct();
 else
-    if(mod(nargin,2)) error('No default extra-input exists for plotbf.'); end;
+    if(mod(nargin,2)) error('No default extra-input exists for plotps.'); end;
 end;
 
 % Update online if necessary

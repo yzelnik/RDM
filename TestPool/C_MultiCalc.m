@@ -1,83 +1,78 @@
 function stats = C_MultiCalc(Vs,Ps,Es,varargin)
 % Run multiple calc-functions and combine output
-% Es.TestList should have a list of functions to run,
-% Or otherwise Es.TestFunc could hold such a list
-% Es.TestOuts can give the number of outputs to take from each function
+% Es.CalcList should have a list of functions to run,
 
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'TestFunc',[],'TestList',[],'TestOuts',[]);
+Es=InsertDefaultValues(Es,'CalcList',[],'CalcOuts',[]);
 
-if(isempty(Es.TestList))
-    if(isempty(Es.TestFunc))
-        error('Need a Es.TestList or Es.TestFunc to be defined');
-    else
-        Es.TestList=Es.TestFunc;
-    end;
+if(isempty(Es.CalcList))
+    error('Need a Es.CalcList to be defined');
 end;
-if(~iscell(Es.TestList)) % Force test-list into a cell structure
-    Es.TestList={Es.TestList};
+if(~iscell(Es.CalcList)) % Force calc-list into a cell structure
+    Es.CalcList={Es.CalcList};
 end;
 
-% Allows the test-outs to be put inside the testlist.
-if(isempty(Es.TestOuts))  
+% Allows the calc-outs to be put inside the CalcList.
+if(isempty(Es.CalcOuts))  
     % If inside the cell-array there are numbers following the function
-    % names, than assume these are the test-outs
+    % names, than assume these are the calc-outs
     ind=0; temp={};
-    for ii=1:length(Es.TestList)
+    for ii=1:length(Es.CalcList)
 
-        if(isnumeric(Es.TestList{ii}))
-            Es.TestOuts(ind,1:length(Es.TestList{ii})) = Es.TestList{ii}(:)';
+        if(isnumeric(Es.CalcList{ii}))
+            Es.CalcOuts(ind,1:length(Es.CalcList{ii})) = Es.CalcList{ii}(:)';
         else
             ind = ind+1;  % Assumed to be a function handle
-            temp{ind}=Es.TestList{ii};
+            temp{ind}=Es.CalcList{ii};
         end;
     end;
-    Es.TestList = temp;
+    Es.CalcList = temp;
 end;
 
 
-num = length(Es.TestList);
+num = length(Es.CalcList);
 % Make sure there are enough outputs, by putting the default value of 1 per function
-if(size(Es.TestOuts,1)<length(Es.TestList))
-    Es.TestOuts(length(Es.TestList),1)=0;
+if(size(Es.CalcOuts,1)<length(Es.CalcList))
+    Es.CalcOuts(length(Es.CalcList),1)=0;
 end;
-if(size(Es.TestOuts,2)<2)
-    Es.TestOuts(1,2)=0;
+if(size(Es.CalcOuts,2)<2)
+    Es.CalcOuts(1,2)=0;
 end;
-Es.TestOuts(:,1) = max(1,Es.TestOuts(:,1));
+Es.CalcOuts(:,1) = max(1,Es.CalcOuts(:,1));
 
 stats = [];
 % Go over different functions
 for ii=1:num
-	if(Es.TestOuts(ii,1)==1)
-		o1 = Es.TestList{ii}(Vs,Ps,Es);
+	if(Es.CalcOuts(ii,1)==1)
+		o1 = Es.CalcList{ii}(Vs,Ps,Es);
         tmp = o1(:)';
-	elseif (Es.TestOuts(ii,1)==2)
-		[o1,o2] =  Es.TestList{ii}(Vs,Ps,Es);
+	elseif (Es.CalcOuts(ii,1)==2)
+		[o1,o2] =  Es.CalcList{ii}(Vs,Ps,Es);
         tmp = [o1(:)' o2(:)'];
 
-	elseif (Es.TestOuts(ii,1)==3)
-		[o1,o2,o3] =  Es.TestList{ii}(Vs,Ps,Es);
+	elseif (Es.CalcOuts(ii,1)==3)
+		[o1,o2,o3] =  Es.CalcList{ii}(Vs,Ps,Es);
         tmp = [o1(:)' o2(:)' o3(:)'];
 		stats = [stats o1(:)' o2(:)' o3(:)'];
-	elseif (Es.TestOuts(ii,1)==4)
-		[o1,o2,o3,o4] =  Es.TestList{ii}(Vs,Ps,Es);
+	elseif (Es.CalcOuts(ii,1)==4)
+		[o1,o2,o3,o4] =  Es.CalcList{ii}(Vs,Ps,Es);
         tmp = [o1(:)' o2(:)' o3(:)' o4(:)'];
 		stats = [stats o1(:)' o2(:)' o3(:)' o4(:)'];
-	elseif (Es.TestOuts(ii,1)==5)
-		[o1,o2,o3,o4,o5] =  Es.TestList{ii}(Vs,Ps,Es);
+	elseif (Es.CalcOuts(ii,1)==5)
+		[o1,o2,o3,o4,o5] =  Es.CalcList{ii}(Vs,Ps,Es);
         tmp = [o1(:)' o2(:)' o3(:)' o4(:)' o5(:)'];
 		stats = [stats o1(:)' o2(:)' ];
     else
         tmp = [];
-		warning('MultiTest does not support more than 5 outputs per function');
+		warning('MultiCalc does not support more than 5 outputs per function');
 	end;
-    if(Es.TestOuts(ii,2)>0)  % Get only specific outsputs if requested
-        tmp = tmp(nonzeros(Es.TestOuts(ii,2:end)));
+    if(Es.CalcOuts(ii,2)>0)  % Get only specific outsputs if requested
+        tmp = tmp(nonzeros(Es.CalcOuts(ii,2:end)));
     end;
     stats = [stats tmp];
 end;
 
+end
