@@ -17,6 +17,7 @@ if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
     end;
     
     totsteps = ceil(Es.TimeDst/Es.TsSize);
+    %disp([totsteps Es.TsSize Es.TimeDst])
     % Go through each time step
     for ii=1:totsteps
         if(Es.SmUse)   % Integrate next time step

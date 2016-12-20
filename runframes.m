@@ -46,15 +46,14 @@ if (length(Es.Frames)>1)	% Deal with Es.Frames being a vector
 	num = length(Es.Frames);
 	Es.Frames = [0 ; Es.Frames(:)];
 	Es.TimeDst = Es.Frames(end);
-	jumps = Es.Frames(2:end)-Es.Frames(1:end-1); 
-
-    if(min(jumps)<0)
-       jumps = Es.Frames(2:end);
-        warning('Es.Frames should be given with absolute values for time, not relative. Values given were converted.');
-    end;
 else
 	num = Es.Frames;
-	jumps = ones(1,num)*Es.TimeDst/(num+0.0);
+    Es.Frames = (0:num)*Es.TimeDst/num;
+end;
+Es.Frames=round(Es.Frames/Es.TsSize)*Es.TsSize;
+jumps = round(diff(Es.Frames)/Es.TsSize)*Es.TsSize; 
+if(min(jumps)<0)
+    error('Es.Frames should be an ordered list')
 end;
 
 % Es.FramesChoice Allows only some frames to be taken out. Default is to return all. 
@@ -97,7 +96,7 @@ frames = zeros([size(Vs) length(nonzeros(Es.FramesChoice))]);
 history = [];
 
 frmind = 1;
- 
+
 Vnow = Vs;
 % Go over each frame
 for index=1:num

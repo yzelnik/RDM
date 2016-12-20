@@ -1,15 +1,15 @@
-function VsOut=L_RH(Vs,Ps,Es,varargin)
+function VsOut=L_RH(Vs,Ps,Es)
 % Rietkerk-HilleRisLambers (non-dimensional) model - Local terms
 % VsOut=L_MK(Vs,Ps,Es)
 % Given the state variables (Vs) and parameters (Ps), calculate the local terms of the model
 % Variables are: B(1),W(2),H(3). 
 % Parameters are: P,mu,alpha,f,ni,gamma,DW,DH. (0.3,0.5,0.4,0.2,0.4,0.1,1,1000)
 
-% Update online if necessary
-if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
+if(~isfield(Es,'JacMode'))
+   Es.JacMode=0;
+end;
 
 % Initialization
-
 B=Vs(:,1); 
 W=Vs(:,2); 
 H=Vs(:,3); 
