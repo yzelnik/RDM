@@ -61,15 +61,15 @@ for ii=1:num
 	elseif (Es.TestOuts(ii,1)==3)
 		[o1,o2,o3] =  Es.TestList{ii}(Vs,Ps,Es);
         tmp = [o1(:)' o2(:)' o3(:)'];
-		stats = [stats o1(:)' o2(:)' o3(:)'];
+		%stats = [stats o1(:)' o2(:)' o3(:)'];
 	elseif (Es.TestOuts(ii,1)==4)
 		[o1,o2,o3,o4] =  Es.TestList{ii}(Vs,Ps,Es);
         tmp = [o1(:)' o2(:)' o3(:)' o4(:)'];
-		stats = [stats o1(:)' o2(:)' o3(:)' o4(:)'];
+		%stats = [stats o1(:)' o2(:)' o3(:)' o4(:)'];
 	elseif (Es.TestOuts(ii,1)==5)
 		[o1,o2,o3,o4,o5] =  Es.TestList{ii}(Vs,Ps,Es);
         tmp = [o1(:)' o2(:)' o3(:)' o4(:)' o5(:)'];
-		stats = [stats o1(:)' o2(:)' ];
+		%stats = [stats o1(:)' o2(:)' ];
     else
         tmp = [];
 		warning('MultiTest does not support more than 5 outputs per function');
