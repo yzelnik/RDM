@@ -11,7 +11,7 @@ if(~mod(nargin,2)) varargin = ['Es.SsThresh' varargin]; end;
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'TimeMax',inf,'TimeMin',0,'TsNum',1e2,'OlDraw',0,'TestFunc',[],'TsMode','none');
+Es=InsertDefaultValues(Es,'TimeMax',inf,'TimeMin',0,'TsNum',1e2,'OlDraw',0,'TestFunc',[],'TsMode','none','NoWarning',0);
 % Initilize state if necessary
 [Vs,Ps,Es]=InitilizeState(Vs,Ps,Es);
 
@@ -90,8 +90,8 @@ while (FlagStop==0) && (time<Es.TimeMax)
            drawnow; 
     end;
 end;
-if(time>=Es.TimeMax)
-    warning(sprintf('did not converge at time = %d.',time));
+if(time>=Es.TimeMax && ~Es.NoWarning)
+    warning(sprintf('Did not converge at time = %d.',time));
 end;
 
 sz=size(history,2);

@@ -29,7 +29,7 @@ for ind = 1:size(InitVals,1)
         % It seems we are not converging still.
         [~,Y2] = ode45(@ODE_shell,(0:4)*deftime/4,Y(5,:),[],Ps,Es);
         %disp([abs(Y(1,:)-Y(5,:)) abs(Y2(1,:)-Y2(5,:))])
-        if(sum(abs(Y(1,:)-Y(5,:))*slowchange<abs(Y2(1,:)-Y2(5,:))))
+        if((sum(abs(Y(1,:)-Y(5,:))*slowchange<abs(Y2(1,:)-Y2(5,:)))) && (~Es.NoWarning))
             warning('Solution does not appear to converge.')
         end;
     end;

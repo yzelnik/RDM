@@ -108,8 +108,11 @@ while((sign(initval)==sign(curval)) && ind<length(jumps))
 end;
 
 if(sign(initval)==sign(curval))
-    warning('Search failed to find opposite values of objective function');
-    finalpoint=NaN; testval=[]; st=[];
+    if(~Es.NoWarning)
+        warning('Search failed to find opposite values of objective function');
+    end;
+    finalpoint=NaN; 
+    testval=[]; st=[];
 else
 	point1 = initpoint;
     point2 = curpoint;

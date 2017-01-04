@@ -8,7 +8,10 @@ function VsOut=I_PSRD(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-if(isfield(Es,'SetupMode') && Es.SetupMode)
+Es=InsertDefaultValues(Es,'SetupMode',0,'NoWarning',0);
+
+
+if(Es.SetupMode)
     % Setup variables for integration in the future    
     Ps=GetSpaData(Vs,Ps,Es);    % Run subfunction (see at the end)
     VsOut = Ps; % This is a "misuse" of the name, but we just want to return the "new" Ps struct
@@ -75,7 +78,7 @@ else        % Normal run
         VsOut(:,ii)=reshape(real(ifftn(Us{ii})),tlen,1); 
     end;
 
-    if(~isfield(Es,'SkipWarning') || Es.SkipWarning==0)    % Check for problematic values
+    if(~Es.NoWarning)    % Check for problematic values
         if any(isnan(reshape(VsOut,1,numel(VsOut))))
             warning('Matrix contains NaN')
         end;

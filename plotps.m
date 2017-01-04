@@ -23,7 +23,7 @@ if(~isempty(Es.BfFilter))
     if(size(Es.BfFilter,2)<2) % set to horizontal vector if needbe
         Es.BfFilter=Es.BfFilter';
     end;
-    if(size(Es.BfFilter,2)<3) % padd in zeros if needbe
+    if(size(Es.BfFilter,2)<3) % padd in zeros if need-be
         Es.BfFilter(1,3)=0;
     end;
     for ii=1:size(Es.BfFilter,1) % go over each field to filter
@@ -34,6 +34,10 @@ end;
 
 if(isempty(bfs))
     error('No data to plot after filtering.');
+end;
+
+if(length(Es.BfFields)<3)
+    error('3 fields needed to make a parameter-space plot');
 end;
 
 % Find the first point where the parameter Es.BfFields(1) changes direction

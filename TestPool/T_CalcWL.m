@@ -1,6 +1,6 @@
-function [K,Lambda,Phi] = T_CalcWL(Vs,Ps,Es,varargin)
-% Calculate wavenumber (k) and wavelength (Lambda) of a given state
-% [K,Lambda,Phi] = T_CalcWL(Vs,Ps,Es)
+function [Lambda,K,Phi] = T_CalcWL(Vs,Ps,Es,varargin)
+% Calculate wavelength (Lambda) and wavenumber (k) of a given state
+% [Lambda,K,Phi] = T_CalcWL(Vs,Ps,Es)
 
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
