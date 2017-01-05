@@ -23,7 +23,6 @@ if(~isfield(Es,'JacNum'))
 end;
 
 if(~Es.JacNum)
-    Es.JacMode = 1;	% Delete this line soon, old version (still needs change across the board)
     Es.JacMode = 1;	% Request a jacobian
 end;
 

@@ -25,6 +25,9 @@ if(Ps.Ny>1) % if this is 2D
 else        % or just 1D
     regsz  = Ps.Lx/max(regnum);
 end;
+if(regnum(1)<1)
+    regsz=0;
+end;
 
 end
 

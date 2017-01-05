@@ -24,11 +24,15 @@ for ii=1:length(pnts)
 	elseif (ind>0)
 
 		if(ind>1)
-			if(wsmooth)
+			if(wsmooth>0)
 				newx=(min(xs):ires:max(xs))';
 				bot=smooth(interp1(xs,mns,newx,'PCHIP'),ceil(wsmooth/ires));
 				top=smooth(interp1(xs,mxs,newx,'PCHIP'),ceil(wsmooth/ires));	
-			else
+            elseif(wsmooth<0)
+                newx=xs';
+	            bot=cleancurve(mns',-wsmooth);
+                top=cleancurve(mxs',-wsmooth);
+	        else
 				newx=xs';
 				bot=mns';
 				top=mxs';
@@ -47,4 +51,14 @@ for ii=1:length(pnts)
 	end;
 end;
 hold off;
+end
+
+
+function curve=cleancurve(curve,jump)
+
+	tmplist  = find(abs(diff(curve(:)))>jump);
+	finlist  = tmplist(diff(tmplist)==1);
+    jumpflag = abs(curve(finlist)-curve(finlist+2))<min([abs(curve(finlist)-curve(finlist+1)) abs(curve(finlist+1)-curve(finlist+2))],[],2);
+    curve(finlist(jumpflag)+1)=(curve(finlist(jumpflag))+curve(finlist(jumpflag)+2))/2;         
+
 end

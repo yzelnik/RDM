@@ -14,6 +14,10 @@ if(~mod(nargin,2)) error('No default extra-input exists for runcont.'); end;
 % Put in some default values of Es
 Es=InsertDefaultValues(Es,'BfMaxDiff',0,'TestFunc',@T_L2Norm);
 
+% By default, a stopping val is checked on the first column
+if(length(Es.BfMaxDiff)<2) ||  (Es.BfMaxDiff(2)<2)
+    Es.BfMaxDiff(2)=1;
+end;
 % In case we want to run several test functions
 if(iscell(Es.TestFunc))  
     Es.TestList=Es.TestFunc;
@@ -75,12 +79,11 @@ stopflag=0;
 ExtData=[];
 
 while((ii<=length(parrange)) && (~stopflag))
-    disp(sprintf('step %d: %s=%.4f, ext: %f',ii,parname,parrange(ii),ExtData(1)));
-	Vs = Vs + rand(size(Vs))*Es.StSmall*1e-4;
+    Vs = Vs + rand(size(Vs))*Es.StSmall*1e-4;
 	% Update paramater
 	Ps.(parname) = parrange(ii);
   	% Run the system to SS
-	[VsOut,ExtData] = Es.SsFunc(Vs,Ps,Es);
+	[VsOut,ExtData,ext2] = Es.SsFunc(Vs,Ps,Es);
     if(isempty(VsOut))
         BfData = [BfData; Ps.(parname) ExtData(:)'];
     else
@@ -90,8 +93,8 @@ while((ii<=length(parrange)) && (~stopflag))
         BfData = [BfData; Ps.(parname) res(:)'];
     end;
     %disp(BfData(end,:));
-    if(Es.BfMaxDiff && (ii>1))
-        if(abs(diff(BfData(ii-1:ii,2)))>Es.BfMaxDiff)
+    if(Es.BfMaxDiff(1) && (ii>1))
+        if(abs(diff(BfData(ii-1:ii,Es.BfMaxDiff(2)+1)))>Es.BfMaxDiff(1))
             stopflag=1;
         end;
     end;
@@ -99,6 +102,7 @@ while((ii<=length(parrange)) && (~stopflag))
 	% Update from the last result
 	if(stopflag)
         BfData(end,:)=[];
+        VsOut=Vs; % push us one state back
     else
         if(~isempty(VsOut))
             Vs = VsOut;
@@ -111,5 +115,7 @@ while((ii<=length(parrange)) && (~stopflag))
 	if(WriteFlag)
 		dlmwrite(Es.BfOut,BfData,'precision',5);
 	end;
+    %disp(sprintf('step %d: %s=%.4f, ext: %f',ii,parname,parrange(ii),ext2));
     ii=ii+1;
+	
 end;

@@ -47,7 +47,7 @@ if(iscell(Es.BfRange))  % Now if we're in (3) format (or (2), in effect)
             Es.CellData{curcel}=Es.BfRange{ii}; % move cell-arr into its proper place
             Es.BfRange{ii}=[1;curlen;-curcel;0]; % now make the proper arangements in Es.BfRange.
         end;
-        tmp = [Es.BfRange{ii}(:) ; 0]; % Padd with zero (for regular grid)
+        tmp = [Es.BfRange{ii}(:) ; 0]; % Pad with zero (for regular grid)
         
         if(tmp(3)<0) % This a "special" type of parameter, given in celldata (-tmp(3))
             Es.PrmInCell(ii)=-tmp(3); % "pointer" to where the data is located
@@ -67,7 +67,7 @@ if(iscell(Es.BfRange))  % Now if we're in (3) format (or (2), in effect)
             parvals = min(max(parvals,min(tmp(1:2))),max(tmp(1:2)));
         elseif(tmp(4)>2)    % logaritmic spacing (non-random), consecutive multplication = tmp(4)/tmp(3)
             % create series from 0 to 1, each jump larger than the last
-            zerotoone=tmp(4).^(((0:(tmp(3)-1))./(tmp(3)-1)))/(tmp(4)-1)-1/(tmp(4)-1);
+            zerotoone=tmp(4).^(((0:(curnum-1))./(curnum-1)))/(tmp(4)-1)-1/(tmp(4)-1);
             parvals = zerotoone'*(tmp(2)-tmp(1))+tmp(1);
         elseif(isnan(tmp(4))) % each point follows seperation from previous parameter (same distances) 
             tmpvals = (parvals-Es.BfRange{ii-1}(1))/(Es.BfRange{ii-1}(2)-Es.BfRange{ii-1}(1)); % normalize
