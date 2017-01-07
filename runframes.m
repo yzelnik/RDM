@@ -110,20 +110,6 @@ for index=1:num
         end;
         [Vs,Ps,Es]=SaveParmList(Vs,Ps,Es,tempvals,Es.DynPrm);
         
-		%for indprm=1:length(Es.DynPrm)
-	    %	 if(iscell(Es.DynVal))  
-		%		tempval = Es.DynVal{index,indprm}; % Read from a cell-array
-        %    elseif(length(Es.DynPrm)==1)
-        %        tempval = Es.DynVal(index,:);      % Read the whole row
-        %    else
-		%		tempval = Es.DynVal(index,indprm); % Read from a single column
-		%	end;
-		%	if(ischar(Es.DynPrm{indprm}))
-		%		Ps.(Es.DynPrm{indprm})=tempval;
-		%	else
-		%		Ps.Ds(Es.DynPrm{indprm})=tempval;
-		%	end;
-		%end;
 	end;
 	Es.TimeDst = jumps(index);
     % Run a recurring function, if the time is right  
@@ -145,15 +131,11 @@ for index=1:num
     % Save run history (bf data)
     if(~isempty(Es.TestFunc))  
         testres = PerformTests(Vnext,Ps,Es,Es.TestFunc);
-        history = [history;  Es.Frames(index) testres(:)'];
+        history = [history;  Es.Frames(index+1) testres(:)'];
     end;
     
-    % Option for breaking the loop
-    if(FlagStop~=0)
-        break;
-    end;
     % Used for Online-drawing, if relevant
-    if Es.OlDraw   
+    if Es.OlDraw  
            cla;
            subplot(1,2,1);
            plotst(Vnow,Ps,Es);
@@ -169,6 +151,11 @@ for index=1:num
     end;
     if(~isempty(Es.FileOut))
         save(Es.FileOut);
+    end;
+    % Option for breaking the loop
+    if(FlagStop~=0)
+        frames = frames(:,:,1:index); % chop off the end of the data since it is blank
+        break;
     end;
 end;
 

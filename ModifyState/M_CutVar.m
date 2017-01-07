@@ -20,6 +20,8 @@ if(Es.ModPrm(2)==0)
 end;
 if(Es.ModPrm(3)==0)
     Es.ModPrm(3)=1; % Augment all the system
+elseif(Es.ModPrm(3)>1)
+    Es.ModPrm(3)=Es.ModPrm(3)/Ps.Lx;
 end;
 
 if(Es.ModPrm(4)>=0)
