@@ -11,6 +11,7 @@ end;
 if(~isfield(Ps,'H2') || Ps.H2==0)
    Ps.H2=Ps.VarNum; % By defauly the H^2 field is assumed to be the last one
 end;
+if(size(Ps.Ds,2)==1) Ps.Ds=Ps.Ds'; end; % Make sure Ds is in a row shape
 
 if(isfield(Es,'SetupMode') && Es.SetupMode)
     % Pre caclculate spatial matrix, for future use
@@ -28,11 +29,8 @@ if(isfield(Es,'SetupMode') && Es.SetupMode)
        %Out.SpaMat((Ps.H2-1)*len+(1:len),(Ps.H2-1)*len+(1:len)) = dervh;
        Es.JacMode=1;
        Es.SetupMode=0;
-       disp(999)
        Out.SpaMat=S_SG(Vs,Out,Es);
-       size(Out.SpaMat)
-       Es.JacMode=0;
-       
+       Es.JacMode=0;    
    end;
 else            % Normal run
    len=Ps.Nx*Ps.Ny; 
@@ -46,9 +44,9 @@ else            % Normal run
             Out = [];
             for ind=1:Ps.VarNum
                 if(ind==Ps.H2)
-                    tmpout = Ps.Derv2Mat*(Vs(:,ind).^2).*Ps.Ds(ind);
+                    tmpout = Ps.Derv2Mat*(Vs(:,ind).^2).*Ps.Ds(:,ind);
                 else
-                    tmpout = Ps.Derv2Mat*Vs(:,ind).*Ps.Ds(ind);
+                    tmpout = Ps.Derv2Mat*Vs(:,ind).*Ps.Ds(:,ind);
                 end;
             Out  = [Out tmpout];
             end;
@@ -73,7 +71,7 @@ else            % Normal run
             else
                 tmpout= d2;
             end;
-            Out(len*(ind-1)+(1:len),len*(ind-1)+(1:len)) = tmpout*Ps.Ds(ind);
+            Out(len*(ind-1)+(1:len),len*(ind-1)+(1:len)) = tmpout*Ps.Ds(:,ind);
         end;
         
    end;

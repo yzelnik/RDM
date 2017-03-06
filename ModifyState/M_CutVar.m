@@ -38,7 +38,6 @@ else
     cutval = Es.ModPrm(1);
 end;
 
-
 VsOut=Vs;
 if(Es.ModPrm(3)>=1)
     VsOut(:,Es.ModPrm(2))= VsOut(:,Es.ModPrm(2)) + cutval;
@@ -52,17 +51,18 @@ else
     
     counter = 1;
     while counter<sitenum  % iteratively find neighboring sites
-        newvec = nnsm*tmpvec;
+        newvec = logical(nnsm*tmpvec);
+        newvec = newvec - tmpvec.*newvec;
         tmpvec = tmpvec + newvec;
         counter = sum(tmpvec ~= 0);
+        %plot(newvec); pause;
     end;
-   
+    
     if(counter>sitenum)  % make sure we have exactly sitenum sites
-        tmpvec = tmpvec-newvec;
-        inds = find((newvec>0)-(tmpvec>0));
-        tmpvec = tmpvec+newvec;
-        tmpvec(inds(1:(counter-sitenum)))=0;
+        inds = find(newvec);
+        tmpvec(inds(1:(counter-sitenum)))=0;     
     end;
+
     locs=logical(tmpvec);
     %locs = mod(ceil(edge*len)+(1:ceil(Es.ModPrm(3)*len))-1,len)+1;
     

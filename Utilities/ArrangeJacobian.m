@@ -14,7 +14,7 @@ if(~isfield(Es,'JacForm') || Es.JacForm==0)
     % Go over diagonals, and for each one go over each equation part
     for ii=1-num:num-1
         for jj=1:num
-            %[jj jj-ii ii+num jj] 
+            %[jj jj-ii ii+num jj len] 
             if((jj-ii)>0 && (jj-ii)<=num)
                 temp((1:len)+(jj-1)*len,ii+num)=Vs((1:len)+(jj-ii-1)*len,jj);
             end;

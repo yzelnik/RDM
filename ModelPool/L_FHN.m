@@ -25,10 +25,8 @@ else                % Jacobian of equations
     VdU = Ps.epsilon;
     VdV = -Ps.epsilon.*Ps.a1;
     
-    syslen = Ps.Nx * Ps.Ny;
     % written in a large sparse matrix format
-    VsOut = spdiags([UdU UdV VdU; VdV UdV VdU],[0 syslen -syslen],syslen*2,syslen*2);
-    %VsOut = sparse([diag(UdU) diag(UdV) ; diag(VdU) diag(VdV)]);
+    VsOut = ArrangeJacobian([UdU UdV;VdU VdV],Ps,Es);
 end;
 
 end

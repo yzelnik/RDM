@@ -30,7 +30,7 @@ else    % Jacobian of equations
     WdW = - Ps.c - B.^2 ;
     
     % written in a large sparse matrix format 
-    VsOut = sparse([diag(BdB) diag(BdW) ; diag(WdB) diag(WdW)]);
+    VsOut = ArrangeJacobian([BdB BdW;WdB WdW],Ps,Es);
 end;
 
 

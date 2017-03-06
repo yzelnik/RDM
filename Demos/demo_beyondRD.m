@@ -37,14 +37,14 @@ Ps2 = struct('LocFunc',@L_GS,'SpaFunc',@S_RD,'IntegFunc',@I_FDCN,'f',0.06,'k',0.
 rd  = run2ss(1,Ps2,Es,'Es.OlDraw',1,'Es.StAxis',[0 1]);
 
 %% To add advection, we change the spatial function to S_LD, and so we need 
-%  to change the derivative coefficients. First 2 values of Ps.Ds are for the 
-%  first derivative (we choose the have advection for the second variable),
+%  to change the derivative coefficients. The first 2 values of Ps.Ds are for 
+%  the first derivative (we choose the have advection for the second variable),
 %  while the next two are for the second derivatives (which we keep the same)
 rda = run2ss(1,Ps2,Es,'Es.OlDraw',1,'Ps.SpaFunc',@S_LD,'Ps.Ds',[0 0.25 1 10],'Es.StAxis',[0 1]);
 
 %% Non-linear derivatives
 %  We can also use non-linear spatial derivatives, which limits our options
-%  of Integration functions, among other things. (No Spectral/Implicit methods)
+%  of integration functions, among other things. (No spectral/implicit methods)
 
 %% The Burger's equation 
 %  We use S_BE for a spatial function (with no local terms) to get the Burger's equation
@@ -54,7 +54,6 @@ try1 = run2ss([1;0],Ps3,Es,'Es.TsSize',2*1e-3,'Es.OlDraw',1,'Es.InitFunc',@M_Ini
 %  Note that the S_BE function returns a vector the size of Vs, not a spatial matrix
 
 %% Integral terms
-%  We can also use non-linear spatial derivatives, which limits our options
-%  of Integration functions, among other things. (No Spectral/Implicit methods)
+%  Using integral terms is typically quite heavy on computing time.
 
 

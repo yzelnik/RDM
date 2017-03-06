@@ -22,7 +22,7 @@ else                % Jacobian of equations
     
     NdN = Ps.r .* ( -1+(2*N.*(Ps.A+Ps.K)-3*N.^2)./(Ps.A.*Ps.K) );
     % written in a large sparse matrix format 
-    VsOut = spdiags(NdN,0,1,1);
+    VsOut = spdiags(NdN,0,Ps.Nx*Ps.Ny,Ps.Nx*Ps.Ny);
 end;
 
 end

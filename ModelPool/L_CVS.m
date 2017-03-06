@@ -41,10 +41,10 @@ VdB = 0.*V;
 BdV = 0.*V;
 BdB = 0.*V;
 
-disp('not implemented yet');
+error('not implemented yet');
 
 % written in a large sparse matrix format 
-VsOut = sparse([diag(VdV) diag(VdB); diag(BdV) diag(BdB)]);
+%VsOut = sparse([diag(VdV) diag(VdB); diag(BdV) diag(BdB)]);
 end;
 
 

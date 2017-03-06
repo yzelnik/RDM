@@ -9,8 +9,12 @@ if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 % Initialization
 Es.TimeMax = Es.TimeDst;
 
+if(isfield(Es,'CsiThresh'))
+    %disp(999);
+    Es.SsThresh=Es.CsiThresh;
+end;
 % Integrate in time
-VsOut=run2ss(Vs+rand(size(Vs))*(Es.StSmall/100),Ps,Es,'Es.OlDraw',0);
+VsOut=run2ss(Vs+rand(size(Vs))*(Es.StSmall/100),Ps,Es,'Es.OlDraw',0,'Es.TestFunc',[],'Es.NoWarning',1);
 
 Es.SsThresh=Es.StSmall*10;
 

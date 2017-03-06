@@ -23,7 +23,6 @@ if(Es.JacMode==0)      % Model equations
 else                % Jacobian of equations
 
     BdB = 1 - Ps.mu + 2*(Ps.Lambda - 1).*B - 3*B.^2;
-    %VsOut = sparse(diag(BdB));  % written in a large sparse matrix format 
     VsOut = spdiags(BdB,0,length(BdB),length(BdB)); % written in a large sparse matrix format 
 end;
 

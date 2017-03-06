@@ -29,7 +29,7 @@ else
 
 % written in a large sparse matrix format 
 VsOut = sparse(Ps.Nx*Ps.VarNum,Ps.Nx*Ps.VarNum);
-warning ('Gacobian Not implemented.')
+warning ('Jacobian Not implemented.')
 end;
 
 

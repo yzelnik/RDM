@@ -1,8 +1,11 @@
-function DrawShape(pnts,cols,wsmooth,color,parse)
+function DrawShape(pnts,cols,wsmooth,color,parse,xy)
 % Draw a shape
 % par = scanned parameter; U = result (variable at steady state); K = wavenumber;
 if(nargin<5)
 	parse = 0;
+end;
+if(nargin<6)
+	xy = 0;
 end;
 
 ires=10;
@@ -24,14 +27,18 @@ for ii=1:length(pnts)
 	elseif (ind>0)
 
 		if(ind>1)
-			if(wsmooth>0)
+			if(wsmooth(1)>0)
 				newx=(min(xs):ires:max(xs))';
 				bot=smooth(interp1(xs,mns,newx,'PCHIP'),ceil(wsmooth/ires));
 				top=smooth(interp1(xs,mxs,newx,'PCHIP'),ceil(wsmooth/ires));	
-            elseif(wsmooth<0)
+            elseif(wsmooth(1)<0)
                 newx=xs';
-	            bot=cleancurve(mns',-wsmooth);
-                top=cleancurve(mxs',-wsmooth);
+	            bot=cleancurve(mns',-wsmooth(1));
+                top=cleancurve(mxs',-wsmooth(1));
+                if(length(wsmooth)>1)
+                    bot=cleancurve(bot,-wsmooth(2));
+                    top=cleancurve(top,-wsmooth(2));
+                end;
 	        else
 				newx=xs';
 				bot=mns';
@@ -41,8 +48,12 @@ for ii=1:length(pnts)
 			%size(bot)
 						%disp([newx(1) newx(end); top(1) top(end); bot(1) bot(end)]);
 			%[newx top bot]
-			fill([newx ; newx(end:-1:1)],[top ; bot(end:-1:1)],color(1:3), 'FaceAlpha', color(4));			
-			hold on;
+			if(xy)
+                fill([top ; bot(end:-1:1)],[newx ; newx(end:-1:1)],color(1:3), 'FaceAlpha', color(4),'EdgeColor','none');			
+            else
+                fill([newx ; newx(end:-1:1)],[top ; bot(end:-1:1)],color(1:3), 'FaceAlpha', color(4),'EdgeColor','none');			
+            end;
+            hold on;
 			xs=[];
 			mxs=[];
 			mns=[];

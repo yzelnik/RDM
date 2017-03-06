@@ -6,7 +6,7 @@
 %  The get-funcs are typically used as accessories, to help clarify things.
 
 %  We will present a basic usage of each run-func, by order of increasing complexity
-%  The plot/get-funcs will be presented in-between, whereever relevant
+%  The plot/get-funcs will be presented in-between, where ever relevant
 clear all;
 clc;
 %% We start by preparing our 3 basic matlab-variables, using the 1-D Gray-Scott model 

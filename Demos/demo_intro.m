@@ -17,7 +17,7 @@ figure;
 out1 = run2ss(1,Ps,Es,'Es.OlDraw',1);
 %  On the left panel we see the pattern changing in real time,
 %  while on the right panel we follow the change between consecutive frames
-%  You can stop the simulation in the middle by clicking on the stop-button
+%  You can stop the simulation mid-run by clicking on the stop-button
 
 %% Now, run a 2D simulation
 out2 = run2ss(1,Ps,Es,'Es.OlDraw',1,'Ps.Nx',80,'Ps.Lx',120,'Ps.Ny',80,'Ps.Ly',120);

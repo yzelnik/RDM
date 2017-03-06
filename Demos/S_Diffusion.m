@@ -1,6 +1,6 @@
 function Mat=S_Diffusion(Vs,Ps,Es)
 % we return a diffusion-operator matrix
-% such that if we call Mat that we return M, and Ps.Ds we call d, we have:
+% such that if we call the Matrix we return M, and Ps.Ds we call d, we have:
 % d*u_xx = M*u
 
 % We begin by building a second-derivative (operator) matrix

@@ -11,17 +11,12 @@ if(~isfield(Es,'JacMode'))
    Es.JacMode=0;
 end;
 
-% Initialization
-U=Vs(:,1); 
 
 if(Es.JacMode==0)      % Model equations
-
-    dU = -U./Ps.lambda;
-    VsOut = [dU];
+    VsOut = -Vs./Ps.lambda;
 else               % Jacobian of equations
-
     % written in a large sparse matrix format 
-    VsOut = ArrangeJacobian([(-1./Ps.lambda).*ones(size(U))],Ps,Es);
+    VsOut = spdiags(repmat(-1./Ps.lambda,Ps.Nx*Ps.Ny,1),0,Ps.Nx*Ps.Ny,Ps.Nx*Ps.Ny);
 end;
 
 

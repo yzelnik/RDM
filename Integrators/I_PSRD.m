@@ -110,7 +110,7 @@ function Ps=GetSpaData(Vs,Ps,Es)
     else
         justdiffusion=0;
     end;
-    Ds   = [Ps.Ds(:) ;zeros(16,1)];
+    Ds   = [Ps.Ds(:) ;zeros(Ps.VarNum*4,1)];
     for ii=1:Ps.VarNum
         Us{ii}=fftn(reshape(Vs(:,ii),Ps.Nx,Ps.Ny));
         if(justdiffusion==1)

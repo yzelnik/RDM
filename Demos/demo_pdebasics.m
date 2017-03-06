@@ -28,10 +28,10 @@ frnt1 = run2ss([1;0],Ps,Es,'Es.OlDraw',1,'Es.InitFunc',@M_InitMixSt,'Es.StAxis',
 %  Note: Here we add to Es 3 more parameters: Es.OlDraw for on-line drawing, 
 %  Es.InitFunc for initlizing a front, Es.StAxis for keeping a constant y-axis
 
-%% Lets try again, but with a very short local function, @L_basics
+%% Lets try again, but with a very simple&short local function, @L_basics
 Ps2 = Ps; 
 Ps2.LocFunc = @L_basics;
-%  Where L_basics is a very-short function in this folder. take a look.
+%  Where L_basics is a very-short function in this folder. Take a look.
 
 %  Now we run the same front simulation again, and it works just the same
 frnt2 = run2ss([1;0],Ps2,Es,'Es.OlDraw',1,'Es.InitFunc',@M_InitMixSt,'Es.StAxis',[-0.1 1.2]);

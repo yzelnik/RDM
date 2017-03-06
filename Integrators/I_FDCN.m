@@ -1,4 +1,3 @@
-
 function VsOut=I_FDCN(Vs,Ps,Es,varargin)
 % Integrator with Finite-Difference Crank-Nicolson Method (semi-implicit)
 % VsOut=I_FDCN(Vs,Ps,Es)

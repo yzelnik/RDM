@@ -11,17 +11,11 @@ Es=InsertDefaultValues(Es,'PopThresh',Es.StSmall);
 
 VsOut=Vs;
 
-if(length(Es.PopThresh)==1)
-    %if(max(VsOut(:,Es.VarInd,1))<Es.PopThresh)
-    %    VsOut(:,Es.VarInd,1)=0;
-    %end;
+if(length(Es.PopThresh)==1) % apply threshold on variable(s) Es.VarInd
     sites=VsOut(:,Es.VarInd,1)<Es.PopThresh;
     VsOut(sites,Es.VarInd,1)=0;
-else
-    for ii=1:length(Es.PopThresh)
-    %    if(max(VsOut(:,ii,1))<Es.PopThresh(ii))
-    %        VsOut(:,ii,1)=0;
-    %    end;
+else % apply threshold according to Es.PopThresh
+    for ii=1:length(Es.PopThresh) 
         sites=VsOut(:,ii,1)<Es.PopThresh(ii);
         VsOut(sites,ii,1)=0;
     end;

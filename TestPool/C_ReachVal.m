@@ -27,7 +27,7 @@ if(initval>Es.ReachVal(1))
 end;
 
 if(initval==Es.ReachVal(1))
-    reachtime=0;    % We started from thie value
+    reachtime=0;    % We started from this value
 elseif(max(bfhist(:,2))<Es.ReachVal(1))
     reachtime=inf;  % Value is never reached
 else

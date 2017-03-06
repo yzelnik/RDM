@@ -1,7 +1,9 @@
 %% DEMO: Using AUTO results
 %  In this demo we will learn how to import results from AUTO and use them
 %  external files: c.POMK, POMK.c, POMK.auto
-%  to start, run POMK.auto using AUTO to get data files we will use below
+%  
+%  To start, run POMK.auto using AUTO to get data files we will use below
+
 clear all;
 clc;
 
@@ -51,7 +53,7 @@ updates = {'a','','Lx'};
 
 stab_snk = AnalyzeAutoStates('MK_snk',Ps,Es,@T_LSA,[],indices,updates);
 %  The first input gives the basic file name, so the function reads b.MK_snk and s.MK_snk
-%  Indices & updates give the columns to read in the b.file, and what
+%  indices & updates give the columns to read in the b.file, and what
 %  variables they stand for in the Ps structure (so that 'a' translates to Ps.a)
 %  Thus, each state is read from the s.file, while its parameter values are
 %  updated from the b.file, when using the function T_LSA
@@ -113,3 +115,4 @@ finsnk=RephaseBf(bfsnk,stab_snk,Es,'Es.RephaseMode',1);
 %  Plot the three branches together, with the stability info we added
 plotbf({finunf,finper,finsnk},Es);
 axis([0.99 1.03 0.7 1.4])
+

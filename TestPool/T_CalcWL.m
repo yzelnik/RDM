@@ -73,7 +73,7 @@ vect=vect(:);
 if(isempty(vect))
     maxloc=NaN;
 else
-    %plot(vect)
+    plot(vect)
     reg = 2; % how much to look around max to estimate the effective location
     vectsm=smooth(vect); % Smoothing out the signal
 

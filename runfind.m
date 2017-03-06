@@ -11,7 +11,7 @@ if(~mod(nargin,2)) varargin = ['Es.FindFunc' varargin]; end;
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'FindFunc',@runflow,'FindVal',0);
+Es=InsertDefaultValues(Es,'FindFunc',@runflow,'FindVal',0,'FindOnlyBf',0);
 
 Es.InitActive  = 0; % Allow states to be updated if necessary
 
@@ -60,7 +60,11 @@ end;
 
 % Return results
 BfData = [finvals testval];
-StData = st;
+if(Es.FindOnlyBf) % if we do not want to save the state-data
+    StData = [];
+else
+    StData = st;
+end;
 
 end
 
@@ -76,6 +80,7 @@ function [dist,testval,st]=TestSearchFunc(Vs,Ps,Es,curpars,goodval,useabs)
 % Run the system
 [st,testval] = Es.FindFunc(Vs,Ps,Es);
 
+%plotst(st,Ps,Es); title(testval); drawnow;
 % Calculate the distance from the value we seek
 if(useabs)
     dist = abs(goodval-testval(1));
@@ -104,13 +109,11 @@ while((sign(initval)==sign(curval)) && ind<length(jumps))
     curpoint = initpoint + jumps(ind);
 	curval   = minfunc(curpoint);
 	ind=ind+1;
-    disp([ind curpoint curval])
+    %disp([ind curpoint curval])
 end;
 
 if(sign(initval)==sign(curval))
-    if(~Es.NoWarning)
-        warning('Search failed to find opposite values of objective function');
-    end;
+    warning('Search failed to find opposite values of objective function');
     finalpoint=NaN; 
     testval=[]; st=[];
 else
@@ -138,7 +141,7 @@ else
             end;    
         end;
         ind=ind+1;
-        disp([ind curpoint curval])
+        %disp([ind curpoint curval])
     end;
 
     finalpoint = curpoint;

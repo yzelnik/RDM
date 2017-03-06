@@ -20,7 +20,7 @@ else                % Jacobian of equations
     
     UdU = Ps.lambda + 2*Ps.a2.*U + 3*Ps.a3.*U.*U;
     % written in a large sparse matrix format 
-    VsOut = sparse(diag(UdU));
+    VsOut = spdiags(UdU,0,Ps.Nx*Ps.Ny,Ps.Nx*Ps.Ny);
 end;
 
 end

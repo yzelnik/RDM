@@ -48,8 +48,8 @@ else
         RdR = 0;
     
     % written in a large sparse matrix format
-    VsOut = 0;%spdiags([VdV VdU UdV; UdU VdU UdV],[0 syslen -syslen],syslen*2,syslen*2);
-    %VsOut = sparse([diag(VdV) diag(VdU) ; diag(UdV) diag(UdU)]);
+    VsOut = 0;
+    %VsOut = ArrangeJacobian([VdV VdU; UdV UdU],Ps,Es);
     end;
 end;
 

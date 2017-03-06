@@ -12,7 +12,7 @@ if(~mod(nargin,2)) error('No default extra-input exists for runcont.'); end;
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'BfMaxDiff',0,'TestFunc',@T_L2Norm);
+Es=InsertDefaultValues(Es,'BfMaxDiff',0,'TestFunc',@T_L2Norm,'ContUpdate',[],'ContMin',0);
 
 % By default, a stopping val is checked on the first column
 if(length(Es.BfMaxDiff)<2) ||  (Es.BfMaxDiff(2)<2)
@@ -81,24 +81,39 @@ ExtData=[];
 while((ii<=length(parrange)) && (~stopflag))
     Vs = Vs + rand(size(Vs))*Es.StSmall*1e-4;
 	% Update paramater
-	Ps.(parname) = parrange(ii);
-  	% Run the system to SS
-	[VsOut,ExtData,ext2] = Es.SsFunc(Vs,Ps,Es);
+    tmpval = parrange(ii);
+    if(isempty(strfind(parname,'.')) && isempty(strfind(parname,'('))) 
+        Ps.(parname) = tmpval;  % for parameters in Ps (Prefereable)
+    else
+        eval(sprintf('%s=tmpval;',parname));   % Use eval, less safe/stable
+	end;
+    if(~isempty(Es.ContUpdate)) % allow for updates in each cont step
+        [Vs,Ps,Es]=Es.ContUpdate(Vs,Ps,Es);
+    end;
+    
+%	Ps.(parname) = parrange(ii);
+ 
+    % Run the system to SS
+	[VsOut,ExtData] = Es.SsFunc(Vs,Ps,Es);
     if(isempty(VsOut))
-        BfData = [BfData; Ps.(parname) ExtData(:)'];
+        BfData = [BfData; tmpval ExtData(:)'];
     else
     	% Analysze this SS
         res = Es.TestFunc(VsOut,Ps,Es);
         % Add res to the overall results
-        BfData = [BfData; Ps.(parname) res(:)'];
+        BfData = [BfData; tmpval res(:)'];
     end;
     %disp(BfData(end,:));
-    if(Es.BfMaxDiff(1) && (ii>1))
+    
+    if(Es.BfMaxDiff(1) && (ii>1)) % is the new state outside of our preferred bounds?
         if(abs(diff(BfData(ii-1:ii,Es.BfMaxDiff(2)+1)))>Es.BfMaxDiff(1))
             stopflag=1;
         end;
     end;
-    
+    % If there's a minimal "success" value, check if we passed the threshold
+    if(Es.ContMin) && (ExtData>Es.ContMin)
+        stopflag=1;
+    end;
 	% Update from the last result
 	if(stopflag)
         BfData(end,:)=[];
@@ -108,14 +123,14 @@ while((ii<=length(parrange)) && (~stopflag))
             Vs = VsOut;
         else
             if(~isempty(Es.BfPrm))
-                [Vs,Ps,Es]=SavePrmList(Vs,Ps,Es,ExtData(1:length(Es.BfPrm)));
+                [Vs,Ps,Es]=SaveParmList(Vs,Ps,Es,ExtData(1:length(Es.BfPrm)));
             end;
         end;
     end;
 	if(WriteFlag)
 		dlmwrite(Es.BfOut,BfData,'precision',5);
 	end;
-    %disp(sprintf('step %d: %s=%.4f, ext: %f',ii,parname,parrange(ii),ext2));
+    %disp(sprintf('step %d: %s=%.4f, ext: %f',ii,parname,parrange(ii),ExtData(1)));
     ii=ii+1;
 	
 end;

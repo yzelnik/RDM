@@ -29,10 +29,10 @@ else    % Jacobian of equations
     ada = + 2*a./(h.*(1+Ps.del.*a.^2).^2) - Ps.mu;
     adh = - a.^2./h.^2;
     hda = + 2*a;
-    hdh = - 1;
+    hdh = - ones(size(a));
     
     % written in a large sparse matrix format 
-    VsOut = sparse([diag(ada) diag(adh) ; diag(hda) diag(hdh)]);
+    VsOut = ArrangeJacobian([ada adh;hda hdh],Ps,Es);
 end;
 
 

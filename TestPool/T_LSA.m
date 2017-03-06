@@ -12,6 +12,8 @@ function [res,evs,iternum]=T_LSA(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
+Es.LsaThresh=[Es.LsaThresh(:);0]; % pad with zero at the end
+
 ind = 0;         % Used for tracking the number of calculating attempts
 eignum = 4;
 if( (isfield(Es,'EigNum')) && Es.EigNum)
@@ -81,12 +83,12 @@ if(sum(abs(evs))==0)	% If the run was not successful, than return -1
 else	% eigs was successful, so return either 1 (stable) or 0 (unstable), using the second eigenvalue
 	temp = sort(real(evs));
     [~,zeromode] = min(abs(temp));
-    if(temp(zeromode)<abs(Es.LsaThresh))
+    if(temp(zeromode)<abs(Es.LsaThresh(1)))
         %disp(sprintf('found mode at %d, with %f',zeromode,temp(zeromode)));
         temp(zeromode)=-inf;    % Ignore zero mode (chose to zero eigvalue)
     end;
     
-    res = (1-sign(max(temp)))>0;
+    res = (1-(max(temp)>Es.LsaThresh(2)))>0;
 	%res = temp(end-1)<Es.LsaThresh;
 end;
 

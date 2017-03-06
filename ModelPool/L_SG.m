@@ -37,7 +37,7 @@ else                % Jacobian of equations
     HdH = -((B+Ps.f.*Ps.q).*Ps.alpha)./(B+Ps.q);
 
     % written in a large sparse matrix format 
-    VsOut = sparse([diag(BdB) diag(BdW) diag(BdH); diag(WdB) diag(WdW) diag(WdH); diag(HdB) diag(HdW) diag(HdH)]);
+    VsOut = ArrangeJacobian([BdB BdW BdH;WdB WdW WdH; HdB HdW HdH],Ps,Es);
 end;
 
 

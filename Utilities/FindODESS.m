@@ -2,7 +2,10 @@ function [state,T,Y] = FindODESS(InitVals,Ps,Es,varargin)
 % Find an ODE (uniform) Steady-State
 % state = FindODESS(InitVals,Ps,Es)
 
+% default values
 Es=InsertDefaultValues(Es,'TimeDst',0);
+% make sure there's no spatial heterogenous parameter
+Ps=ForcePrmMeanField(Ps);
 
 slowchange = 0.01;  % Used to test that a solution is converging. 
 deftime = max(100,Es.TimeDst);

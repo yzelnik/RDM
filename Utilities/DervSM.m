@@ -36,11 +36,16 @@ if((Ps.Nx==1) || (Ps.Ny==1))
 	end;
 else  % 2D system
 	res=sqrt(Ps.Ly/Ps.Ny*Ps.Lx/Ps.Nx);
-	switch order	% Pick relevant stencil for this order of derivative
+	switch order(1)	% Pick relevant stencil for this order of derivative
    	  case 0
   		Matt=StencilToSM([0 0 0 ;0 1 0; 0 0 0],Ps.Nx,Ps.Ny,Ps.Bc);
   	  case 1
-  		Matt=StencilToSM([0 1 0;0 0 0;0 -1 0],Ps.Nx,Ps.Ny,Ps.Bc)/res/2;
+  		%Matt=StencilToSM([0 1 0;1 0 -1;0 -1 0],Ps.Nx,Ps.Ny,Ps.Bc)/res/2;
+        if(length(order)<2) || (order(2)<2)  % defauly is x direction
+            Matt=StencilToSM([0 1 0; 0 0  0;0 -1 0],Ps.Nx,Ps.Ny,Ps.Bc)/res/2;
+        else  % other wise, in y direction
+            Matt=StencilToSM([0 0 0; 1 0 -1;0  0 0],Ps.Nx,Ps.Ny,Ps.Bc)/res/2;
+        end;
   	  case 2
 		Matt=StencilToSM([0 1 0;1 -4 1; 0 1 0],Ps.Nx,Ps.Ny,Ps.Bc)/res^2;
 	  case 4

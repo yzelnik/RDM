@@ -17,13 +17,13 @@ U=Vs(:,1);
 
 if(Es.JacMode==0)      % Model equations
 
-    dU = Ps.r.*U.* (1-U);
+    dU = Ps.r .* U .* (1-U);
     VsOut = dU;
 else                % Jacobian of equations
     
     UdU = Ps.r .* (1-2*U);
     % written in a large sparse matrix format 
-    VsOut = spdiags(UdU,0,Ps.VarNum,Ps.VarNum);
+    VsOut = spdiags(UdU,0,Ps.Nx*Ps.Ny,Ps.Nx*Ps.Ny);
 end;
 
 end
