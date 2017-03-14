@@ -5,6 +5,10 @@ function Matt=DistSM(maxdist,Ps,Es,varargin)
 % Update online if necessary
 [~,Ps,~]=UpdateParameters([],Ps,Es,varargin{:});
 
+if(~isfield(Ps,'Bc'))
+   Ps.Bc=0;
+end;
+
 if((Ps.Nx==1) || (Ps.Ny==1))  
     [X,Y]  = meshgrid(-ceil(maxdist):ceil(maxdist),0);
 else
@@ -15,7 +19,7 @@ diststencil = sqrt(X.^2+Y.^2);
 diststencil(diststencil>maxdist)=0;
 %imagesc(diststencil)
 
-Matt=StencilToSM(diststencil,Ps.Nx,Ps.Ny,Ps.BC);    
+Matt=StencilToSM(diststencil,Ps.Nx,Ps.Ny,Ps.Bc);    
 
 
 end

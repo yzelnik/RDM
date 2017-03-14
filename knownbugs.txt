@@ -1,0 +1,1 @@
+NeighborSM gives some wrong/extra sites when BC is not periodic (Ps.Bc<>0), due to the definition of StencilToSM

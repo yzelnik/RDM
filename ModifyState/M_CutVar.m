@@ -42,30 +42,10 @@ VsOut=Vs;
 if(Es.ModPrm(3)>=1)
     VsOut(:,Es.ModPrm(2))= VsOut(:,Es.ModPrm(2)) + cutval;
 else
-    nnsm=NeighborSM(1,Ps,Es);
-    sitenum = ceil(Es.ModPrm(3)*len);
-    mean(sum(nnsm));
-    % initilize vector of differnet-order neighbors
-    tmpvec  = zeros(size(Vs,1),1);
-    tmpvec(ceil(edge*len))=1;
+    reg=FindLocalRegion([Es.ModPrm(3) edge],Ps,Es);
     
-    counter = 1;
-    while counter<sitenum  % iteratively find neighboring sites
-        newvec = logical(nnsm*tmpvec);
-        newvec = newvec - tmpvec.*newvec;
-        tmpvec = tmpvec + newvec;
-        counter = sum(tmpvec ~= 0);
-        %plot(newvec); pause;
-    end;
-    
-    if(counter>sitenum)  % make sure we have exactly sitenum sites
-        inds = find(newvec);
-        tmpvec(inds(1:(counter-sitenum)))=0;     
-    end;
+    locs=logical(reg);
 
-    locs=logical(tmpvec);
-    %locs = mod(ceil(edge*len)+(1:ceil(Es.ModPrm(3)*len))-1,len)+1;
-    
     VsOut(locs,Es.ModPrm(2))= VsOut(locs,Es.ModPrm(2)) + cutval/Es.ModPrm(3);
 end;
 

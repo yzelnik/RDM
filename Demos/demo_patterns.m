@@ -14,3 +14,4 @@ Es=struct('TsSize',0.2,'TimeDst',200,'OdeInit',1,'SsThresh',1e-6,'NonNeg',1,'Lsa
 %% getting a pattern-gradient
 
 %% using a mask for initial conditions
+

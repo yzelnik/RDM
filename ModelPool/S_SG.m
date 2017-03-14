@@ -9,12 +9,12 @@ if(~isfield(Ps,'Nld'))
     Ps.Nld=0;
 end;
 if(~isfield(Ps,'H2') || Ps.H2==0)
-   Ps.H2=Ps.VarNum; % By defauly the H^2 field is assumed to be the last one
+   Ps.H2=Ps.VarNum; % By default the H^2 field is assumed to be the last one
 end;
 if(size(Ps.Ds,2)==1) Ps.Ds=Ps.Ds'; end; % Make sure Ds is in a row shape
 
 if(isfield(Es,'SetupMode') && Es.SetupMode)
-    % Pre caclculate spatial matrix, for future use
+    % Pre calculate spatial matrix, for future use
    Out = Ps;
    Out.Derv2Mat = DervSM(2,Ps,Es);
    if(Ps.Nld==0) % More direct way, just apply second derivative on H^2
@@ -58,18 +58,22 @@ else            % Normal run
    else			% Jacobian of equations
        
         Out = sparse(len*Ps.VarNum,len*Ps.VarNum);
-        d2    = Ps.Derv2Mat;
         for ind=1:Ps.VarNum
             if(ind==Ps.H2)
                 H     = Vs(:,ind);
-                d1    = DervSM(1,Ps,Es);
-        
-                part1 = sparse(H*ones(1,len)).*d2;		% H0 * Derv2 (dH)
-                part2 = sparse(diag(d2*H));			% dH * Derv2 (H0)
-                part3 = 2*sparse((d1*H)*ones(1,len)).*d1;	% 2* Derv1(H0) * Derv1(dH)
+  
+                grad  = GradSM(1,Ps,Es);
+                part1 = sparse(H*ones(1,len)).*Ps.Derv2Mat;		% H0 * Derv2 (dH)
+                part2 = sparse(diag(Ps.Derv2Mat*H));			% dH * Derv2 (H0)
+                %d1   = DervSM(1,Ps,Es);
+                %part3 = 2*sparse((d1*H)*ones(1,len)).*d1;	% 2* Derv1(H0) * Derv1(dH)
+                part3 = sparse(len,len);
+                for jj=1:length(grad)  % 2* Derv1(H) * Derv1(dU)
+                    part3=part3+2*sparse((grad{jj}*H)*ones(1,len)).*grad{jj};
+                end;
                 tmpout= 2* (part1 + part2 + part3);
             else
-                tmpout= d2;
+                tmpout= Ps.Derv2Mat;
             end;
             Out(len*(ind-1)+(1:len),len*(ind-1)+(1:len)) = tmpout*Ps.Ds(:,ind);
         end;

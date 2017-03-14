@@ -79,6 +79,10 @@ if(~isempty(Es.RecurFunc))
     end;
 end;
 
+if(~iscell(Es.RecurFunc))  % wrap in cell array if needed
+    Es.RecurFunc={Es.RecurFunc};
+end;
+
 % Set up GUI for online drawing
 FlagStop = 0;
 if Es.OlDraw
@@ -113,9 +117,11 @@ for index=1:num
 	end;
 	Es.TimeDst = jumps(index);
     % Run a recurring function, if the time is right  
-    if(~isempty(Es.RecurFunc))&&(Es.RecurFrames(index))   
-        Vnext = Es.RecurFunc(Vnow,Ps,Es);
-        Vnow = Vnext;
+    if(~isempty(Es.RecurFunc))&&(Es.RecurFrames(index))  
+        for funcind=1:length(Es.RecurFunc)
+            Vnext = Es.RecurFunc{funcind}(Vnow,Ps,Es);
+            Vnow = Vnext;
+        end;
     end;
     
 	% Run integrator to next frame

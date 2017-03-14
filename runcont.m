@@ -95,7 +95,7 @@ while((ii<=length(parrange)) && (~stopflag))
  
     % Run the system to SS
 	[VsOut,ExtData] = Es.SsFunc(Vs,Ps,Es);
-    if(isempty(VsOut))
+    if(isempty(VsOut)) % if the result is the bif-data itself
         BfData = [BfData; tmpval ExtData(:)'];
     else
     	% Analysze this SS
@@ -119,10 +119,10 @@ while((ii<=length(parrange)) && (~stopflag))
         BfData(end,:)=[];
         VsOut=Vs; % push us one state back
     else
-        if(~isempty(VsOut))
+        if(~isempty(VsOut)) % update the new state if it's not empty
             Vs = VsOut;
         else
-            if(~isempty(Es.BfPrm))
+            if(~isempty(Es.BfPrm)) % update the other parameters, if relevant
                 [Vs,Ps,Es]=SaveParmList(Vs,Ps,Es,ExtData(1:length(Es.BfPrm)));
             end;
         end;
@@ -130,7 +130,7 @@ while((ii<=length(parrange)) && (~stopflag))
 	if(WriteFlag)
 		dlmwrite(Es.BfOut,BfData,'precision',5);
 	end;
-    %disp(sprintf('step %d: %s=%.4f, ext: %f',ii,parname,parrange(ii),ExtData(1)));
+    disp(sprintf('step %d: %s=%.4f, ext: %f',ii,parname,parrange(ii),ExtData(1)));
     ii=ii+1;
 	
 end;
