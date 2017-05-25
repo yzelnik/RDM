@@ -47,6 +47,8 @@ if(~isfield(Es,'FuncSpec') || isempty(Es.FuncSpec))
                 Es.FuncSpec(ii,1)=3;      % Input state, output bifdata
             elseif (txt(1)=='C')
                 Es.FuncSpec(ii,1)=4;      % Input bifdata, output bifdata
+            elseif (txt(1)=='U')
+                Es.FuncSpec(ii,1)=0;      % Update function
             else
                 error('Function %s specificed in Es.FuncList is not recognized. Use Es.FuncSpec',txt);
             end;
@@ -89,6 +91,7 @@ for ii=1:length(Es.FuncList)    % Go over functions in the flow
   %  disp([ii size(Vs)])
   %  plotst(Vs,Ps,Es);
   % pause;
+
     if(Es.FuncSpec(ii,1)==0)        % General functions, mostly for updates
         [Vs,Ps,Es] = Es.FuncList{ii}(Vs,Ps,Es);
     elseif(Es.FuncSpec(ii,1)==1)    % Input state, output state
@@ -138,7 +141,7 @@ for ii=1:length(Es.FuncList)    % Go over functions in the flow
              BfData = CollectBfData(BfData,BfOut,Es.MergeBfData,ii);
 %            BfData(size(BfData,1)+(1:size(BfOut,1)),1:1+size(BfOut,2)) = [repmat(ii,size(BfOut,1),1) BfOut];
         end;
-    end;    
+    end;
 end;
 
 if((~Es.MergeBfData) && (sum((Es.FuncSpec(:,1)>1).*(Es.FuncSpec(:,2)>0))==1))

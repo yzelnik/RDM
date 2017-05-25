@@ -76,7 +76,6 @@ for ii=whichruns
 	BfData(size(BfData,1)+1,1:(length(bf)+size(Es.BfVal,2))) = [Es.BfVal(ii,:) bf];
     
     StData = [StData; {st}];
-	%disp(BfData)
     
 	if(WriteFlag)   % Write to file if needed
         if(writeind>=Es.WriteFreq || ii==whichruns(end))

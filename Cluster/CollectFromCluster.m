@@ -13,9 +13,14 @@ if(length(basefilename)>4) % If a predefined file type is used
     end;
 end;
 if(subfilenum)
-    NumTxt=num2str(subfilenum);
+    NumTxt=num2str(subfilenum); % use a specific number of a file
 else
-    NumTxt='*';
+    % use any number
+    if(strcmp(FileType,'*')) 
+        NumTxt=''; % make sure we don't have a "**" situation
+    else
+        NumTxt='*'; 
+    end;
 end;
 
 list=dir(sprintf('*%s_part*of%s%s',basefilename,NumTxt,FileType));

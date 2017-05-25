@@ -14,7 +14,7 @@ if(~mod(nargin,2)) varargin = ['Es.Frames' varargin]; end;
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'DynPrm',[],'RecurFunc',[],'OlDraw',0,'TestFunc',[],'TsMode','none','FileOut',[]);
+Es=InsertDefaultValues(Es,'DynPrm',[],'RecurFunc',[],'OlDraw',0,'TestFunc',[],'TsMode','none','FileOut',[],'BfPrm',[]);
 % Initilize state if necessary
 [Vs,Ps,Es]=InitilizeState(Vs,Ps,Es);
 
@@ -56,11 +56,11 @@ if(min(jumps)<0)
     error('Es.Frames should be an ordered list')
 end;
 
-% Es.FramesChoice Allows only some frames to be taken out. Default is to return all. 
+% Es.FramesChoice allows only some frames to be taken out. Default is to return all. 
 % Es.FramesChoice can be given as [1 1 0 0 1 0] or [1 2 5] for getting the first, second and fifth out of six frames
 if(~isfield(Es,'FramesChoice') || ((length(Es.FramesChoice)==1) && (Es.FramesChoice(1)==0)))
     Es.FramesChoice = ones(num,1);
-elseif (length(Es.FramesChoice) < num)
+elseif (length(Es.FramesChoice) < num) || (max(Es.FramesChoice)>1)
 	temp = zeros(num,1);
 	temp(Es.FramesChoice) = 1;
 	Es.FramesChoice = temp;
@@ -79,8 +79,10 @@ if(~isempty(Es.RecurFunc))
     end;
 end;
 
-if(~iscell(Es.RecurFunc))  % wrap in cell array if needed
+% wrap in cell array if needed
+if(~isempty(Es.RecurFunc)&&~iscell(Es.RecurFunc))  
     Es.RecurFunc={Es.RecurFunc};
+    
 end;
 
 % Set up GUI for online drawing
@@ -112,10 +114,10 @@ for index=1:num
         else
             tempvals = Es.DynVal(index,:);
         end;
-        [Vs,Ps,Es]=SaveParmList(Vs,Ps,Es,tempvals,Es.DynPrm);
+        [Vs,Ps,Es]=SaveParmList(Vs,Ps,Es,tempvals,Es.DynPrm,length(Es.BfPrm));
         
 	end;
-	Es.TimeDst = jumps(index);
+	Es.TimeDst = jumps(index); 
     % Run a recurring function, if the time is right  
     if(~isempty(Es.RecurFunc))&&(Es.RecurFrames(index))  
         for funcind=1:length(Es.RecurFunc)
@@ -165,6 +167,9 @@ for index=1:num
     end;
 end;
 
+if((frmind-1)<size(frames,3))
+    frames=frames(:,:,1:frmind-1);
+end;
 %%% SUB FUNCTIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 % stop and pause buttons for OnLine draw option %
    function stopb(~,~)
