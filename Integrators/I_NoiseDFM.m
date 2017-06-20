@@ -1,6 +1,10 @@
 function VsOut=I_NoiseDFM(Vs,Ps,Es,varargin)
 % Integrator with noise (SDE) using the derivative free Milstein scheme
 % VsOut=I_NoiseDFM(Vs,Ps,Es)
+% Ps.NoiseType should be either a number, a function or a cell array:
+% - number(s):  [a b] --> noise(x) = a*x.^b  (where x is the variable, b=0 by default)
+% - function:   a function handle, assuming no extra input is needed
+% - cell-array: {func,prms} where func is some function, and prms its parameters
 % Ps.LocFunc and Ps.SpaFunc are the functions that detail the local and non-local parts of the system
 % X_next = X + f(X)*dt + g(X)*W + (g(Y)-g(X))*(W^2)/(2*sqrt(dt)) 
 % where f,g are the rhs without noise and the noise function, and X are the varibles

@@ -1,6 +1,10 @@
 function VsOut=I_NoiseEM(Vs,Ps,Es,varargin)
 % Integrator with noise (SDE) using the Euler-Maruyama scheme
 % VsOut=I_NoiseEM(Vs,Ps,Es)
+% Ps.NoiseType should be either a number, a function or a cell array:
+% - number(s):  [a b] --> noise(x) = a*x.^b  (where x is the variable)
+% - function:   a function handle, assuming no extra input is needed
+% - cell-array: {func,prms} where func is some function, and prms its parameters
 % Ps.LocFunc and Ps.SpaFunc are the functions that detail the local and non-local parts of the system
 
 % Update online if necessary

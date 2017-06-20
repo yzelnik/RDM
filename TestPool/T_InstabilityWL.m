@@ -4,7 +4,6 @@ function [KMinmax,LambdaMinmax,AllKs,AllLambdas,evectors] = T_InstabilityWL(Vs,P
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-Es.JacMode = 1;	% Delete this line soon, old version (still needs change across the board)
 Es.JacMode = 1;	% Request a jacobian
 
 [vecs,evs]=eig(full(Ps.LocFunc(Vs,Ps,Es)+Ps.SpaFunc(Vs,Ps,Es)));
@@ -16,7 +15,7 @@ evsunstable=find(real(diag(evs))>0);
 %[~,inds]=max(tmp(1:min(Ps.Nx/2),:));
 %K_vec = Ps.Nx/2*linspace(0,1,Ps.Nx/2+1)/Ps.Lx;
 %KMinmax = K_vec(inds)*2*pi;
-
+size(evsunstable)
 for ii=1:length(evsunstable)
     %disp([ii size(vecs(:,evsunstable(ii)))]);
     tmp=T_CountRegions(reshape(real(vecs(:,evsunstable(ii))),Ps.Nx,Ps.VarNum),Ps,Es);

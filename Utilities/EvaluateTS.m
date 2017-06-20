@@ -6,7 +6,13 @@ function goodts=EvaluateTS(Vs,Ps,Es,varargin)
 
 % Update online if necessary
 [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
+% Make sure Ps parameters are properly setup
+[Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
+
+Es.OlDraw = 0; % making sure we're not plotting anything...
 Es.TsMode = 'none'; % Making sure this function does not call itself
+% Initilize state if necessary
+[Vs,Ps,Es]=InitilizeState(Vs,Ps,Es);
 
 stepnum = 100;  % how many steps to run each time
 factor  = 2;    % muliply ts by how much each time?
@@ -26,11 +32,14 @@ while (score<thresh) && (Es.TsSize<maxts)
     score = T_L2Norm(gs - twofrms(:,:,1),Ps,Es);  % compare old run to new one
     %disp([Es.TsSize score])
     gs = twofrms(:,:,2);    % new run now becomes old
-
 end;
 %score
 goodts = Es.TsSize/(factor^2);   % we found a "bad" time-step, no decrease back to "safe levels"
+% round it down into a nice number
+tmp=10.^floor(log10(abs(goodts)));
+goodts=floor(goodts/tmp)*tmp;
 
+%disp(goodts)
 %tmp=IntFunc(Vs,Ps,Es,'Es.NoWarning',1,'Es.TsSize',goodts,'Es.TimeDst',stepnum*10*goodts);
 %T_L2Norm(tmp,Ps,Es)
 end

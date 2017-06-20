@@ -5,3 +5,5 @@ for ii=1:size(Vs,2)
 	pervar(ii) = sqrt(mean(Vs(:,ii,1).^2));
 end;
 total = sqrt(sum(pervar.^2));
+
+end
