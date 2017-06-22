@@ -99,12 +99,14 @@ end
 
 
 frames = zeros([size(Vs) length(nonzeros(Es.FramesChoice))]);
-history = [];
-
+if(~isempty(Es.TestFunc))  
+    history = [Es.Frames(:) zeros(size(Es.Frames(:)))];
+end;
 frmind = 1;
 
 Vnow = Vs;
 % Go over each frame
+
 for index=1:num
     % Deal with dynamic parameters if necessary
 	if(~isempty(Es.DynPrm))	
@@ -139,22 +141,25 @@ for index=1:num
     % Save run history (bf data)
     if(~isempty(Es.TestFunc))  
         testres = PerformTests(Vnext,Ps,Es,Es.TestFunc);
-        history = [history;  Es.Frames(index+1) testres(:)'];
+        %history = [history;  Es.Frames(index+1) testres(:)'];
+        history(index,2:(length(testres)+1))=testres(:)';
     end;
     
     % Used for Online-drawing, if relevant
     if Es.OlDraw  
            cla;
-           subplot(1,2,1);
+           if(~isempty(Es.TestFunc))
+                subplot(1,2,2);
+                plot(history(:,1),history(:,Es.OlDraw+1));
+                title(testtext); 
+                subplot(1,2,1);
+           end;
            plotst(Vnow,Ps,Es);
            titletext = sprintf('step = %d',index);
            if(~isempty(Es.DynPrm) && ~iscell(Es.DynVal))
                titletext = sprintf('%s, %s = %.4f',titletext,Es.DynPrm{1},Es.DynVal(index,1));
            end;
            title(titletext); 
-           subplot(1,2,2);
-           plot(history(:,1),history(:,Es.OlDraw+1));
-           title(testtext); 
            drawnow; 
     end;
     if(~isempty(Es.FileOut))
@@ -163,6 +168,9 @@ for index=1:num
     % Option for breaking the loop
     if(FlagStop~=0)
         frames = frames(:,:,1:index); % chop off the end of the data since it is blank
+        if(~isempty(Es.TestFunc))
+            history = history(1:index,:);
+        end;
         break;
     end;
 end;

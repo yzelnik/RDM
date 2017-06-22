@@ -36,7 +36,6 @@ else
     reachtime=bfhist(crossloc(1),1);
 end;
 
-
 end
 
 
