@@ -1,5 +1,6 @@
 function [Vs,Ps,Es]=U_SetupPoissonProcess(Vs,Ps,Es,varargin)
 % A Utility function to setup A Poisson point process for runframes
+% Es.PppPrm(1) is the average time between events
 % [Vs,Ps,Es]=U_SetupPoissonProcess(Vs,Ps,Es)
 
 % Update online if necessary

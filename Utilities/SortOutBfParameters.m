@@ -8,7 +8,7 @@ function Es=SortOutBfParameters(Es)
 %    Type = 0: regular grid spacing (default value), 
 %    Type < 0: uniform rand to the power of (-Type) (hence, -1 : uniform-rand)
 %    0<Type<1: gaussian-rand with std=2/Type (so Type=1 will include ~95%)
-%    Type > 2: logarithmic grid spacing (not random). mult-spacing=Type/NumVal
+%    Type >=2: logarithmic grid spacing (not random). mult-spacing ~Type/NumVal
 %    Type=NaN: Same parition with same randomization as last parameter
 %    If NumVal=0, then no new points are formed for this parameter
 % 3) Cell array. N cell arrays, each per parameter, with format as 2) above
@@ -65,7 +65,7 @@ if(iscell(Es.BfRange))  % Now if we're in (3) format (or (2), in effect)
             % cuttoff at range edges, tmp(4)=0.5 is four std inside range
             parvals = ((randn(curnum,1)*tmp(4)+2)/4*(tmp(2)-tmp(1))+tmp(1));
             parvals = min(max(parvals,min(tmp(1:2))),max(tmp(1:2)));
-        elseif(tmp(4)>2)    % logaritmic spacing (non-random), consecutive multplication = tmp(4)/tmp(3)
+        elseif(tmp(4)>=2)  % logaritmic spacing (non-random), consecutive multplication ~ tmp(4)/(tmp(3)-1)
             % create series from 0 to 1, each jump larger than the last
             zerotoone=tmp(4).^(((0:(curnum-1))./(curnum-1)))/(tmp(4)-1)-1/(tmp(4)-1);
             parvals = zerotoone'*(tmp(2)-tmp(1))+tmp(1);

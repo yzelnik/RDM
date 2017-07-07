@@ -18,8 +18,8 @@ if(~mod(nargin,2)) varargin = ['Es.FuncList' varargin]; end;
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
 Es=InsertDefaultValues(Es,'MergeBfData',0,'TsMode','none');
-% Initilize state if necessary
-[Vs,Ps,Es]=InitilizeState(Vs,Ps,Es);
+%%% Initilize state if necessary % taken out, but is this ok?
+%[Vs,Ps,Es]=InitilizeState(Vs,Ps,Es);
 
 
 if(~isfield(Es,'FuncList') || isempty(Es.FuncList))
@@ -91,7 +91,6 @@ for ii=1:length(Es.FuncList)    % Go over functions in the flow
   %  disp([ii size(Vs)])
   %  plotst(Vs,Ps,Es);
   % pause;
-
     if(Es.FuncSpec(ii,1)==0)        % General functions, mostly for updates
         [Vs,Ps,Es] = Es.FuncList{ii}(Vs,Ps,Es);
     elseif(Es.FuncSpec(ii,1)==1)    % Input state, output state

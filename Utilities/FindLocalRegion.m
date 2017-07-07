@@ -1,4 +1,4 @@
-function reg=FindLocalRegion(regprm,Ps,Es,varargin)
+function [reg,relsz]=FindLocalRegion(regprm,Ps,Es,varargin)
 % Find a local region with a given size ("volume") of the system
 % reg=FindLocalRegion(regprm,Ps,Es)
 % Where regprm = [sz x y], sz is the size of the system to choose,
@@ -86,6 +86,9 @@ if(counter>regprm(1))    % make sure we have exactly the right number of sites
 	reg(inds(1:(counter-regprm(1))))=0;     
 end;
 
+reg   = logical(reg);
+
+relsz = regprm(1)/Ps.Nx*Ps.Ny; % relative size of region found
 
 end
 
