@@ -44,14 +44,14 @@ Vs = Vs(:,:,1); % Take only first state, if there are more than one.
 % Initilize
 if (length(Es.Frames)>1)	% Deal with Es.Frames being a vector
 	num = length(Es.Frames);
-	Es.Frames = [0 ; Es.Frames(:)];
+	Es.Frames = Es.Frames(:);
 	Es.TimeDst = Es.Frames(end);
 else
 	num = Es.Frames;
-    Es.Frames = (0:num)*Es.TimeDst/num;
+    Es.Frames = (0:num)'*Es.TimeDst/num;
 end;
 Es.Frames=round(Es.Frames/Es.TsSize)*Es.TsSize;
-jumps = round(diff(Es.Frames)/Es.TsSize)*Es.TsSize; 
+jumps = round(diff([0;Es.Frames])/Es.TsSize)*Es.TsSize; 
 if(min(jumps)<0)
     error('Es.Frames should be an ordered list')
 end;
@@ -96,7 +96,6 @@ if Es.OlDraw
     end;
     testtext=regexprep(func2str(Es.TestFunc),'_','-');
 end
-
 
 frames = zeros([size(Vs) length(nonzeros(Es.FramesChoice))]);
 if(~isempty(Es.TestFunc))  
@@ -174,6 +173,7 @@ for index=1:num
         break;
     end;
 end;
+
 
 if((frmind-1)<size(frames,3))
     frames=frames(:,:,1:frmind-1);

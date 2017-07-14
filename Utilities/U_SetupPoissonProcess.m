@@ -9,7 +9,7 @@ function [Vs,Ps,Es]=U_SetupPoissonProcess(Vs,Ps,Es,varargin)
 Es=InsertDefaultValues(Es,'PppPrm',[]);
 % make sure these 2 fields are not empty
 if(isempty(Es.PppPrm))
-    error('Both Es.PppPrm needs to be defined for setup (including at least the rate of events).');
+    error('Es.PppPrm needs to be defined for setup (including at least the rate of events).');
 end; 
 
 Es.PppPrm = [Es.PppPrm(:)' 0 0]; % padding zeros for buffer

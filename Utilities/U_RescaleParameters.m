@@ -17,6 +17,9 @@ if(length(Es.RescalePow)<length(Es.RescalePrm))
     Es.RescalePow = [Es.RescalePow(:) ; repmat(Es.RescalePow(1),length(Es.RescalePrm),1)];
 end;
 
+oldnx = Ps.Nx;
+oldny = Ps.Ny;
+
 % load original values of parameters that will be rescaled
 basevals=LoadParmList(Vs,Ps,Es,Es.RescalePrm);
 
@@ -25,5 +28,9 @@ for ii=1:length(Es.RescalePrm) % rescale each parameter
 end;
 % save these parameters into Ps/Es
 [Vs,Ps,Es]=SaveParmList(Vs,Ps,Es,tmpvals,Es.RescalePrm);
+
+if(~(oldnx==Ps.Nx) || ~(oldny==Ps.Ny)) % change Vs if necessary
+    [Vs,Ps,Es]=InitilizeState(mean(Vs,1),Ps,Es);
+end;
 
 end

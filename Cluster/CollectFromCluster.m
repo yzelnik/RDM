@@ -69,7 +69,7 @@ else
         Ps = tmp.Ps;
         Es = tmp.Es;
         if(sum(PartsCollected)<size(TotBf,1)) 
-            Es.PartsCollected=PartsCollected;   % Used if there were missing parts
+            Es.PartsCollected=logical(PartsCollected);   % Used if there were missing parts
         end;
         save(sprintf('%s_totalof%d%s',basefilename,length(list),FileType),'TotSt','TotBf','Es','Ps');
     else

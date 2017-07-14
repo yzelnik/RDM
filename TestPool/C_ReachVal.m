@@ -21,19 +21,28 @@ end;
 
 % Make sure that initial value is always lower than Es.ReachVal
 initval = bfhist(1,2);
-if(initval>Es.ReachVal(1))
-    Es.ReachVal=-Es.ReachVal;
-    bfhist(:,2)=-bfhist(:,2);
-end;
 
-if(initval==Es.ReachVal(1))
-    reachtime=0;    % We started from this value
-elseif(max(bfhist(:,2))<Es.ReachVal(1))
-    reachtime=inf;  % Value is never reached
-else
-    %[~,minind]=min(abs(bfhist(:,2)-Es.ReachVal(1)));
-    crossloc=find(diff(sign(bfhist(:,2)-Es.ReachVal(1))));
-    reachtime=bfhist(crossloc(1),1);
+% For each value to check if/when we reached
+for ii=1:length(Es.ReachVal)
+    % normalize
+    if(initval>Es.ReachVal(1))
+        tmpval=-Es.ReachVal(ii);
+        tmphist=-bfhist(:,2);
+    else
+        tmpval=Es.ReachVal(ii);
+        tmphist=bfhist(:,2);
+    end;
+    
+    if(initval==Es.ReachVal(1))
+        reachtime(ii)=0;    % We started from this value
+    elseif(max(tmphist)<tmpval)
+        reachtime(ii)=inf;  % Value is never reached
+    else
+        %[~,minind]=min(abs(bfhist(:,2)-Es.ReachVal(1)));
+        crossloc=find(abs(diff(sign(tmphist-tmpval)))>eps); % first sign switch
+        reachtime(ii)=bfhist(crossloc(1),1);
+    end;
+
 end;
 
 end
