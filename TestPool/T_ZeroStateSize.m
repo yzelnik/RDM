@@ -13,7 +13,7 @@ if (~isfield(Es,'VarInd'))
 end;
 
 % Calculate the geometric mean of the following:
-thresh = sqrt(Es.StSmall * max(abs(Vs(:,Es.VarInd))));
+thresh = sqrt(Es.StSmall * max(abs(Vs(:,Es.VarInd(1)))));
 
 % Segment the state into positive and negative regions
 regs = SegmentRegions(abs(Vs),Ps,Es,'Es.SegThresh',thresh);

@@ -13,8 +13,8 @@ if(length(column)==1)
     for ii=1:length(axdata)
         tmp = TotBf(TotBf(:,column)==axdata(ii),:);
         valnum(ii) = size(tmp,1); % how many did we get?
-        for kk=1:collen-1
-        	tmp3 = tmp(:,kk+1);
+        for kk=1:collen
+        	tmp3 = tmp(:,kk);
         	tmp3 = tmp3(~isinf(tmp3)&~isnan(tmp3)); % make sure no nan's and inf's
         	data(ii,kk) = mean(tmp3); % calculate average
         end;
@@ -32,8 +32,8 @@ elseif(length(column)==2)
             for jj=1:length(ax2) % go over axis 2
                 tmp2=tmp1(tmp1(:,column(2))==ax2(jj),:);
                 valnum(ii,jj) = size(tmp2,1); % how many did we get?
-                for kk=1:collen-2
-                    tmp3 = tmp2(:,kk+2);
+                for kk=1:collen
+                    tmp3 = tmp2(:,kk);
                     tmp3 = tmp3(~isinf(tmp3)&~isnan(tmp3)); % make sure no nan's and inf's
                     data(ii,jj,kk) = mean(tmp3); % calculate average
                 end;

@@ -52,12 +52,16 @@ elseif(Es.ModPrm(5)>0) % uniform distribution
 	wid = min([Es.ModPrm(5) Es.ModPrm(3) 1-Es.ModPrm(3)]);
 	cutsz = rand(1)*wid*2-wid+Es.ModPrm(3);
 else  % gaussian distribution
-    wid = min([Es.ModPrm(3) 1-Es.ModPrm(3)]);
+    wid = min([Es.ModPrm(5) Es.ModPrm(3) 1-Es.ModPrm(3)]);
     cutsz = randn(1)*wid;
-    if(abs(cutsz)>wid) % apply cutoff
-        cutsz = wid * sign(cutsz);
-    end;
+    
+    %if(abs(cutsz)>-wid) % apply cutoff
+    %    cutsz = wid * sign(cutsz);
+    %end;
     cutsz = cutsz + Es.ModPrm(3);
+    if(cutsz<0) cutsz=0; end;
+    if(cutsz>1) cutsz=1; end;
+    disp([wid cutsz])
 end;
 
 VsOut=Vs;

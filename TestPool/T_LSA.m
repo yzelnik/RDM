@@ -12,8 +12,10 @@ function [res,evs,iternum]=T_LSA(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-Es.LsaThresh=[Es.LsaThresh(:);0]; % pad with zero at the end
 
+Es.LsaThresh=[Es.LsaThresh(:);0]; % pad with zero at the end
+tmp=getjac(Vs,Ps,Es);
+        %spy(tmp)
 ind = 0;         % Used for tracking the number of calculating attempts
 eignum = 4;
 if( (isfield(Es,'EigNum')) && Es.EigNum)
@@ -24,9 +26,9 @@ if(~isfield(Es,'JacNum'))
     Es.JacNum=0;
 end;
 
-if(~Es.JacNum)
-    Es.JacMode = 1;	% Request a jacobian
-end;
+%if(~Es.JacNum)
+%    Es.JacMode = 1;	% Request a jacobian
+%end;
 
 % If Matlab crashes (because of eigs) - we can try to deal with this:
 if( (isfield(Es,'AvoidErrors')) && Es.AvoidErrors)
@@ -47,11 +49,13 @@ if( (isfield(Es,'AvoidErrors')) && Es.AvoidErrors)
 		flag=0;
 		opts.tol = tol;
 		try
-            if(~Es.JacNum)  % Use analytical jacobian?
-    			evs=eigs(Ps.LocFunc(Vs,Ps,Es)+Ps.SpaFunc(Vs,Ps,Es),eignum,1,opts);
-            else            % or numeric one?
-                evs=eigs(NumericJacobian(Vs,Ps,Es),eignum,1,opts);
-            end;
+            evs = eigs(CalculateJacobian(Vs,Ps,Es),eignum,1,ops);
+           % if(~Es.JacNum)  % Use analytical jacobian?
+    			%evs=eigs(Ps.LocFunc(Vs,Ps,Es)+Ps.SpaFunc(Vs,Ps,Es),eignum,1,opts);
+            %    evs=eigs(getjac(Vs,Ps,Es),eignum,1,opts);
+            %else            % or numeric one?
+            %    evs=eigs(NumericJacobian(Vs,Ps,Es),eignum,1,opts);
+            %end;
         catch
 			flag = 1;
 			evs = [0 0 0 0];
@@ -70,11 +74,16 @@ if( (isfield(Es,'AvoidErrors')) && Es.AvoidErrors)
 	end;
     
 else	% Notmal run of eigs
-	if(~Es.JacNum)  % Use analytical jacobian?
-        evs=eigs(Ps.LocFunc(Vs,Ps,Es)+Ps.SpaFunc(Vs,Ps,Es),eignum,1);
-	else            % or numeric one?
-        evs=eigs(NumericJacobian(Vs,Ps,Es),eignum,1);
-	end;
+    evs = eigs(CalculateJacobian(Vs,Ps,Es),eignum,1);
+%	if(~Es.JacNum)  % Use analytical jacobian?
+ %       tmp=CalculateJacobian(Vs,Ps,Es);
+        %spy(tmp)
+  %      evs=eigs(tmp,eignum,1);
+        %evs=eigs(Ps.LocFunc(Vs,Ps,Es)+Ps.SpaFunc(Vs,Ps,Es),eignum,1);
+   %     disp(999)
+%	else            % or numeric one?
+%        evs=eigs(NumericJacobian(Vs,Ps,Es),eignum,1);%
+%	end;
 end;
 
 

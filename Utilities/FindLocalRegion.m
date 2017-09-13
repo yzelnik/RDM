@@ -35,7 +35,7 @@ if(~isfield(Ps,'Bc'))
 end;
 
 if(isfield(Ps,'Net') && ~isempty(Ps.Net))
-    inds=regprm(1); % a network structure
+    inds=regprm(2); % a network structure
 elseif(Ps.Ny==1)  % 1D case
     rad=regprm(1)/2-1;
     X  = meshgrid(-ceil(rad):ceil(rad),0);
@@ -88,7 +88,7 @@ end;
 
 reg   = logical(reg);
 
-relsz = regprm(1)/Ps.Nx*Ps.Ny; % relative size of region found
+relsz = regprm(1)/(Ps.Nx*Ps.Ny); % relative size of region found
 
 end
 

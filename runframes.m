@@ -1,3 +1,4 @@
+
 function [frames,history]=runframes(Vs,Ps,Es,varargin)
 % Run integrator (to time Es.TimeDst) and get (Es.Frames) snapshots of the system
 % [frames,history]=runframes(Vs,Ps,Es)
@@ -85,15 +86,18 @@ if(~isempty(Es.RecurFunc)&&~iscell(Es.RecurFunc))
     
 end;
 
+% If no test was defined, but we are using online-draw, or history was
+% requested, make something up...
+if(isempty(Es.TestFunc)) && (Es.OlDraw || nargout>1)
+    Es.TestFunc=@T_L2Norm;
+end;
+
 % Set up GUI for online drawing
 FlagStop = 0;
 if Es.OlDraw
     clf;
     uicontrol('style','pushbutton','units','norm','position',[0.01 0.6 0.08,0.1],'string','Stop','callback',{@stopb});
     uicontrol('style','pushbutton','units','norm','position',[0.01 0.4 0.08,0.1],'string','Pause','callback',{@pauseb});
-    if(isempty(Es.TestFunc))  % If no test was defined, but we are using Online-draw, make something up...
-        Es.TestFunc=@T_L2Norm;
-    end;
     testtext=regexprep(func2str(Es.TestFunc),'_','-');
 end
 
@@ -149,7 +153,7 @@ for index=1:num
            cla;
            if(~isempty(Es.TestFunc))
                 subplot(1,2,2);
-                plot(history(:,1),history(:,Es.OlDraw+1));
+                plot(history(1:index,1),history(1:index,Es.OlDraw+1));
                 title(testtext); 
                 subplot(1,2,1);
            end;
@@ -166,9 +170,9 @@ for index=1:num
     end;
     % Option for breaking the loop
     if(FlagStop~=0)
-        frames = frames(:,:,1:index); % chop off the end of the data since it is blank
+        frames = frames(:,:,1:frmind-1); % chop off the end of the data since it is blank
         if(~isempty(Es.TestFunc))
-            history = history(1:index,:);
+            history = history(1:frmind-1,:);
         end;
         break;
     end;

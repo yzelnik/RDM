@@ -1,9 +1,10 @@
 function MatOut=S_NET(~,Ps,Es)
-% Spatial Matrix for a set of sites connected by a network 
+% Spatial Matrix for (site-wise) dispersal across a network 
 % MatOut=S_NET(Vs,Ps,Es)
 % Ps.Nx gives the number of sites, Ps.Ds the diffusion rates per agent type
 % The netork is either given by Ps.Net (Ps.Nx by Ps.Nx, diagonal set to zeros)
-% or use a default of all-connected. Sum of each column is normalized to 1.
+% or use a default of all-connected. Sum of each column is normalized to 1,
+% so that the more connected sites get more incoming dispersal
 
 if(isfield(Es,'SetupMode') && Es.SetupMode)
     % Pre caclculate spatial matrix, for future use

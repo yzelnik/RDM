@@ -34,8 +34,8 @@ if((Ps.Nx==1) || (Ps.Ny==1))
 else  % Assuming this is a 2D system
     % create two upside-down-v-shapes, for x&y
     maxcenterx = reshape(repmat([0.5:Ps.Nx/2 Ps.Nx/2:-1:0.5]',1,Ps.Ny),Ps.Nx*Ps.Ny,1)';
-    maxcentery = reshape(repmat([0.5:Ps.Nx/2 Ps.Nx/2:-1:0.5],Ps.Nx,1),Ps.Nx*Ps.Ny,1)';
-    
+    maxcentery = reshape(repmat([0.5:Ps.Ny/2 Ps.Ny/2:-1:0.5],Ps.Nx,1),Ps.Nx*Ps.Ny,1)';
+
     % get score for each cyclic shift, for both x&y
     for ii=1:Ps.Nx 
         tmp = M_ShiftSt(Vs,Ps,Es,'Es.ShiftPrm',[ii 0]);

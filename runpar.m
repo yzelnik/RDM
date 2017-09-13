@@ -27,7 +27,6 @@ if(~mod(nargin,2)) error('No default extra-input exists for runpar.'); end;
 Es=InsertDefaultValues(Es,'WriteFreq',100,'RunFunc',@runflow,'RandSeed',0,'FileOut',[],'WriteSt',1);
 
 
-
 Es.InitActive  = 0; % Allow states to be updated if necessary
 Es.MergeBfData = 1; % If/when using runflow, take all bif data as one row
 

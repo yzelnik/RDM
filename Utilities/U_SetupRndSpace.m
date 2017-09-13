@@ -29,9 +29,9 @@ Es.RndSpaceVal(1,size(Es.RndSpaceVal,2)+3)=0; % adding zeros for buffer
 % load average values of parameters that will be redefined
 basevals=LoadParmList(Vs,Ps,Es,Es.RndSpacePrm);
 
-% go oer list of parameters, and calculate their random dist.
+% go our list of parameters, and calculate their random dist.
 for ii=1:length(Es.RndSpacePrm)
-    if(Es.RndSpaceVal(ii,2)==0) %uniform dist.
+    if(Es.RndSpaceVal(ii,2)==0) % uniform dist.
         tmpvals{ii}=basevals(ii)+(rand(Ps.Nx*Ps.Ny,1)-0.5)*Es.RndSpaceVal(ii,1);
     elseif(Es.RndSpaceVal(ii,2)==1) % normal dist.
         tmpvals{ii}=basevals(ii)+randn(Ps.Nx*Ps.Ny,1)*Es.RndSpaceVal(ii,1);

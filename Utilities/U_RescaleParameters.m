@@ -30,6 +30,7 @@ end;
 [Vs,Ps,Es]=SaveParmList(Vs,Ps,Es,tmpvals,Es.RescalePrm);
 
 if(~(oldnx==Ps.Nx) || ~(oldny==Ps.Ny)) % change Vs if necessary
+    Es.InitActive=0; % make sure we actually (re)initilize the state
     [Vs,Ps,Es]=InitilizeState(mean(Vs,1),Ps,Es);
 end;
 

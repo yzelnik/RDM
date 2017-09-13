@@ -34,12 +34,13 @@ function SM=CalcSM(Ps,Es)
 %   Ds=reshape([Ps.Ds(:); zeros(maxderv*Ps.VarNum-length(Ps.Ds),1)],Ps.VarNum,maxderv);
    
    SM = sparse(len*Ps.VarNum,len*Ps.VarNum);	% Build the initial block-diagonal matrix
+   
    for ii=1:maxderv
-	if(sum(abs(Ps.Ds(:,ii))))			% If there are non zero coefficients for this derivative order
+	if(sum(abs(Ps.Ds((1:Ps.VarNum)+(ii-1)*Ps.VarNum))))			% If there are non zero coefficients for this derivative order
 		base = DervSM(ii,Ps,Es);	% Get derivative spatial matrix
 		for jj=1:Ps.VarNum
 			loc = (jj-1)*len+(1:len); 			% Find location for this block-diagonal part
-			SM(loc,loc) = SM(loc,loc) + base.*Ps.Ds(:,jj+(ii-1)*Ps.VarNum);	% Update this part
+			SM(loc,loc) = SM(loc,loc) + base.*Ps.Ds(jj+(ii-1)*Ps.VarNum);	% Update this part
 		end;
 	end;
    end;

@@ -22,20 +22,32 @@ E=Vs(:,4);
 
 if(Es.JacMode==0)      % Model equations
     
-    dB = Ps.lambda.*W.*B.*(1 + Ps.eta.*B).^2.*(1 - B./Ps.kappa) - Ps.mu.*B;
-    dW = Ps.alpha.*(B*Ps.Y1 + E*Ps.Y2 + Ps.q.*Ps.f)./(B*Ps.Y1 + E*Ps.Y2 + Ps.q).*H - Ps.nu.*W./(1 + Ps.rho.*B./Ps.kappa) - Ps.gamma.*B.*W.*(1 + Ps.eta.*B).^2 - Ps.gamma2.*E.*W;
+    dB = Ps.lambda.*B.*W.*(1 + Ps.eta.*B).^2.*(1 - B./Ps.kappa) - Ps.mu.*B;
+    dW = Ps.alpha.*(B*Ps.Y1 + E*Ps.Y2 + Ps.q.*Ps.f)./(B*Ps.Y1 + E*Ps.Y2 + Ps.q).*H - Ps.nu.*W./(1 + Ps.rho.*B./Ps.kappa) - Ps.gamma.*B.*W.*(1 + Ps.eta.*B).^2 - Ps.gamma2.*E.*W.*(1 + Ps.eta2.*E).^2;
     dH = Ps.P - Ps.alpha.*(B*Ps.Y1 + E*Ps.Y2 + Ps.q.*Ps.f)./(B*Ps.Y1 + E*Ps.Y2 + Ps.q).*H;
     dE = Ps.lambda2.*E.*W.*(1 + Ps.eta2.*E).^2.*(1 - E./Ps.kappa2) - Ps.mu2.*E;
     
     VsOut = [dB,dW,dH,dE];
 else               % Jacobian of equations
-    %BdB = (-Ps.kappa.* Ps.mu + (1 + B.* Ps.eta).* (Ps.kappa + B.* (-2 - 4* B.* Ps.eta + 3* Ps.eta.* Ps.kappa)).* Ps.lambda.* W)./Ps.kappa;
-    %BdW = Ps.lambda.*B.*(1 + Ps.eta.*B).^2.*(1 - B./Ps.kappa);
-   % WdB = - Ps.gamma.*W.*(1 + 4* B.* Ps.eta + 3* B.^2.* Ps.eta.^2) + Ps.rho.*Ps.nu.*W./Ps.kappa;
-   % WdW = - Ps.nu.*(1-Ps.rho.*B./Ps.kappa) - Ps.gamma.*B.*(1 + Ps.eta.*B).^2 ;
-    % need to fix up rho part
+    BdB = -Ps.mu + (1 + B.*Ps.eta).*(Ps.kappa+B.*(-2-4.*B.*Ps.eta + 3.*Ps.eta.*Ps.kappa)).*Ps.lambda.*W./Ps.kappa;
+    BdW = B.*(1 + B.*Ps.eta).^2.*(1 - B./Ps.kappa).*Ps.lambda;
+    
+    WdB = -Ps.alpha.*(-1 + Ps.f).*H.*Ps.q.*Ps.Y1./(B*Ps.Y1 + E*Ps.Y2 + Ps.q).^2 + Ps.nu.*W.*Ps.rho./(Ps.kappa.*(1 + Ps.rho.*B./Ps.kappa).^2) - Ps.gamma.*W.*(1 + 4*Ps.eta.*B + 3*Ps.eta.^2.*B.^2);
+    WdW = - Ps.nu./(1 + Ps.rho.*B./Ps.kappa) - Ps.gamma.*B.*(1 + Ps.eta.*B).^2 - Ps.gamma2.*E.*(1 + Ps.eta2.*E).^2; 
+    WdH = Ps.alpha.*(B*Ps.Y1 + E*Ps.Y2 + Ps.q.*Ps.f)./(B*Ps.Y1 + E*Ps.Y2 + Ps.q);
+    WdE = -Ps.alpha.*(-1 + Ps.f).*H.*Ps.q.*Ps.Y2./(B*Ps.Y1 + E*Ps.Y2 + Ps.q).^2 - Ps.gamma2.*W.*(1 + 4*Ps.eta2.*E + 3*Ps.eta2.^2.*E.^2);
+    
+    HdB = Ps.alpha.*(-1 + Ps.f).*H.*Ps.q.*Ps.Y1./(B*Ps.Y1 + E*Ps.Y2 + Ps.q).^2;
+    HdH = -Ps.alpha.*(B*Ps.Y1 + E*Ps.Y2 + Ps.q.*Ps.f)./(B*Ps.Y1 + E*Ps.Y2 + Ps.q);
+    HdE = Ps.alpha.*(-1 + Ps.f).*H.*Ps.q.*Ps.Y2./(B*Ps.Y1 + E*Ps.Y2 + Ps.q).^2;
+    
+    EdW = E.*(1 + E.*Ps.eta2).^2.*(1 - E./Ps.kappa2).*Ps.lambda2;
+    EdE = -Ps.mu2 + (1 + E.*Ps.eta2).*(Ps.kappa2+E.*(-2-4.*E.*Ps.eta2 + 3.*Ps.eta2.*Ps.kappa2)).*Ps.lambda2.*W./Ps.kappa2;
+    
+    zrs = zeros(size(B));
+  
     % written in a large sparse matrix format 
-    VsOut = 0;%ArrangeJacobian([BdB BdW;WdB WdW],Ps,Es);
+    VsOut = ArrangeJacobian([BdB BdW zrs zrs;WdB WdW WdH WdE;HdB zrs HdH HdE;zrs EdW zrs EdE],Ps,Es);
 end;
 
 

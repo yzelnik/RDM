@@ -17,7 +17,7 @@ end;
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'VarInd',1,'StInd',1,'StAxis',[],'PlotBare',0,'St1Color',[jet(2) ;hsv(7)],'St2Colorbar',1,'St2Interp',0);
+Es=InsertDefaultValues(Es,'VarInd',1,'StInd',1,'StAxis',[],'PlotBare',0,'St1Color',[jet(2) ;hsv(7); parula(11)],'St2Colorbar',1,'St2Interp',0);
 
 minst2colorlen = 10;
 defst2colorlen = 64;
@@ -28,6 +28,9 @@ if(~isfield(Es,'St2Color'))
 end;
 if(size(Es.St2Color,1)<minst2colorlen)
 	Es.St2Color=interp1(0:(size(Es.St2Color,1)-1),Es.St2Color,(0:(defst2colorlen-1))/(defst2colorlen-1)*(size(Es.St2Color,1)-1),'cubic');
+end;
+if(size(Es.St1Color,1)<Ps.VarNum)
+    Es.St1Color=repmat(Es.St1Color,ceil(Ps.VarNum/size(Es.St1Color,1)),1);
 end;
 
 % first check if this is a 1D plot
