@@ -29,7 +29,9 @@ function SM=CalcSM(Ps,Es)
    if(~isfield(Ps,'Net') || length(Ps.Net)<=1)
        Ps.Net = ones(len)-diag(ones(len,1));
    end;
-   Net = Ps.Net./repmat(sum(Ps.Net,1),len,1); % Normalizing each row to one
+   
+   Net = Ps.Net./repmat(max(1,sum(Ps.Net,1)),len,1); % Normalizing each row to one
+
    Net = sparse(Net-diag(diag(Net)+ones(len,1)));
 
    for ii=1:Ps.VarNum	% Put in derivative sub-matrix in a block-diagonal fashion

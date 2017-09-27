@@ -23,6 +23,17 @@ oldny = Ps.Ny;
 % load original values of parameters that will be rescaled
 basevals=LoadParmList(Vs,Ps,Es,Es.RescalePrm);
 
+tiny = 1e-10;
+% try and round off rescaling value if relevant
+if(mod(Es.RescaleFactor,1)<tiny || mod(-Es.RescaleFactor,1)<tiny)
+    Es.RescaleFactor=round(Es.RescaleFactor);
+elseif(mod(10*Es.RescaleFactor,1)<tiny || mod(-10*Es.RescaleFactor,1)<tiny)
+    Es.RescaleFactor = round(10*Es.RescaleFactor)/10;
+elseif(mod(100*Es.RescaleFactor,1)<tiny || mod(-100*Es.RescaleFactor,1)<tiny)
+    Es.RescaleFactor = round(100*Es.RescaleFactor)/100;
+end;
+    
+
 for ii=1:length(Es.RescalePrm) % rescale each parameter
     tmpvals(ii)=basevals(ii)*(Es.RescaleFactor^Es.RescalePow(ii));
 end;
@@ -35,3 +46,4 @@ if(~(oldnx==Ps.Nx) || ~(oldny==Ps.Ny)) % change Vs if necessary
 end;
 
 end
+

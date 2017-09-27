@@ -26,7 +26,7 @@ if(size(Vs,1)<(Ps.Nx*Ps.Ny))
 		end;	
 	end;
 	%disp(VsTmp(:)')	% delete?
-	
+
 	% repeat to form a uniform state
 	VsOut = repmat(VsTmp,Ps.Nx*Ps.Ny,1);
 else

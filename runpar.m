@@ -24,7 +24,7 @@ if(~mod(nargin,2)) error('No default extra-input exists for runpar.'); end;
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'WriteFreq',100,'RunFunc',@runflow,'RandSeed',0,'FileOut',[],'WriteSt',1);
+Es=InsertDefaultValues(Es,'WriteFreq',100,'RunFunc',@runflow,'RandSeed',0,'FileOut',[],'WriteSt',1,'Verbose',0);
 
 
 Es.InitActive  = 0; % Allow states to be updated if necessary
@@ -67,6 +67,12 @@ for ii=whichruns
     else
         rng(Es.RandSeed(1));	% Randomize with a pre-defined seed
     end;
+    
+    if(Es.Verbose)
+        tmptxt = sprintf('%.2f,',Es.BfVal(ii,:));
+        disp(sprintf('running #%d, prm vals: (%s)',ii,tmptxt(1:end-1)));
+    end;
+    
     % Run the system
 	[st,bf] = Es.RunFunc(Vs,Ps,Es);
     bf = bf(:)';

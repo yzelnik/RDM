@@ -74,13 +74,19 @@ reg=false(Ps.Nx*Ps.Ny,1);
 reg(inds)=1;
 
 counter = sum(reg);
-while counter<regprm(1)  % iteratively find neighboring sites
+maxiter = 1e4;
+exitind = 1;
+while counter<regprm(1) && exitind<maxiter  % iteratively find neighboring sites
 	tmpreg = logical(nnsm*reg);
 	tmpreg = tmpreg - reg.*tmpreg;
 	reg = reg + tmpreg;
 	counter = sum(reg ~= 0);
+    exitind = exitind+1;
 end;
-    
+if(exitind>=maxiter)
+    warning('Reached maximum number of iterations while trying to find neighbors. Is network not connected?');
+end;
+
 if(counter>regprm(1))    % make sure we have exactly the right number of sites
 	inds = find(tmpreg);
 	reg(inds(1:(counter-regprm(1))))=0;     
