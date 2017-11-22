@@ -2,7 +2,7 @@ function [avgt,stdt] = C_AvgTest(Input,Ps,Es,varargin)
 % Average out the output of a test function (and calculate it's std as well)
 
 % Update online if necessary
-if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
+if(nargin>3) [~,Ps,Es]=UpdateParameters([],Ps,Es,varargin{:}); end;
 
 Es=InsertDefaultValues(Es,'TestFields',[],'CalcRange',[]);
 

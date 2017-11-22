@@ -38,7 +38,13 @@ for ii=1:length(bforg)	% Go over each bf array
 %	size(bforg{ii})
 %size(bforg{ii}(:,Es.BfFields))
 
-	org2dst_dist=pdist2(bforg{ii}(:,Es.BfFields),bfdst{ii}(:,Es.BfFields),'seuclidean');	% calculate dist between points
+	%org2dst_dist=pdist2(bforg{ii}(:,Es.BfFields),bfdst{ii}(:,Es.BfFields),'seuclidean');	% calculate dist between points
+    org2dst_dist=altpdist2(bforg{ii}(:,Es.BfFields),bfdst{ii}(:,Es.BfFields));	% calculate dist between points
+    
+    % trying for an alternative
+    %tmp=bforg{ii}(:,Es.BfFields);
+    %org2dst_dist = sqrt( bsxfun(@plus,sum(tmp.^2,2),sum(tmp.^2,2)') - 2*(tmp*tmp') );
+    
     %imagesc(org2dst_dist);
     %pause;
     if(Es.RephaseMode==0)  % simple straight-forward method: find min distance per point

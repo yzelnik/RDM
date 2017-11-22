@@ -29,7 +29,7 @@ else                % Jacobian of equations
     WdB = - 2*W.*B;
     WdW = - 1 - B.*B ;
     
-    syslen = Ps.Nx * Ps.Ny;
+    %syslen = Ps.Nx * Ps.Ny;
     % written in a large sparse matrix format 
     VsOut = ArrangeJacobian([BdB BdW;WdB WdW],Ps,Es);
 end;

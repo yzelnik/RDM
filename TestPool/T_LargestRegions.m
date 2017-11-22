@@ -10,12 +10,23 @@ if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
 % Segment the state into positive and negative regions
 regs = SegmentRegions(Vs,Ps,Es);
-
+plot(regs)
+minmax = [min(regs) max(regs)];
+if(minmax(1)<0)
+    negsizes=histcounts(regs,(minmax(1)-0.5):0);
+else
+    negsizes=[];
+end;
+if(minmax(2)>0)
+    possizes=histcounts(regs,0.5:(minmax(2)+0.5));
+else
+    possizes=[];
+end;
 % Get Area count for positive and negative regions
-temp = regionprops(regs.*(regs>0),'Area');
-possizes=cat(1, temp.Area);
-temp = regionprops(-regs.*(regs<0),'Area');
-negsizes=cat(1, temp.Area);
+%temp = regionprops(regs.*(regs>0),'Area');
+%possizes=cat(1, temp.Area);
+%temp = regionprops(-regs.*(regs<0),'Area');
+%negsizes=cat(1, temp.Area);
 
 % Return the largest of each, divided by the system size
 if(length(negsizes)*length(possizes)) % Make sure there's data here

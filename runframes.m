@@ -37,6 +37,10 @@ if(iscell(Es.TestFunc))
     Es.TestFunc=@T_MultiTest;
 end;
 
+% Calculate time step automatically if relevant
+if(strcmp(Es.TsMode,'auto'))
+	Es.TsSize = EvaluateTS(Vs,Ps,Es);
+end;
 % Calculate any matrices and other auxiliary data before run
 [Vs,Ps,Es]=SetupSpatialData(Vs,Ps,Es);
 
@@ -49,7 +53,8 @@ if (length(Es.Frames)>1)	% Deal with Es.Frames being a vector
 	Es.TimeDst = Es.Frames(end);
 else
 	num = Es.Frames;
-    Es.Frames = (0:num)'*Es.TimeDst/num;
+    Es.Frames = (1:num)'*Es.TimeDst/num;
+    
 end;
 Es.Frames=round(Es.Frames/Es.TsSize)*Es.TsSize;
 jumps = round(diff([0;Es.Frames])/Es.TsSize)*Es.TsSize; 
@@ -177,7 +182,6 @@ for index=1:num
         break;
     end;
 end;
-
 
 if((frmind-1)<size(frames,3))
     frames=frames(:,:,1:frmind-1);

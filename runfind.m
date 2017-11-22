@@ -11,7 +11,7 @@ if(~mod(nargin,2)) varargin = ['Es.FindFunc' varargin]; end;
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'FindFunc',@runflow,'FindVal',0,'FindOnlyBf',0);
+Es=InsertDefaultValues(Es,'FindFunc',@runflow,'PrmLim',[],'FindVal',0,'FindOnlyBf',0,'Verbose',0);
 
 Es.InitActive  = 0; % Allow states to be updated if necessary
 
@@ -59,7 +59,7 @@ else
 end;
 
 % Return results
-BfData = [finvals testval];
+BfData = [testval finvals];
 if(Es.FindOnlyBf) % if we do not want to save the state-data
     StData = [];
 else
@@ -80,15 +80,30 @@ function [dist,testval,st]=TestSearchFunc(Vs,Ps,Es,curpars,goodval,useabs)
 % Run the system
 [st,testval] = Es.FindFunc(Vs,Ps,Es);
 
+if(Es.Verbose)
+    disp(testval);
+end;
+
+
+dist=0;
+if(~isempty(Es.PrmLim))
+    outside = (curpars<Es.PrmLim(1,:)) | (curpars>Es.PrmLim(2,:));
+    if(sum(outside))
+        dist = inf;
+    end;
+end;
 %plotst(st,Ps,Es); title(testval); drawnow;
 % Calculate the distance from the value we seek
-if(useabs)
-    dist = abs(goodval-testval(1));
-else
-    dist = goodval-testval(1);
+if(~dist) % don't calculate anything if we're outside...
+    if(useabs)
+        dist = abs(goodval-testval(1));
+    else
+        dist = goodval-testval(1);
+    end;
 end;
 
 end
+    
 %%%%%%%% A heuristic search for non-continous values %%%%%%
 
 function [finalpoint,testval,st]=HeuristicSearch(minfunc,initpoint,step,searchtol) 

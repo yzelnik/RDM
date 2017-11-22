@@ -48,8 +48,9 @@ if( (isfield(Es,'AvoidErrors')) && Es.AvoidErrors)
 		ind=ind+1;
 		flag=0;
 		opts.tol = tol;
+        
 		try
-            evs = eigs(CalculateJacobian(Vs,Ps,Es),eignum,1,ops);
+            evs = eigs(CalculateJacobian(Vs,Ps,Es),eignum,1,opts);
            % if(~Es.JacNum)  % Use analytical jacobian?
     			%evs=eigs(Ps.LocFunc(Vs,Ps,Es)+Ps.SpaFunc(Vs,Ps,Es),eignum,1,opts);
             %    evs=eigs(getjac(Vs,Ps,Es),eignum,1,opts);
@@ -57,7 +58,7 @@ if( (isfield(Es,'AvoidErrors')) && Es.AvoidErrors)
             %    evs=eigs(NumericJacobian(Vs,Ps,Es),eignum,1,opts);
             %end;
         catch
-			flag = 1;
+            flag = 1;
 			evs = [0 0 0 0];
 		end;
 		tol = tol * tolchange;
@@ -73,7 +74,13 @@ if( (isfield(Es,'AvoidErrors')) && Es.AvoidErrors)
 			end;
 	end;
     
-else	% Notmal run of eigs
+elseif( (isfield(Es,'UseEig')) && Es.UseEig)
+    % use eig instead of eigs
+    tmp = eig(full(CalculateJacobian(Vs,Ps,Es)));
+    tmp = sort(real(tmp),'descend');
+    evs = tmp(1:eignum);
+else
+    % Notmal run of eigs
     evs = eigs(CalculateJacobian(Vs,Ps,Es),eignum,1);
 %	if(~Es.JacNum)  % Use analytical jacobian?
  %       tmp=CalculateJacobian(Vs,Ps,Es);

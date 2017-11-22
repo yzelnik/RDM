@@ -1,7 +1,7 @@
 function VsOut = M_CutVar(Vs,Ps,Es,varargin)
 % Cut down a variable to some level, with (randomized) size
 % VsOut = M_CutVar(Vs,Ps,Es)
-% Using Es.ModPrm = [cutval,vind,sz,loc,wid], where:
+% Using Es.ModPrm = [cutval,vind,sz,loc,wid,mod], where:
 % - cutval tells how much of the variable to cut
 % - vind is which variable to change (def=0, is to set by Es.VarInd)
 % - sz is the relative size of the system to augment (def=0, all of it)
@@ -13,6 +13,8 @@ function VsOut = M_CutVar(Vs,Ps,Es,varargin)
 %   cutval>2 gives the volume to cut (in pixels).
 % if loc<0 then it is decided at random
 % if wid>0 it is uniform, else gaussian (|wid| = std)
+% mod (def=0) can change the meaning of cutval&sz
+% mod=1 -> cutval=density, mod=2 -> sz=density (the other one doesn't change)
 
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
@@ -22,6 +24,7 @@ Es.ModPrm = [Es.ModPrm(:)' 0 0 0 0 0];
 if(Es.ModPrm(2)==0) % By default change the Es.VarInd variable
     Es.ModPrm(2)=Es.VarInd;
 end;
+
 if(Es.ModPrm(3)==0)
     Es.ModPrm(3)=1; % Augment all the system
 elseif(Es.ModPrm(3)>1)
@@ -32,6 +35,16 @@ if(Es.ModPrm(4)>=0) % location of cut region?
     edge = Es.ModPrm(4);
 else  % random location
     edge = rand(1);
+end;
+
+if(Es.ModPrm(6)) % switch meaning of parameters
+    if(Es.ModPrm(6)==1)
+        Es.ModPrm(1)=Es.ModPrm(1)*Es.ModPrm(3);
+    elseif(Es.ModPrm(6)==2)
+        Es.ModPrm(3)=min(1,abs(Es.ModPrm(1)/Es.ModPrm(3)));
+    else
+        error('Value of mod (Es.ModPrm(6)) should be 0 1 or 2.');
+    end; 
 end;
 
 len = Ps.Nx*Ps.Ny;
@@ -67,7 +80,7 @@ end;
 VsOut=Vs;
 if(Es.ModPrm(3)==1) % uniform disturbance
     VsOut(:,Es.ModPrm(2))= VsOut(:,Es.ModPrm(2)) + cutval;
-else % sz<1 is relative size, sz>1 is obsolute (in "pixels")
+else % sz<1 is relative size, sz>1 is in real size (in "pixels")
     [reg,regsz]=FindLocalRegion([cutsz edge],Ps,Es);
     
     VsOut(reg,Es.ModPrm(2))= VsOut(reg,Es.ModPrm(2)) + cutval/regsz;

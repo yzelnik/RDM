@@ -7,7 +7,6 @@ function regsize=T_ZeroStateSize(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-
 if (~isfield(Es,'VarInd'))
     Es.VarInd = 1;
 end;
@@ -18,18 +17,28 @@ thresh = sqrt(Es.StSmall * max(abs(Vs(:,Es.VarInd(1)))));
 % Segment the state into positive and negative regions
 regs = SegmentRegions(abs(Vs),Ps,Es,'Es.SegThresh',thresh);
 
+%plot(regs)
+
+% get the number of "pixels" in each (negative) region
+if(min(regs)<0)
+    zerosizes=histcounts(regs,(min(regs)-0.5):0);
+else
+    zerosizes=[];
+end;
+
+regsize = max(zerosizes)/(Ps.Nx*Ps.Ny);
 
 % Get Area count for zero-dominated domain
-temp = regionprops(-regs.*(regs<0),'Area');
+%temp = regionprops(-regs.*(regs<0),'Area');
 
-zerosizes=cat(1, temp.Area);
+%zerosizes=cat(1, temp.Area);
 
-% Return the largest of each, divided by the system size
-if(length(temp)) % Make sure there's data here
-    regsize = [max(zerosizes)]/(Ps.Nx*Ps.Ny);
-else
-    regsize = [NaN];
-end;
+% Return this value, divided by the system size
+%if(length(temp)) % Make sure there's data here
+%    regsize = [max(zerosizes)]/(Ps.Nx*Ps.Ny);
+%else
+%    regsize = [NaN];
+%end;
 
 % Alternative (simpler) version, just return precentage that's close to 0
 %regsize = mean(abs(Vs(:,Es.VarInd))<thresh);

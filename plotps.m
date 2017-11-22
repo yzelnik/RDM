@@ -16,7 +16,7 @@ end;
 if(nargin>2) [~,~,Es]=UpdateParameters([],[],Es,varargin{:}); end;
 
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'BfFields',[1,2,3],'BfPhases',[0,1],'BfFilter',[],'BfSmooth',0);
+Es=InsertDefaultValues(Es,'BfFields',[1,2,3],'BfPhases',[0,1],'BfFilter',[],'BfSmooth',0,'BfLogColor',0);
 
 if(isempty(bfs)) % make sure there's data
     error('No data to plot.');
@@ -64,12 +64,22 @@ if(isgrid)
             end;
         end;
     end;
+
     % plot it out
-    handle=imagesc(yax,xax,grid(:,:,Es.BfFields(3))');
+    if(~Es.BfLogColor)
+        handle=imagesc(yax,xax,grid(:,:,Es.BfFields(3))');
+    else
+        handle=imagesc(yax,xax,log(grid(:,:,Es.BfFields(3))'));
+    end;
     axis xy;
 else % just make a scatter plot
-    handle=scatter(bfs(:,Es.BfFields(1)),bfs(:,Es.BfFields(2)),20,bfs(:,Es.BfFields(3)));
+	if(~Es.BfLogColor)
+        handle=scatter(bfs(:,Es.BfFields(1)),bfs(:,Es.BfFields(2)),20,bfs(:,Es.BfFields(3)));
+    else
+        handle=scatter(bfs(:,Es.BfFields(1)),bfs(:,Es.BfFields(2)),20,log(bfs(:,Es.BfFields(3))));
+    end;
 end;
+    
 %axis([min(bfs(:,Es.BfFields(1))) max(bfs(:,Es.BfFields(1))) min(bfs(:,Es.BfFields(2))) max(bfs(:,Es.BfFields(2)))]);
 
 if(nargout>0)  % Only return a handle if one's requested.

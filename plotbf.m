@@ -12,7 +12,7 @@ end;
 if(nargin>2) [~,~,Es]=UpdateParameters([],[],Es,varargin{:}); end;
 
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'PrmSpace',0,'BfBalloon',0,'BfColor',[0,0,0 ; hsv(9)],'BfPattern',0);
+Es=InsertDefaultValues(Es,'PrmSpace',0,'BfBalloon',0,'BfColor',[0,0,0 ; hsv(9)],'BfPattern',0,'BfLineWidth',1);
 Es=InsertDefaultValues(Es,'BfFields',[1,2],'BfPhases',[1,0],'BfStyle',['-  ';'-- '],'BfSmooth',0);
 
 ihold = ishold; % is hold on/off activated?
@@ -32,7 +32,7 @@ color=Es.BfColor(mod(ind-1,length(Es.BfColor))+1,1:3);
 while(isempty(bfs{ind}))
 	ind=ind+1;
 end;
-plot(bfs{ind}(1,bffields(1)),bfs{ind}(1,bffields(2)),'Color',color);
+plot(bfs{ind}(1,bffields(1)),bfs{ind}(1,bffields(2)),'Color',color,'lineWidth',Es.BfLineWidth);
 hold on;
 
 % Run through all colors so legend will make sense with the colors used	
@@ -40,7 +40,7 @@ rind=1;
 for ind=2:length(bfs(:))
 	if(~isempty(bfs{ind}))
 		color=Es.BfColor(mod(ind-1,length(Es.BfColor))+1,1:3);
-		plot(bfs{ind}(1,bffields(1)),bfs{ind}(1,bffields(2)),'Color',color);
+		plot(bfs{ind}(1,bffields(1)),bfs{ind}(1,bffields(2)),'Color',color,'lineWidth',Es.BfLineWidth);
 		rind=rind+1;
 	end;	
 end;
@@ -99,10 +99,10 @@ for ind=1:length(bfs(:))
 					indphase=find(phase(ii-1)==Es.BfPhases);
 					% figure out if this is a "known" phase
 					if((isempty(indphase)) || (indphase(1)>size(Es.BfStyle,1)))
-						plot(xs,ys,'Color',color); % unknown phase - simple plot
+						plot(xs,ys,'Color',color,'lineWidth',Es.BfLineWidth); % unknown phase - simple plot
                     else
                         % we know the phase - plot accordingly
-						plot(xs,ys,Es.BfStyle(indphase(1),:),'Color',color);
+						plot(xs,ys,Es.BfStyle(indphase(1),:),'Color',color,'lineWidth',Es.BfLineWidth);
 					end;
                     % start a new segment
 					xs=xx(ii);
@@ -112,7 +112,7 @@ for ind=1:length(bfs(:))
 			end;
 	
         else % no phase information exists, just simple plot
-			handle=plot(xx,yy,Es.BfStyle(1,:),'Color',color);
+			handle=plot(xx,yy,Es.BfStyle(1,:),'Color',color,'lineWidth',Es.BfLineWidth);
 		end;
 	end;
 	rind=rind+1;	

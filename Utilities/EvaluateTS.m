@@ -8,22 +8,24 @@ function goodts=EvaluateTS(Vs,Ps,Es,varargin)
 [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
+% Put in some default values of Es
+Es=InsertDefaultValues(Es,'Verbose',0,'TsMax',1e+1,'TsMin',1e-7);
 
 Es.OlDraw = 0; % making sure we're not plotting anything...
 Es.TsMode = 'none'; % Making sure this function does not call itself
 % Initilize state if necessary
 [Vs,Ps,Es]=InitilizeState(Vs,Ps,Es);
 
-stepnum = 100;  % how many steps to run each time
-factor  = 2;    % muliply ts by how much each time?
-mints   = 1e-7; % minimum value of ts to start from
-maxts   = 1e+1; % max value of ts allowed
-thresh  = 1e-1; % threshold of noise that is considered bad integration
+stepnum = 100;      % how many steps to run each time
+factor  = 2;        % muliply ts by how much each time?
+mints   = Es.TsMin; % minimum value of ts to start from
+maxts   = Es.TsMax; % max value of ts allowed
+thresh  = 1e-1;     % threshold of noise that is considered bad integration
 
 % Start things by calculating integrating with slow time-step, and score=0
 Es.TsSize=mints;
 gs=runsim(Vs,Ps,Es,'Es.NoWarning',1,'Es.TimeDst',stepnum*Es.TsSize);
-nrm = T_L2Norm(gs,Ps,Es);
+%nrm = T_L2Norm(gs,Ps,Es);
 score=0;
 
 while (score<thresh) && (Es.TsSize<maxts)
@@ -34,12 +36,14 @@ while (score<thresh) && (Es.TsSize<maxts)
     gs = twofrms(:,:,2);    % new run now becomes old
 end;
 %score
-goodts = Es.TsSize/(factor^2);   % we found a "bad" time-step, no decrease back to "safe levels"
+goodts = Es.TsSize/(factor^2);   % we found a "bad" time-step, now decrease back to "safe levels"
 % round it down into a nice number
 tmp=10.^floor(log10(abs(goodts)));
 goodts=floor(goodts/tmp)*tmp;
 
-%disp(goodts)
+if(Es.Verbose)
+    disp(sprintf('ts = %e',goodts))
+end;
 %tmp=IntFunc(Vs,Ps,Es,'Es.NoWarning',1,'Es.TsSize',goodts,'Es.TimeDst',stepnum*10*goodts);
 %T_L2Norm(tmp,Ps,Es)
 end
