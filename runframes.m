@@ -1,4 +1,3 @@
-
 function [frames,history]=runframes(Vs,Ps,Es,varargin)
 % Run integrator (to time Es.TimeDst) and get (Es.Frames) snapshots of the system
 % [frames,history]=runframes(Vs,Ps,Es)
@@ -38,9 +37,7 @@ if(iscell(Es.TestFunc))
 end;
 
 % Calculate time step automatically if relevant
-if(strcmp(Es.TsMode,'auto'))
-	Es.TsSize = EvaluateTS(Vs,Ps,Es);
-end;
+[Vs,Ps,Es]=SetupTimeStep(Vs,Ps,Es);
 % Calculate any matrices and other auxiliary data before run
 [Vs,Ps,Es]=SetupSpatialData(Vs,Ps,Es);
 
@@ -74,7 +71,6 @@ end;
 
 % Setup a recurring function information (function that operates every-so-often)
 % Es.RecurFrames can be given as [1 1 0 0 1 0] or [1 2 5] for getting the first, second and fifth out of six frames
-
 if(~isempty(Es.RecurFunc))
     if(~isfield(Es,'RecurFrames') || ((length(Es.RecurFrames)==1) && (Es.RecurFrames(1)==0)))
         Es.RecurFrames = zeros(num,1); % Turn off RecurFunc
@@ -85,7 +81,7 @@ if(~isempty(Es.RecurFunc))
     end;
 end;
 
-% wrap in cell array if needed
+% Wrap in cell array if needed
 if(~isempty(Es.RecurFunc)&&~iscell(Es.RecurFunc))  
     Es.RecurFunc={Es.RecurFunc};
     
@@ -101,20 +97,21 @@ end;
 FlagStop = 0;
 if Es.OlDraw
     clf;
-    uicontrol('style','pushbutton','units','norm','position',[0.01 0.6 0.08,0.1],'string','Stop','callback',{@stopb});
-    uicontrol('style','pushbutton','units','norm','position',[0.01 0.4 0.08,0.1],'string','Pause','callback',{@pauseb});
+    uicontrol('style','pushbutton','units','norm','position',[0.01 0.7 0.09,0.1],'string','Stop','callback',{@stopb});
+    uicontrol('style','pushbutton','units','norm','position',[0.01 0.5 0.09,0.1],'string','Pause','callback',{@pauseb});
+    uicontrol('style','pushbutton','units','norm','position',[0.01 0.3 0.09,0.1],'string','Finish','callback',{@finishb});
     testtext=regexprep(func2str(Es.TestFunc),'_','-');
 end
 
+% Initilize
 frames = zeros([size(Vs) length(nonzeros(Es.FramesChoice))]);
 if(~isempty(Es.TestFunc))  
     history = [Es.Frames(:) zeros(size(Es.Frames(:)))];
 end;
 frmind = 1;
-
 Vnow = Vs;
-% Go over each frame
 
+% Main loop
 for index=1:num
     % Deal with dynamic parameters if necessary
 	if(~isempty(Es.DynPrm))	
@@ -125,8 +122,8 @@ for index=1:num
             tempvals = Es.DynVal(index,:);
         end;
         [Vs,Ps,Es]=SaveParmList(Vs,Ps,Es,tempvals,Es.DynPrm,length(Es.BfPrm));
-        
 	end;
+    
 	Es.TimeDst = jumps(index); 
     % Run a recurring function, if the time is right  
     if(~isempty(Es.RecurFunc))&&(Es.RecurFrames(index))  
@@ -183,18 +180,21 @@ for index=1:num
     end;
 end;
 
+% fix-up frames
 if((frmind-1)<size(frames,3))
     frames=frames(:,:,1:frmind-1);
 end;
+
 %%% SUB FUNCTIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-% stop and pause buttons for OnLine draw option %
+% stop, pause and finish buttons for OnLine draw option %
    function stopb(~,~)
         FlagStop=1;
    end
-
    function pauseb(~,~)
         pause();
    end
-
+   function finishb(~,~)
+        Es.OlDraw=0;
+   end
 end
    

@@ -15,9 +15,7 @@ Es=InsertDefaultValues(Es,'TsMode','none');
 [Vs,Ps,Es]=InitilizeState(Vs,Ps,Es);
 
 % Calculate time step automatically if relevant
-if(strcmp(Es.TsMode,'auto'))
-	Es.TsSize = EvaluateTS(Vs,Ps,Es);
-end;
+[Vs,Ps,Es]=SetupTimeStep(Vs,Ps,Es);
 % Calculate any matrices and other auxiliary data before run
 [Vs,Ps,Es]=SetupSpatialData(Vs,Ps,Es);
 

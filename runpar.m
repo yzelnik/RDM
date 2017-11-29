@@ -1,13 +1,15 @@
 function [StData,BfData]=runpar(Vs,Ps,Es,varargin)
 % Run multiple scenarios in parallel, with differnet parameters
-% Use a some function (Es.RunFunc) to get a measure/norm (default=runflow)
+% [StData,BfData]=runpar(Vs,Ps,Es)
+% Use some function (Es.RunFunc) to get a measure/norm (default=runflow)
 % Parameters to change are Es.BfPrm, with values specificed by Es.BfRange
 % Es.BfPrm is a string or a cell-array of strings. 
 % The string is a parameter name in Ps (e.g. "gamma"), 
-% or anything from Ps/Es  with the full hieracry (e.g. "Ps.Ds(2)")
-% Three formats are supported for Es.BfRange, for parm # of N (in Es.BfPrm):
-% 1) Specific points. N columns, each row is a point in parameter space
-% 2) N columns of size 3 or 4. Format is: [LowVal; HighVal; NumVal; Type]
+% or anything from Ps/Es  with the full hierarchy (e.g. "Ps.Ds(2)")
+% Three formats are supported for Es.BfRange, for prm # of N (in Es.BfPrm):
+% 1) Specific points. N columns, each row is a point in parameter space,
+%    each column is for a different parameter. Column min length is 6.
+% 2) Array of size 3 or 4. Format is: [LowVal, HighVal, NumVal, Type]
 %    Where NumVal gives the number of evaluations, and Type is either:
 %    Type = 0: regular grid spacing (default value), 
 %    Type < 0: uniform rand to the power of (-Type) (hence, -1 : uniform-rand)
@@ -15,7 +17,7 @@ function [StData,BfData]=runpar(Vs,Ps,Es,varargin)
 %    Type > 2: logarithmic grid spacing (not random). mult-spacing=Type/NumVal
 %    Type=NaN: Same parition with same randomization as last parameter
 %    If NumVal=0, then no new points are formed for this parameter
-% 3) Cell array. N cell arrays, each per parameter, with format as 2) above
+% 3) Cell array, each cell with format as 1) or 2) above
 
 if(~mod(nargin,2)) error('No default extra-input exists for runpar.'); end;
     
@@ -51,12 +53,12 @@ Es=SortOutBfParameters(Es);
 [WriteFlag,FileName]= CheckOutput(Es,partrun);
 Es.FileOut=[];
 
-% Initilize before main loop
+% Initilize
 BfData=[];
 StData=[];
 writeind = 1;
 
-
+% Main loop
 for ii=whichruns
    	% Update paramaters
     [Vs,Ps,Es]=SaveParmList(Vs,Ps,Es,Es.BfVal(ii,:));
@@ -68,7 +70,7 @@ for ii=whichruns
         rng(Es.RandSeed(1));	% Randomize with a pre-defined seed
     end;
     
-    if(Es.Verbose)
+    if(Es.Verbose) % Print out info?
         tmptxt = sprintf('%.2f,',Es.BfVal(ii,:));
         disp(sprintf('running #%d, prm vals: (%s)',ii,tmptxt(1:end-1)));
     end;
@@ -79,7 +81,6 @@ for ii=whichruns
     
     % Add data to final result
 	BfData(size(BfData,1)+1,1:(length(bf)+size(Es.BfVal,2))) = [Es.BfVal(ii,:) bf];
-    
     StData = [StData; {st}];
     
 	if(WriteFlag)   % Write to file if needed
@@ -100,8 +101,8 @@ end;
 
 end
 
-%%%%%%%%%%%%%%%%%%%% AUX FUNCTIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%% AUX FUNCTIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [partrun,whichruns] = CheckPartialRuns(Es)
 % Choose which (of Es.BfVal) parm-value combinations should be run

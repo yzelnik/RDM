@@ -24,25 +24,22 @@ if(iscell(Es.TestFunc))
     Es.TestList=Es.TestFunc;
     Es.TestFunc=@T_MultiTest;
 end;
-% Calculate time step automatically if relevant
-if(strcmp(Es.TsMode,'auto'))
-	Es.TsSize = EvaluateTS(Vs,Ps,Es);
-end;
 
+% Calculate time step automatically if relevant
+[Vs,Ps,Es]=SetupTimeStep(Vs,Ps,Es);
 % Calculate any matrices and other auxiliary data before run
 [Vs,Ps,Es]=SetupSpatialData(Vs,Ps,Es);
 
 Vs = Vs(:,:,1); % Take only first state, if there are more than one.
-
 Es.TimeDst = Es.TsSize*Es.TsNum;
-
 
 % Set up GUI for online drawing
 FlagStop = 0;
 if Es.OlDraw
     clf;
-    uicontrol('style','pushbutton','units','norm','position',[0.01 0.6 0.08,0.1],'string','Stop','callback',{@stopb});
-    uicontrol('style','pushbutton','units','norm','position',[0.01 0.4 0.08,0.1],'string','Pause','callback',{@pauseb});
+    uicontrol('style','pushbutton','units','norm','position',[0.01 0.7 0.09,0.1],'string','Stop','callback',{@stopb});
+    uicontrol('style','pushbutton','units','norm','position',[0.01 0.5 0.09,0.1],'string','Pause','callback',{@pauseb});
+    uicontrol('style','pushbutton','units','norm','position',[0.01 0.3 0.09,0.1],'string','Finish','callback',{@finishb});
 
     if(isempty(Es.TestFunc)) || (Es.OlDraw==1)  % If no test was defined, but we are using Online-draw, make something up...
         testtext='log10 of difference';
@@ -52,28 +49,34 @@ if Es.OlDraw
     
 end
 
-%recalculating Es.SsThresh for step size...
+% Recalculating Es.SsThresh for step size...
 Es.SsThresh=Es.SsThresh*Es.TimeDst;
 %disp([ Es.TimeDst Es.TsSize Es.TsNum])
-ind = 1;
-time= 0;
+
+% Initilize
+ind  = 1;
+time = 0;
 history = [];
-testres=[];
+testres = [];
+% Main loop
 while (FlagStop==0) && (time<Es.TimeMax)
 	Vnext = Ps.IntegFunc(Vs,Ps,Es);		% Integrate in time
 	Vboth = cat(3,Vs,Vnext);			% Concatanate the old and new state, to compare
 	[FlagStop,score]=CheckSS(Vboth,Ps,Es);	% Compare the new and old states
-    if(time<Es.TimeMin)
-        FlagStop=0;
+    
+    if(time<Es.TimeMin) % Don't allow stopping before min-time
+        FlagStop=0; 
     end;
     
-    if(~isempty(Es.TestFunc))
+    if(~isempty(Es.TestFunc)) % make a test on new state if relevant
         testres=PerformTests(Vnext,Ps,Es,Es.TestFunc);
     end;
    
+    % update the score (of how much has changed) and the history 
     score = [time log10(score/Es.TimeDst) testres(:)'];
     history = [history; score];
-    
+   
+    % Move us along
     Vs = Vnext;		
     ind = ind+1;
     time= time + Es.TimeDst;
@@ -94,6 +97,7 @@ if(time>=Es.TimeMax && ~Es.NoWarning)
     warning(sprintf('Did not converge at time = %d.',time));
 end;
 
+% fix up the history we'll return
 sz=size(history,2);
 if(sz>2)  % Don't save the convergence info if other info exists
     history(:,2)=[];
@@ -105,15 +109,16 @@ VsOut = Vs;
 
 
 %%% SUB FUNCTIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-% stop and pause buttons for OnLine draw option %
+% stop, pause and finish buttons for OnLine draw option %
    function stopb(~,~)
         FlagStop=1;
    end
-
    function pauseb(~,~)
         pause();
    end
-
+   function finishb(~,~)
+        Es.OlDraw=0;
+   end
 end
 
 

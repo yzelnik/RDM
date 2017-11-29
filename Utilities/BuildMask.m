@@ -5,7 +5,8 @@ function mask=BuildMask(parms,Ps,varargin)
 % If any value is negative, an inverse mask (1-mask) is used
 % The parameters in parms are interpeted by the number of them specified:
 % 1 - the system is cut into two parts, in this location (in X)
-% 2 - A rectangle from (0,0) to (X,Y), with parms = [X,Y,R]
+% 2 - either (2D case): A rectangle from (0,0) to (X,Y), parms = [X,Y]
+%     or (1D case): 2*W width centered on X, parms = [X,W]
 % 3 - A circle with center of (X,Y) and radius R, with parms = [X,Y,R]
 % 4 - A rectangle from (X1,Y1) to (X2,Y2), with parms = [X1,Y1,X2,Y2]
 
@@ -15,10 +16,10 @@ if(~isstruct(Ps))	% Build Ps struct online, mostly as a shortcut
 end;
 
 % Update online if necessary
-[Vs,Ps,Es]=UpdateParameters([],Ps,[],varargin{:});
+[~,Ps,~]=UpdateParameters([],Ps,[],varargin{:});
 
-if(~length(parms))
-	parms = [0.5];
+if(isempty(parms))
+	parms = 0.5;
 end;
 
 if(sum(parms<0)>0)
@@ -34,16 +35,16 @@ if((Ps.Nx==1) || (Ps.Ny==1))
 	if(sum(abs(parms)<=1)>0)	% If paramteres are given in relative terms, give them in Nx dimensions
 		parms = round(parms(:).*Ps.Nx);
 	end;
-	
+
 	if(length(parms)==1)
 		mask = [ones(parms(1),1) ; zeros(Ps.Nx-parms(1),1)];
 	else
 		mask = zeros(Ps.Nx,1);
-		mask(max(1,parms(1)-parms(2)):min(Ps.Nx,parms(1)+parms(2)))=1;
+		mask(max(1,parms(1)-parms(2)):min(Ps.Nx,parms(1)+parms(2)-1))=1;
 	end;
 
 else  % Assuming this is a 2D system
-	if(sum(abs(parms)<=1)>0)	% If paramteres are given in relative terms, give them in Nx&Ny dimensions
+	if(sum(abs(parms)<=1)>0)	% If parameters are given in relative terms, give them in Nx&Ny dimensions
 		temp = repmat([Ps.Nx ;Ps.Ny],4,1);
 		parms = round(parms(:).*temp(1:length(parms)));
 	end;
