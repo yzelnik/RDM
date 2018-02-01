@@ -25,12 +25,11 @@ thresh  = 1e-1;     % threshold of noise that is considered bad integration
 % Start things by calculating integrating with slow time-step, and score=0
 Es.TsSize=mints;
 gs=runsim(Vs,Ps,Es,'Es.NoWarning',1,'Es.TimeDst',stepnum*Es.TsSize);
-%nrm = T_L2Norm(gs,Ps,Es);
-score=0;
 
+score=0;
 while (score<thresh) && (Es.TsSize<maxts)
 	Es.TsSize=Es.TsSize*factor; % Increase time-step
-    twofrms = runframes(Vs,Ps,Es,'Es.NoWarning',1,'Es.Frames',[1/factor 1]*stepnum*Es.TsSize);
+    twofrms = runframes(Vs,Ps,Es,'Es.NoWarning',1,'Es.Frames',[1/factor 1]*stepnum*Es.TsSize,'Es.FramesChoice',1:2,'Es.RecurFrames',[]);
     score = T_L2Norm(gs - twofrms(:,:,1),Ps,Es);  % compare old run to new one
     %disp([Es.TsSize score])
     gs = twofrms(:,:,2);    % new run now becomes old
@@ -42,38 +41,10 @@ tmp=10.^floor(log10(abs(goodts)));
 goodts=floor(goodts/tmp)*tmp;
 
 if(Es.Verbose)
-    disp(sprintf('ts = %e',goodts))
+    disp(sprintf('ts = %e',goodts));
 end;
-%tmp=IntFunc(Vs,Ps,Es,'Es.NoWarning',1,'Es.TsSize',goodts,'Es.TimeDst',stepnum*10*goodts);
-%T_L2Norm(tmp,Ps,Es)
+
 end
 
 
 
-% OLD CODE - if becomes relevant
-
-%firstTs=1;
-%thresh=1e-9;
-%smallTS=1e-20;
-%Es.TsSize=firstTs;
-
-% while flag==0
-%Es.TimeDst=runnum*Es.TsSize;
-	%VsOut=IntFunc(Vs,Ps,Es,'Es.NoWarning',1);
-	
-    %tot=sum(sum(abs(VsOut-Vs)));
-    %[log10(tot) log10(Es.TsSize)]
-	%if (isfinite(tot) && (tot<1/thresh) )
-	%	flag=1;
-	%end;
-	%if(Es.TsSize<=smallTS)
-	%	flag=2;
-	%end;
-%end;
-
-
-%if flag==1
-%	goodts=Es.TsSize;
-%else
-%	goodts=0;
-%end;

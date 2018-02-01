@@ -15,7 +15,7 @@ end;
 [states,tags]=ReadAutoStates(sprintf('s.%s',filename),Ps,Es,0);
 
 if strcmp(Es.Auto,'notags')
-	tmppoints=ReadAutoBif(sprintf('b.%s',filename),[0 inds(:)']);
+  	tmppoints=ReadAutoBif(sprintf('b.%s',filename),[0 inds(:)']);
 	tags = find(tmppoints(:,1));
 	tmppoints = tmppoints(:,2:end);
 else

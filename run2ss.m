@@ -11,7 +11,7 @@ if(~mod(nargin,2)) varargin = ['Es.SsThresh' varargin]; end;
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'TimeMax',inf,'TimeMin',0,'TsNum',1e2,'OlDraw',0,'TestFunc',[],'TsMode','none','NoWarning',0);
+Es=InsertDefaultValues(Es,'TimeMax',inf,'TimeMin',0,'TsNum',1e2,'OlDraw',0,'TestFunc',[],'TsMode','none','NoWarning',0,'PlotFunc',@plotst);
 % Initilize state if necessary
 [Vs,Ps,Es]=InitilizeState(Vs,Ps,Es);
 
@@ -85,7 +85,8 @@ while (FlagStop==0) && (time<Es.TimeMax)
     if Es.OlDraw   
            cla;
            subplot(1,2,1);
-           plotst(Vs,Ps,Es);
+           Es.PlotFunc(Vs,Ps,Es);
+           %plotst(Vs,Ps,Es);
            title(sprintf('step = %d',ind)); 
            subplot(1,2,2);
            plot(history(:,1),history(:,Es.OlDraw+1));

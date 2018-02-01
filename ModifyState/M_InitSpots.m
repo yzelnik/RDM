@@ -7,8 +7,8 @@ MinSysLen = 10;
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-if(~isfield(Es,'InitPrm'))
-	Es.InitPrm = [];
+if(~isfield(Es,'InitPrm') || isempty(Es.InitPrm))
+	error('Need at least one value in Es.InitPrm (radius).');
 end;
 
 % If only mean-field values are given for Vs
@@ -21,7 +21,7 @@ if(size(Vs,3)==1)
 	Vs2 = M_InitUnfSt(mean(Vs,1),Ps,Es);
 	Vs = cat(3,Vs,Vs2);
 end;
-
+Es.InitPrm
 if(length(Es.InitPrm)<2)
     spotnum=1;
 else

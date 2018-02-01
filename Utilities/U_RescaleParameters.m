@@ -7,7 +7,7 @@ function [Vs,Ps,Es]=U_RescaleParameters(Vs,Ps,Es,varargin)
 % Update online if necessary
 [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
 % give default values
-Es=InsertDefaultValues(Es,'RescaleFactor',[],'RescalePrm',[],'RescalePow',1);
+Es=InsertDefaultValues(Es,'RescaleFactor',[],'RescalePrm',[],'RescalePow',1,'PrmInCell',[]);
 % make sure these 2 fields are not empty
 if(isempty(Es.RescalePrm) || isempty(Es.RescalePow)|| isempty(Es.RescaleFactor))
     error('Es.RescaleFactor, Es.RescalePrm and Es.RescalePow all need to be defined for rescaling.');
@@ -37,8 +37,12 @@ end;
 for ii=1:length(Es.RescalePrm) % rescale each parameter
     tmpvals(ii)=basevals(ii)*(Es.RescaleFactor^Es.RescalePow(ii));
 end;
+
 % save these parameters into Ps/Es
+BackupPrmInCell=Es.PrmInCell; % In case we are using Es.PrmInCell, make sure we don't use it here
+Es.PrmInCell=[];
 [Vs,Ps,Es]=SaveParmList(Vs,Ps,Es,tmpvals,Es.RescalePrm);
+Es.PrmInCell=BackupPrmInCell; % In case we are using Es.PrmInCell, make sure we don't use it here
 
 if(~(oldnx==Ps.Nx) || ~(oldny==Ps.Ny)) % change Vs if necessary
     Es.InitActive=0; % make sure we actually (re)initilize the state

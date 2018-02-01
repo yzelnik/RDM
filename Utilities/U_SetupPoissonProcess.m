@@ -14,9 +14,15 @@ end;
 
 Es.PppPrm = [Es.PppPrm(:)' 0 0]; % padding zeros for buffer
 
-res     = diff(Es.Frames(1:2));
+if(length(Es.Frames)>1)
+    res     = diff(Es.Frames(1:2));
+    tottime = Es.Frames(end);
+else
+    res     = Es.TimeDst/Es.Frames;
+    tottime = Es.TimeDst;
+end;
 avgjmp  = Es.PppPrm(1);
-tottime = Es.Frames(end);
+
 
 if(sum(abs(diff(Es.Frames)-res)>Es.TsSize)) % making sure Es.Frames is setup properly
     error('Es.Frames contains non-ordered frames');

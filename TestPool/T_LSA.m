@@ -101,7 +101,7 @@ else	% eigs was successful, so return either 1 (stable) or 0 (unstable), using t
     [~,zeromode] = min(abs(temp));
     if(temp(zeromode)<abs(Es.LsaThresh(1)))
         %disp(sprintf('found mode at %d, with %f',zeromode,temp(zeromode)));
-        temp(zeromode)=-inf;    % Ignore zero mode (chose to zero eigvalue)
+        temp(zeromode)=-inf;    % Ignore zero mode ( zero eigvalue)
     end;
     
     res = (1-(max(temp)>Es.LsaThresh(2)))>0;

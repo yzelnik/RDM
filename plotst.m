@@ -17,7 +17,7 @@ end;
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'VarInd',1,'StInd',1,'StAxis',[],'PlotBare',0,'St1Color',[jet(2) ;hsv(7); parula(11)],'St2Colorbar',1,'St2Interp',0);
+Es=InsertDefaultValues(Es,'VarInd',1,'StInd',1,'StAxis',[],'PlotBare',0,'St1Color',[jet(2) ;hsv(7); parula(11)],'St2Colorbar',1,'St2Interp',0,'StLineWidth',1);
 
 minst2colorlen = 10;
 defst2colorlen = 64;
@@ -49,7 +49,7 @@ if((Ps.Nx==1) || (Ps.Ny==1))
     data=reshape(Vs(:,Es.VarInd,Es.StInd),size(Vs,1),length(Es.VarInd)*length(Es.StInd));
     %set(gcf,'Colormap',Es.St2Color);
     set(gcf,'DefaultAxesColorOrder',[Es.St1Color(Es.VarInd,:) ; Es.St1Color]);
-    handle=plot((1:Ps.Nx)*(reallen/Ps.Nx),data);
+    handle=plot((1:Ps.Nx)*(reallen/Ps.Nx),data,'lineWidth',Es.StLineWidth);
     %if (isfield(Es,'VarInd'))
 %	set(0,'DefaultAxesColorOrder',[Es.St1Color(Es.VarInd,:) ; Es.St1Color]);
 %        plot((1:Ps.Nx*Ps.Ny)*(reallen/Ps.Nx*Ps.Ny),Vs(:,Es.VarInd,Es.StInd));

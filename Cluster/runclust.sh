@@ -13,7 +13,7 @@ servername="$(hostname)"
 #echo $servername
 if [ "$kernelversion" == "Darwin" ]; then
 #echo "we're using mac?"
-	matloc="/Applications/MATLAB_R2014b.app/bin/matlab" # For Mac
+	matloc="/Applications/MATLAB_R2017a.app/bin/matlab" # For Mac
     rdmloc="~/Dropbox/Tools/RDM"
 else
 	if [[ $servername =~ "sge" ]]; then

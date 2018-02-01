@@ -2,9 +2,12 @@ function [frames,history]=runframes(Vs,Ps,Es,varargin)
 % Run integrator (to time Es.TimeDst) and get (Es.Frames) snapshots of the system
 % [frames,history]=runframes(Vs,Ps,Es)
 % Alternatively, if Es.Frames is a vector, then is specifies the time point of the snapshots
-% if Es.DynPrm exists, than it allows running different frames with different parameters (Ps). 
+% if Es.DynPrm exists, than it allows running different frames with different parameters. 
 % Es.DynPrm is a cell array of these parameters names, while Es.DynVal has the values (in either an array or cell array).
 % Es.FramesChoice can be used to specify which frames to get (default is all), with either indices or a logical array format.
+% Es.RecurFunc and Es.RecurFrames can be used to run a modifying function after before of the frames
+% If Es.RecurFrames has more than one column, each column corresponds to a function in Es.RecurFrames
+
 
 % Default first extra input is for the frames to run
 if(~mod(nargin,2)) varargin = ['Es.Frames' varargin]; end;
@@ -14,7 +17,7 @@ if(~mod(nargin,2)) varargin = ['Es.Frames' varargin]; end;
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'DynPrm',[],'RecurFunc',[],'OlDraw',0,'TestFunc',[],'TsMode','none','FileOut',[],'BfPrm',[]);
+Es=InsertDefaultValues(Es,'DynPrm',[],'RecurFunc',[],'OlDraw',0,'TestFunc',[],'TsMode','none','FileOut',[],'BfPrm',[],'PlotFunc',@plotst);
 % Initilize state if necessary
 [Vs,Ps,Es]=InitilizeState(Vs,Ps,Es);
 
@@ -49,6 +52,9 @@ if (length(Es.Frames)>1)	% Deal with Es.Frames being a vector
 	Es.Frames = Es.Frames(:);
 	Es.TimeDst = Es.Frames(end);
 else
+    if(~(Es.Frames==round(Es.Frames)))
+        error('If Es.Frames is a single number, it must be an integer.');
+    end;
 	num = Es.Frames;
     Es.Frames = (1:num)'*Es.TimeDst/num;
     
@@ -69,23 +75,37 @@ elseif (length(Es.FramesChoice) < num) || (max(Es.FramesChoice)>1)
 	Es.FramesChoice = temp;
 end;
 
-% Setup a recurring function information (function that operates every-so-often)
-% Es.RecurFrames can be given as [1 1 0 0 1 0] or [1 2 5] for getting the first, second and fifth out of six frames
-if(~isempty(Es.RecurFunc))
-    if(~isfield(Es,'RecurFrames') || ((length(Es.RecurFrames)==1) && (Es.RecurFrames(1)==0)))
-        Es.RecurFrames = zeros(num,1); % Turn off RecurFunc
-    elseif (length(Es.RecurFrames) < num) || (max(Es.RecurFrames)>1)
-        temp = zeros(num,1); % Setup specific frames to use RecurFunc
-        temp(Es.RecurFrames) = 1;
-        Es.RecurFrames = temp;
-    end;
-end;
-
 % Wrap in cell array if needed
 if(~isempty(Es.RecurFunc)&&~iscell(Es.RecurFunc))  
     Es.RecurFunc={Es.RecurFunc};
-    
 end;
+
+% Setup a recurring function information (function that operates every-so-often)
+% Es.RecurFrames can be given as [1 1 0 0 1 0] or [1 2 5] for getting the first, second and fifth out of six frames
+if(~isempty(Es.RecurFunc))
+    if(~isfield(Es,'RecurFrames'))
+        Es.RecurFunc = []; % Turn off RecurFunc as there are no frames
+        Es.RecurFrames = [];
+    elseif(size(Es.RecurFrames,1)>1 && size(Es.RecurFrames,2)>1) % if there's more than one set of recur func/frames
+        if(~(size(Es.RecurFrames,2)==length(Es.RecurFunc)))
+            error('If column number of Es.RecurFrames is more than 1, it should match number of funcs in Es.RecurFunc');
+        end;
+        Es.RecurFramesExtra=Es.RecurFrames; % Keep the real information here
+        Es.RecurFrames = -sum(Es.RecurFrames,2); % just to know if this frames has any recuring func
+    else 
+        if(((length(Es.RecurFrames)==1) && (Es.RecurFrames(1)==0)))
+            Es.RecurFunc = []; % Turn off RecurFunc as there are no frames
+        elseif(length(Es.RecurFrames)==num-1)
+            Es.RecurFrames=[0;Es.RecurFrames];
+        elseif(length(Es.RecurFrames) < num) || (max(Es.RecurFrames)>1)
+            temp = zeros(num,1); % Setup specific frames to use RecurFunc
+            temp(Es.RecurFrames) = 1;
+            Es.RecurFrames = temp;
+        end;
+    end;
+end;
+
+
 
 % If no test was defined, but we are using online-draw, or history was
 % requested, make something up...
@@ -126,10 +146,19 @@ for index=1:num
     
 	Es.TimeDst = jumps(index); 
     % Run a recurring function, if the time is right  
-    if(~isempty(Es.RecurFunc))&&(Es.RecurFrames(index))  
-        for funcind=1:length(Es.RecurFunc)
-            Vnext = Es.RecurFunc{funcind}(Vnow,Ps,Es);
-            Vnow = Vnext;
+    if(~isempty(Es.RecurFunc))&&(Es.RecurFrames(index)) 
+        if(Es.RecurFrames(index)>0) % In each frame, run all funcs together or none at all
+            for funcind=1:length(Es.RecurFunc)
+                Vnext = Es.RecurFunc{funcind}(Vnow,Ps,Es);
+                Vnow = Vnext;
+            end;
+        else % Each function has a differnet timing set
+            for funcind=1:length(Es.RecurFunc)
+                if(Es.RecurFramesExtra(index,funcind))
+                    Vnext = Es.RecurFunc{funcind}(Vnow,Ps,Es);
+                    Vnow = Vnext;
+                end;
+            end;
         end;
     end;
     
@@ -159,7 +188,8 @@ for index=1:num
                 title(testtext); 
                 subplot(1,2,1);
            end;
-           plotst(Vnow,Ps,Es);
+           Es.PlotFunc(Vnow,Ps,Es);
+           %plotst(Vnow,Ps,Es);
            titletext = sprintf('step = %d',index);
            if(~isempty(Es.DynPrm) && ~iscell(Es.DynVal))
                titletext = sprintf('%s, %s = %.4f',titletext,Es.DynPrm{1},Es.DynVal(index,1));

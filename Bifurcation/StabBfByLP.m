@@ -1,5 +1,5 @@
 function bfs=StabBfByLP(bfs,pnts)
-% Add a fake stability values for a bifurcation array
+% Add fake stability values for a bifurcation array
 % bfs=StabBfByLP(bfs,pnts)
 
 if(nargin<2)

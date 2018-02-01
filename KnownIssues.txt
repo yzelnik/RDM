@@ -1,1 +1,3 @@
 NeighborSM gives some wrong/extra sites when BC is not periodic (Ps.Bc<>0), due to the definition of StencilToSM
+
+U_RescaleParameters forcibly reinitializes Vs if Ps.Nx or Ps.Ny have been changed

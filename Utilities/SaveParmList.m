@@ -11,7 +11,7 @@ if(nargin<4) vallist = Es.PrmList; end;
 if(nargin<5) namelist = Es.BfPrm; end;
 if(nargin<6) prmoffset = 0; end;
 
-% Do we have parameters who's values are given in cell-arrays?
+% Do we have parameters whos values are given in cell-arrays?
 Es=InsertDefaultValues(Es,'PrmInCell',zeros(length(namelist),1));
 Es.PrmInCell=[Es.PrmInCell(:) ; zeros(length(namelist),1)]; % buffer with zeros
 

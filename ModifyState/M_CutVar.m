@@ -22,7 +22,7 @@ if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 Es.ModPrm = [Es.ModPrm(:)' 0 0 0 0 0];
 
 if(Es.ModPrm(2)==0) % By default change the Es.VarInd variable
-    Es.ModPrm(2)=Es.VarInd;
+    Es.ModPrm(2)=Es.VarInd(1);
 end;
 
 if(Es.ModPrm(3)==0)

@@ -74,7 +74,7 @@ end
 
 function st=ReadSingleState(fin,pointnum,fieldnum)
 % This function attempts to read the state even in "difficult conditions"
-numtxtsz=19;  % number of characters representing 1 number
+numtxtsz=19;  % number of characters representing a single number
 offset=4;     % initial offset
 tmpstr = fgetl(fin); % Clear the first line (half read from before)
 for ii=1:pointnum
