@@ -44,7 +44,10 @@ Es.PrmInCell=[];
 [Vs,Ps,Es]=SaveParmList(Vs,Ps,Es,tmpvals,Es.RescalePrm);
 Es.PrmInCell=BackupPrmInCell; % In case we are using Es.PrmInCell, make sure we don't use it here
 
+
 if(~(oldnx==Ps.Nx) || ~(oldny==Ps.Ny)) % change Vs if necessary
+    Ps.Nx=round(Ps.Nx); % In case some small digits are making a fuss
+    Ps.Ny=round(Ps.Ny);
     Es.InitActive=0; % make sure we actually (re)initilize the state
     [Vs,Ps,Es]=InitilizeState(mean(Vs,1),Ps,Es);
 end;

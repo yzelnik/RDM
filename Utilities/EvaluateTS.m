@@ -29,7 +29,7 @@ gs=runsim(Vs,Ps,Es,'Es.NoWarning',1,'Es.TimeDst',stepnum*Es.TsSize);
 score=0;
 while (score<thresh) && (Es.TsSize<maxts)
 	Es.TsSize=Es.TsSize*factor; % Increase time-step
-    twofrms = runframes(Vs,Ps,Es,'Es.NoWarning',1,'Es.Frames',[1/factor 1]*stepnum*Es.TsSize,'Es.FramesChoice',1:2,'Es.RecurFrames',[]);
+    twofrms = runframes(Vs,Ps,Es,'Es.NoWarning',1,'Es.Frames',[1/factor 1]*stepnum*Es.TsSize,'Es.FramesChoice',1:2,'Es.RecurFrames',[],'Es.DynPrm',[]);
     score = T_L2Norm(gs - twofrms(:,:,1),Ps,Es);  % compare old run to new one
     %disp([Es.TsSize score])
     gs = twofrms(:,:,2);    % new run now becomes old

@@ -17,7 +17,7 @@ if(~mod(nargin,2)) varargin = ['Es.Frames' varargin]; end;
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'DynPrm',[],'RecurFunc',[],'OlDraw',0,'TestFunc',[],'TsMode','none','FileOut',[],'BfPrm',[],'PlotFunc',@plotst);
+Es=InsertDefaultValues(Es,'DynPrm',[],'RecurFunc',[],'OlDraw',0,'TestFunc',[],'TsMode','none','FileOut',[],'BfPrm',[],'PlotFunc',@plotst,'RepDynVal',0);
 % Initilize state if necessary
 [Vs,Ps,Es]=InitilizeState(Vs,Ps,Es);
 
@@ -93,10 +93,15 @@ if(~isempty(Es.RecurFunc))
         Es.RecurFramesExtra=Es.RecurFrames; % Keep the real information here
         Es.RecurFrames = -sum(Es.RecurFrames,2); % just to know if this frames has any recuring func
     else 
-        if(((length(Es.RecurFrames)==1) && (Es.RecurFrames(1)==0)))
-            Es.RecurFunc = []; % Turn off RecurFunc as there are no frames
+        if(length(Es.RecurFrames)==1)
+            if(Es.RecurFrames(1)==0)
+                % Turn off RecurFunc as there are no frames
+                Es.RecurFunc = []; 
+            else % assume that this solve value is every how many frames to run RecurFunc 
+                Es.RecurFrames = Es.RecurFrames:Es.RecurFrames:length(Es.Frames); 
+            end;
         elseif(length(Es.RecurFrames)==num-1)
-            Es.RecurFrames=[0;Es.RecurFrames];
+            Es.RecurFrames=[0;Es.RecurFrames]; % assume this is a binary yes/no values per frame
         elseif(length(Es.RecurFrames) < num) || (max(Es.RecurFrames)>1)
             temp = zeros(num,1); % Setup specific frames to use RecurFunc
             temp(Es.RecurFrames) = 1;
@@ -131,15 +136,22 @@ end;
 frmind = 1;
 Vnow = Vs;
 
+if(Es.RepDynVal) % replicate Es.DynVal as necessary? (periodic forcing etc...)
+    dynmax = size(Es.DynVal,1);
+else
+    dynmax = num; % no repeat (default)
+end;
+
 % Main loop
 for index=1:num
     % Deal with dynamic parameters if necessary
 	if(~isempty(Es.DynPrm))	
+        dynindex = mod(index-1,dynmax)+1;
         % Allow for simple vector change if only 1 parameter is used
         if(length(Es.DynPrm)==1) && (size(Es.DynVal,2)>1)
-            tempvals = {Es.DynVal(index,:)}; 
+            tempvals = {Es.DynVal(dynindex,:)}; 
         else
-            tempvals = Es.DynVal(index,:);
+            tempvals = Es.DynVal(dynindex,:);
         end;
         [Vs,Ps,Es]=SaveParmList(Vs,Ps,Es,tempvals,Es.DynPrm,length(Es.BfPrm));
 	end;
@@ -192,7 +204,7 @@ for index=1:num
            %plotst(Vnow,Ps,Es);
            titletext = sprintf('step = %d',index);
            if(~isempty(Es.DynPrm) && ~iscell(Es.DynVal))
-               titletext = sprintf('%s, %s = %.4f',titletext,Es.DynPrm{1},Es.DynVal(index,1));
+               titletext = sprintf('%s, %s = %.4f',titletext,Es.DynPrm{1},Es.DynVal(dynindex,1));
            end;
            title(titletext); 
            drawnow; 

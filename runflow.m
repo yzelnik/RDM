@@ -4,6 +4,7 @@ function [StData,BfData]=runflow(Vs,Ps,Es,varargin)
 % The function will attempt to automatically identify which functions
 % accept which input by name, but this can also be specified by Es.FuncSpec
 % Values in Es.FuncSpec(:,1) indicate the folowing input/output:
+%   0: function to update Vs,Ps,Es (intput and output are both of these three)
 %   1: function takes a state and returns a state
 %   2: function takes a state and returns both state and bif data
 %   3: function takes a state and returns bif data
@@ -11,14 +12,14 @@ function [StData,BfData]=runflow(Vs,Ps,Es,varargin)
 
 % Default first extra input is for the list of functions to run
 if(~mod(nargin,2)) varargin = ['Es.FuncList' varargin]; end;
-    
+
 % Update online if necessary
 [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'MergeBfData',0,'TsMode','none');
-% Initilize state if necessary 
+Es=InsertDefaultValues(Es,'MergeBfData',0,'TsMode','none','TestMultSt',0);
+% Initilize state if necessary
 [Vs,Ps,Es]=InitilizeState(Vs,Ps,Es);
 
 
@@ -64,33 +65,32 @@ if(Es.FuncSpec(1)==4)   % Make sure we don't start with a bif-only function
 end;
 
 
-if((size(Es.FuncSpec,1)==1) && (length(Es.FuncList)>1))  
-    Es.FuncSpec = Es.FuncSpec'; % fit into column in necessary 
+if((size(Es.FuncSpec,1)==1) && (length(Es.FuncList)>1))
+    Es.FuncSpec = Es.FuncSpec'; % fit into column in necessary
 end;
-if(size(Es.FuncSpec,2)<2)   % Need to add in default values of what information to save
-    if(sum(Es.FuncSpec(:,1)==4))
-        Es.FuncSpec(:,2)=(Es.FuncSpec(:,1)==4);     % If we have Comparison functions, save only their output and tests coming after
-       
-        lastcalc = find(Es.FuncSpec(:,1)==4,1,'last');
-        if(lastcalc < find(Es.FuncSpec(:,1)==3,1,'last'))
-            Es.FuncSpec(find(Es.FuncSpec(lastcalc+1:end,1)==3)+lastcalc,2) = 1;
+% Do we need to add in default values of what information to save
+if(size(Es.FuncSpec,2)<2)
+    if(sum(Es.FuncSpec(:,1)==4)) % If we have Comparison functions, save only their output and tests coming after
+        Es.FuncSpec(:,2)=(Es.FuncSpec(:,1)==4);
+
+        lastcomp = find(Es.FuncSpec(:,1)==4,1,'last'); % Find the last comparison function
+        if(lastcomp < find(Es.FuncSpec(:,1)==3,1,'last'))
+            % Save test function output if it is after the last comparison function
+            Es.FuncSpec(find(Es.FuncSpec(lastcomp+1:end,1)==3)+lastcomp,2) = 1;
         end;
-    else
-        if(sum(Es.FuncSpec(:,1)==3))
+    else % No comparison functions
+        if(sum(Es.FuncSpec(:,1)==3)) % Ouput of test functions is prefered
             Es.FuncSpec(:,2)=(Es.FuncSpec(:,1)==3); % Save output of Test functions
         else
             Es.FuncSpec(:,2)=(Es.FuncSpec(:,1)==2); % Save output of mixed functions
         end;
-        Es.FuncSpec(end,2)=1; % Save output from last function in the flow 
+        Es.FuncSpec(end,2)=1; % Save output from last function in the flow
     end;
 end;
 
 BfData = [];
 StData = [];
 for ii=1:length(Es.FuncList)    % Go over functions in the flow
-  %  disp([ii size(Vs)])
-  %  plotst(Vs,Ps,Es);
-  % pause;
     if(Es.FuncSpec(ii,1)==0)        % General functions, mostly for updates
         [Vs,Ps,Es] = Es.FuncList{ii}(Vs,Ps,Es);
     elseif(Es.FuncSpec(ii,1)==1)    % Input state, output state
@@ -108,18 +108,30 @@ for ii=1:length(Es.FuncList)    % Go over functions in the flow
         end;
         Vs = StOut(:,:,end);
     elseif(Es.FuncSpec(ii,1)==3)     % Input state, output bifdata
-        BfOut=[];
-        for stind = 1:size(Vs,3)    % In case there are multiple states
-            if(Es.FuncSpec(ii,2)<2)
-                newbf = Es.FuncList{ii}(Vs(:,:,stind),Ps,Es);
-            elseif (Es.FuncSpec(ii,2)<3)
-                [tmp1,tmp2] = Es.FuncList{ii}(Vs(:,:,stind),Ps,Es);
-                newbf = [tmp1(:)' tmp2(:)'];
-            else
-                [tmp1,tmp2,tmp3] = Es.FuncList{ii}(Vs(:,:,stind),Ps,Es);
-                newbf = [tmp1(:)' tmp2(:)'  tmp3(:)'];
+        if(Es.TestMultSt) % run test on multiple states
+            BfOut=[];
+            for stind = 1:size(Vs,3)    % In case there are multiple states
+                if(Es.FuncSpec(ii,2)<2)
+                    newbf = Es.FuncList{ii}(Vs(:,:,stind),Ps,Es);
+                elseif (Es.FuncSpec(ii,2)<3)
+                    [tmp1,tmp2] = Es.FuncList{ii}(Vs(:,:,stind),Ps,Es);
+                    newbf = [tmp1(:)' tmp2(:)'];
+                else
+                    [tmp1,tmp2,tmp3] = Es.FuncList{ii}(Vs(:,:,stind),Ps,Es);
+                    newbf = [tmp1(:)' tmp2(:)'  tmp3(:)'];
+                end;
+                BfOut = [BfOut newbf];
             end;
-            BfOut = [BfOut newbf];
+        else % run the test only once on all of Vs
+            if(Es.FuncSpec(ii,2)<2)
+                BfOut = Es.FuncList{ii}(Vs,Ps,Es);
+            elseif (Es.FuncSpec(ii,2)<3)
+            	[tmp1,tmp2] = Es.FuncList{ii}(Vs,Ps,Es);
+                BfOut = [tmp1(:)' tmp2(:)'];
+            else
+                [tmp1,tmp2,tmp3] = Es.FuncList{ii}(Vs,Ps,Es);
+            	BfOut = [tmp1(:)' tmp2(:)'  tmp3(:)'];
+            end;
         end;
         if(Es.FuncSpec(ii,2)>0)
             BfData = CollectBfData(BfData,BfOut,Es.MergeBfData,ii);
@@ -138,7 +150,7 @@ for ii=1:length(Es.FuncList)    % Go over functions in the flow
         %BfOut = Es.FuncList{ii}(BfOut,Ps,Es);
         if(Es.FuncSpec(ii,2)>0)
              BfData = CollectBfData(BfData,BfOut,Es.MergeBfData,ii);
-%            BfData(size(BfData,1)+(1:size(BfOut,1)),1:1+size(BfOut,2)) = [repmat(ii,size(BfOut,1),1) BfOut];
+            %BfData(size(BfData,1)+(1:size(BfOut,1)),1:1+size(BfOut,2)) = [repmat(ii,size(BfOut,1),1) BfOut];
         end;
     end;
 end;
@@ -162,5 +174,5 @@ function BfRes=CollectBfData(BfData,BfOut,mergeflag,ind)
         BfData(size(BfData,1)+(1:size(BfOut,1)),1:1+size(BfOut,2)) = [repmat(ind,size(BfOut,1),1) BfOut];
         BfRes = BfData;
     end;
-    
+
 end

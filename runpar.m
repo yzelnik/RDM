@@ -3,15 +3,15 @@ function [StData,BfData]=runpar(Vs,Ps,Es,varargin)
 % [StData,BfData]=runpar(Vs,Ps,Es)
 % Use some function (Es.RunFunc) to get a measure/norm (default=runflow)
 % Parameters to change are Es.BfPrm, with values specificed by Es.BfRange
-% Es.BfPrm is a string or a cell-array of strings. 
-% The string is a parameter name in Ps (e.g. "gamma"), 
+% Es.BfPrm is a string or a cell-array of strings.
+% The string is a parameter name in Ps (e.g. "gamma"),
 % or anything from Ps/Es  with the full hierarchy (e.g. "Ps.Ds(2)")
 % Three formats are supported for Es.BfRange, for prm # of N (in Es.BfPrm):
 % 1) Specific points. N columns, each row is a point in parameter space,
 %    each column is for a different parameter. Column min length is 6.
 % 2) Array of size 3 or 4. Format is: [LowVal, HighVal, NumVal, Type]
 %    Where NumVal gives the number of evaluations, and Type is either:
-%    Type = 0: regular grid spacing (default value), 
+%    Type = 0: regular grid spacing (default value),
 %    Type < 0: uniform rand to the power of (-Type) (hence, -1 : uniform-rand)
 %    0<Type<1: gaussian-rand with std=2/Type (so Type=1 will include ~95%)
 %    Type > 2: logarithmic grid spacing (not random). mult-spacing=Type/NumVal
@@ -20,10 +20,10 @@ function [StData,BfData]=runpar(Vs,Ps,Es,varargin)
 % 3) Cell array, each cell with format as 1) or 2) above
 
 if(~mod(nargin,2)) error('No default extra-input exists for runpar.'); end;
-    
+
 % Update online if necessary
 [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
-% Make sure Ps parameters are properly setup
+% Make sure Ps parameters are properly set up
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
 Es=InsertDefaultValues(Es,'WriteFreq',100,'RunFunc',@runflow,'RandSeed',0,'FileOut',[],'WriteSt',1,'Verbose',0);
@@ -37,8 +37,8 @@ if(~iscell(Es.BfPrm))   % Wrap in cell array if not already in one
 end;
 
 % setup randomization issues (relevant if parameters are randomly chosen)
-if(Es.RandSeed(1)==0)   
-    rng('shuffle');         % Get unique (set by time) seed    
+if(Es.RandSeed(1)==0)
+    rng('shuffle');         % Get unique (set by time) seed
 else
     rng(Es.RandSeed(1));	% Randomize with a pre-defined seed
 end;
@@ -62,27 +62,27 @@ writeind = 1;
 for ii=whichruns
    	% Update paramaters
     [Vs,Ps,Es]=SaveParmList(Vs,Ps,Es,Es.BfVal(ii,:));
-   
+
     % setup randomization (relevant if randomization is used inside Es.RunFunc)
-    if(Es.RandSeed(1)==0)   
-        rng('shuffle');         % Get unique (set by time) seed    
+    if(Es.RandSeed(1)==0)
+        rng('shuffle');         % Get unique (set by time) seed
     else
         rng(Es.RandSeed(1));	% Randomize with a pre-defined seed
     end;
-    
+
     if(Es.Verbose) % Print out info?
         tmptxt = sprintf('%.2f,',Es.BfVal(ii,:));
         disp(sprintf('running #%d, prm vals: (%s)',ii,tmptxt(1:end-1)));
     end;
-    
+
     % Run the system
 	[st,bf] = Es.RunFunc(Vs,Ps,Es);
     bf = bf(:)';
-    
+
     % Add data to final result
 	BfData(size(BfData,1)+1,1:(length(bf)+size(Es.BfVal,2))) = [Es.BfVal(ii,:) bf];
     StData = [StData; {st}];
-    
+
 	if(WriteFlag)   % Write to file if needed
         if(writeind>=Es.WriteFreq || ii==whichruns(end))
             if(WriteFlag==1)
@@ -94,7 +94,7 @@ for ii=whichruns
             end;
             writeind=1;
         else
-            writeind = writeind+1;  
+            writeind = writeind+1;
         end;
 	end;
 end;
@@ -110,12 +110,12 @@ function [partrun,whichruns] = CheckPartialRuns(Es)
 totvals = Es.BfVal; % list of parameter-combinations
 
 if(isfield(Es,'RunsChoice') & Es.RunsChoice)
-    
+
 	if(length(Es.RunsChoice)==2) % Es.RunsChoice = [partition-index partition-total-number]
         whichruns = ceil(size(totvals,1)*(Es.RunsChoice(1)-1)/Es.RunsChoice(2))+1 : ceil(size(totvals,1)*Es.RunsChoice(1)/Es.RunsChoice(2));
     else % if Es.RunsChoice has one values, or more than 2, than assume these are just a list to run
         % old version: whichruns = Es.RunsChoice;
-        whichruns = Es.RunsChoice;  
+        whichruns = Es.RunsChoice;
     end;
     partrun = 1;
 else
@@ -135,7 +135,7 @@ if(~isempty(Es.FileOut))
     if(isnumeric(Es.FileOut))
         FileName = sprintf('runpar_Of%s_par%s_out%d',func2str(Es.RunFunc),Es.BfPrm{1},Es.FileOut);
     else
-        if(length(Es.FileOut)>4) % If a predefined file type is used 
+        if(length(Es.FileOut)>4) % If a predefined file type is used
             if(strcmp(Es.FileOut(end-3:end),'.mat') || strcmp(Es.FileOut(end-3:end),'.csv') || strcmp(Es.FileOut(end-3:end),'.txt'))
                 FileEnd=Es.FileOut(end-3:end);
                 FileName=Es.FileOut(1:end-4);
