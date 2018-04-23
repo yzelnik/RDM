@@ -15,7 +15,7 @@ function Es=SortOutBfParameters(Es)
 % 3) Cell array, each cell with format as 1) or 2) above
 
 % Do we have parameters who's values are given in cell-arrays?
-Es=InsertDefaultValues(Es,'PrmInCell',zeros(1,length(Es.BfPrm)));
+Es=InsertDefaultValues(Es,'PrmInCell',zeros(1,length(Es.BfPrm)),'CellData',{});
 
 % Wrap in cell-array format for convenience 
 if(~iscell(Es.BfPrm))  
@@ -30,13 +30,13 @@ emptycells = find(cellfun(@isempty,Es.BfRange)); % find empty cells
 Es.BfRange(emptycells) = [];                     % remove these cells
 
 curnum=1; % number of different values of parameter (size of total prm-set)
-
+actind=1;
 for ii=1:length(Es.BfRange)
 	% If we got a cell-array within cell-array, it means cell-data in inside Es.BfRange
 	if(iscell(Es.BfRange{ii})) 
-        if(~isfield(Es,'CellData'))
-            Es.CellData={}; % Create the Es.CellData if needed
-        end;
+        %if(~isfield(Es,'CellData'))
+        %    Es.CellData={}; % Create the Es.CellData if needed
+        %end;
         curcel = length(Es.CellData)+1;
         curlen = length(Es.BfRange{ii});
         Es.CellData{curcel}=Es.BfRange{ii}; % Move cell-arr into its proper place
@@ -50,12 +50,13 @@ for ii=1:length(Es.BfRange)
         curnum  = size(Es.BfRange{ii},1);
         parnum  = size(Es.BfRange{ii},2);
         tmp     = [0 0 curnum];
+        actind=actind+parnum;
     else % type 2
         parnum  = 1; % only one parameter set is specified per cell
         tmp = [Es.BfRange{ii}(:)' 0]; % Pad with zero (for regular grid)
         
         if(tmp(3)<0) % This a "special" type of parameter, given in celldata (-tmp(3))
-            Es.PrmInCell(ii)=-tmp(3); % "pointer" to where the data is located
+            Es.PrmInCell(actind)=-tmp(3); % "pointer" to where the data is located
             curnum=tmp(2);
         elseif(tmp(3)>0) 
             curnum=tmp(3); % number of new points multipled by tmp(3)
@@ -78,9 +79,9 @@ for ii=1:length(Es.BfRange)
             tmpvals = (parvals-Es.BfRange{ii-1}(1))/(Es.BfRange{ii-1}(2)-Es.BfRange{ii-1}(1)); % normalize
             parvals = tmpvals*(tmp(2)-tmp(1))+tmp(1);
         else
-            error('Unidentified type of value distribution for param: "%s" given by %.2f.',Es.BfPrm{ii},tmp(4));
+            error('Unidentified type of value distribution for param: "%s" given by %.2f.',Es.BfPrm{actind},tmp(4));
         end;  
-        
+        actind=actind+1;
 	end;  
     
     % Add the new set of parameter values to the final result

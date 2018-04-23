@@ -1,17 +1,10 @@
-function VsOut=L_GLV(Vs,Ps,Es,varargin)
+    function VsOut=L_GLV(Vs,Ps,Es)
 % Generalized Lotka Volterra equations - Local terms
 % VsOut=L_GLV(Vs,Ps,Es)
 % equation per variable N_i is: dN_i/dt = r_i*N_i + Simga{A_ij*N_j} + d_i* D^2(N_i))
 % Parameters are the growth and diffusion vectors (r,d) and interaction matrix A.
 % For example, for a two-species symmetric competition:
 % r=[0.1,0.1], A=-[1 2;2 1]; d=[1,2];
-
-% Update online if necessary
-if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
-
-if(~isfield(Es,'JacMode'))
-   Es.JacMode=0;
-end;
 
 len=size(Vs,1);
 

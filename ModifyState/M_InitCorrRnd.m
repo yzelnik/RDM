@@ -5,7 +5,7 @@ function VsOut = M_InitCorrRnd(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-Es=InsertDefaultValues(Es,'VarInd',1);
+Es=InsertDefaultValues(Es,'NonNeg',0,'VarInd',1);
 
 % Prepare Uniform states if necessary
 VsOut = M_InitUnfSt(Vs,Ps,Es);
@@ -37,8 +37,7 @@ randmask = randmask/max(randmask);
 % Add a perturbation around the uniform state
 VsOut(:,Es.VarInd) = randmask*2*VsOut(1,Es.VarInd);
 
-% If we know variables are positive, make sure they remain so	
-if((isfield(Es,'NonNeg')) & (Es.NonNeg))
+if(Es.NonNeg)  % make sure values are not negative, if relevant
 	VsOut = max(0,VsOut);
 end;
 

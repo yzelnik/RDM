@@ -4,16 +4,12 @@ function VsOut=L_ConRes(Vs,Ps,Es)
 % Variables are: N_1..N_M and R1..R_L, Parameters are: (e,c,m,I,l)
 % Where L = Ps.ResNum (default is 1), and M = Ps.VarNum-Ps.ResNum
 % Equations: dN_i/dt = N_i*(e_i*c_i*R_j - m_i) + D_i*N_i''
-%            dR_j/dt = I - l*R_j - R_j*sum_i(c_i*N_i_) + D_{i+j}*R_j''
+%            dR_j/dt = I - l*R_j - R_j*sum_i(c_i*N_i) + D_{i+j}*R_j''
 % Diffusion is set by Ds, where 1 value given means same diffusion for all,
 % and 2 values give it for consumers and resources seperately (otherwise, all should be defined)
 % For other parameters, they can each be defined flexibly, 
 % (either as scalar,vector or matrix) where for e&c the size of the
 % vector/matrix on the N/R axis can be either one of them, or both (N before R)
-
-if(~isfield(Es,'JacMode'))
-   Es.JacMode=0;
-end;
 
 if(isfield(Es,'SetupMode') && Es.SetupMode)
     % Make some adjusments, to allow for easier definition of parameters

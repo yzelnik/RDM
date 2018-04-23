@@ -24,7 +24,7 @@ end;
 % Allows the test-outs to be put inside the testlist.
 if(isempty(Es.TestOuts))  
     % If inside the cell-array there are numbers following the function
-    % names, than assume these are the test-outs
+    % names, then assume these are the test-outs
     ind=0; temp={};
     for ii=1:length(Es.TestList)
 
@@ -80,3 +80,4 @@ for ii=1:num
     stats = [stats tmp];
 end;
 
+end

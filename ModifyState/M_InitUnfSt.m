@@ -9,7 +9,7 @@ if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 % Should we actually do anything? (is the state ready already?)
 if(size(Vs,1)<(Ps.Nx*Ps.Ny))	
 	% Check if we should run an ODE integration until Steady-State, per initial value set
-	if(isfield(Es,'OdeInit') && (length(Es.OdeInit)>0))
+	if(isfield(Es,'OdeInit') && ~isempty(Es.OdeInit))
 		if(length(Es.OdeInit)==1)
 			Es.OdeInit = repmat(Es.OdeInit,size(Vs,1),1);
 		end;
@@ -25,8 +25,7 @@ if(size(Vs,1)<(Ps.Nx*Ps.Ny))
 			VsTmp(1,:,ind) = Vs(ind,:);
 		end;	
 	end;
-	%disp(VsTmp(:)')	% delete?
-
+	
 	% repeat to form a uniform state
 	VsOut = repmat(VsTmp,Ps.Nx*Ps.Ny,1);
 else

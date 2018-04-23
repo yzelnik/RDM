@@ -17,9 +17,8 @@ end;
 
 diststencil = sqrt(X.^2+Y.^2);
 diststencil(diststencil>maxdist)=0;
-%imagesc(diststencil)
 
-Matt=StencilToSM(diststencil,Ps.Nx,Ps.Ny,Ps.Bc);    
+Matt=StencilToSM(diststencil,Ps.Nx,Ps.Ny,-abs(Ps.Bc));  % make sure Bc is either 0 or -1
 
 
 end

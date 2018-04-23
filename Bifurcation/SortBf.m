@@ -19,8 +19,16 @@ end;
 
 for ii=1:length(bfs)    % Go over the cells
     bf=bfs{ii};
+    if(exist('pdist2','builtin')) % does function exist?
+        dist=pdist2(bf(:,Es.BfFields),bf(:,Es.BfFields));
+    else % or do it ourselves
+        bfsz=size(bf,1);
+        dist = zeros(bfsz);
+        for ind=1:bfsz
+            dist(:,ind) = sqrt(sum((bf(:,Es.BfFields)-repmat(bf(ind,Es.BfFields),bfsz,1)).^2,2));
+        end;
+    end;
     
-    dist=pdist2(bf(:,Es.BfFields),bf(:,Es.BfFields));
     %imagesc(dist)
     dist(logical(eye(size(bf,1))))=inf;
     [~,ind]=min(dist(:));

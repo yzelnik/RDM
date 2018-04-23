@@ -1,4 +1,4 @@
-function VsOut=L_EDGE(Vs,Ps,Es,varargin)
+function VsOut=L_EDGE(Vs,Ps,Es)
 % Vegetation on the edge between UV and BS (based on the SG model) - Local terms
 % That is, very simplified Gilad model with strong shading (dimensional), and extra B
 % VsOut=L_EDGE(Vs,Ps,Es)
@@ -6,13 +6,6 @@ function VsOut=L_EDGE(Vs,Ps,Es,varargin)
 % Variables are: B(1), W(2), H(3) and E(4)
 % Ps = struct('LocFunc',@L_EDGE,'SpaFunc',@S_RD,'IntegFunc',@I_FDSIMP,'P',43,'eta',4.5,'kappa',0.5,'mu',0.25,'mu2',0.25,'nu',1.75,'lambda',0.005,'lambda2',0.005,'gamma',1.5,'gamma2',1.5,'rho',0.5,'Ds',[0.1 5 0.1],'VarNum',3,'Lx',160,'Ly',10,'Nx',160*5,'Ny',1,'BC',1);
 % Parameters are: P,q,nu,alpha,eta,gamma,rho,f,DW,DH. (1,0.05 3.333 33.333 3.5 16.667  0.95 0.1,100,10000)
-
-% Update online if necessary
-[Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
-
-if(~isfield(Es,'JacMode'))
-   Es.JacMode=0;
-end;
 
 % Initialization
 B=Vs(:,1); 

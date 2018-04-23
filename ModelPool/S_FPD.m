@@ -1,6 +1,8 @@
 function Out=S_FPD(Vs,Ps,Es)
 % Fokker-Planck diffusion
 % Out=S_FPD(Vs,Ps,Es)
+
+% Note that Nld is only used here for the purpose of comparison
 if(~isfield(Ps,'Nld'))
     Ps.Nld=0;
 end;
@@ -13,7 +15,7 @@ if(isfield(Es,'SetupMode') && Es.SetupMode)
     end;
 else  	 % Normal run
     
-    if(Ps.Nld)
+    if(Ps.Nld) % This is much slower and should not be used
         len  = Ps.Nx*Ps.Ny;
         SM   = sparse(len*Ps.VarNum,len*Ps.VarNum);	% Build the block-diagonal matrix
         dsm2 = DervSM(2,Ps,Es);  

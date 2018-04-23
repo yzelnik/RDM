@@ -11,7 +11,7 @@ if(~mod(nargin,2)) varargin = ['Es.SsThresh' varargin]; end;
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'TimeMax',inf,'TimeMin',0,'TsNum',1e2,'OlDraw',0,'TestFunc',[],'TsMode','none','NoWarning',0,'PlotFunc',@plotst);
+Es=InsertDefaultValues(Es,'TimeMax',inf,'TimeMin',0,'TsNum',1e2,'OlDraw',0,'TestFunc',[],'TsMode','none','NoWarning',0,'SsCheckFunc',@CheckSS,'PlotFunc',@plotst);
 % Initilize state if necessary
 [Vs,Ps,Es]=InitilizeState(Vs,Ps,Es);
 
@@ -42,7 +42,11 @@ if Es.OlDraw
     uicontrol('style','pushbutton','units','norm','position',[0.01 0.3 0.09,0.1],'string','Finish','callback',{@finishb});
 
     if(isempty(Es.TestFunc)) || (Es.OlDraw==1)  % If no test was defined, but we are using Online-draw, make something up...
-        testtext='log10 of difference';
+        if(isequal(Es.SsCheckFunc,@CheckSS))
+            testtext='log10 of difference';
+        else
+            testtext=sprintf('log10 of %s',regexprep(func2str(Es.SsCheckFunc),'_','-'));
+        end;
     else
         testtext=regexprep(func2str(Es.TestFunc),'_','-');
     end;
@@ -62,7 +66,7 @@ testres = [];
 while (FlagStop==0) && (time<Es.TimeMax)
 	Vnext = Ps.IntegFunc(Vs,Ps,Es);		% Integrate in time
 	Vboth = cat(3,Vs,Vnext);			% Concatanate the old and new state, to compare
-	[FlagStop,score]=CheckSS(Vboth,Ps,Es);	% Compare the new and old states
+	[FlagStop,score]=Es.SsCheckFunc(Vboth,Ps,Es);	% Compare the new and old states
     
     if(time<Es.TimeMin) % Don't allow stopping before min-time
         FlagStop=0; 

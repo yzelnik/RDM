@@ -4,17 +4,15 @@ function VsOut=M_InsertRegions(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
+Es=InsertDefaultValues(Es,'VarInd',1,'RegPrm',1);
+
+
 if ~isfield(Es,'RegPrm')  
     Es.RegPrm = 1;       % By default, add one (positive) region
 end;
 
-Es.RegPrm = [Es.RegPrm(:)' 0 0];  % buffer with zeros
-% VarInd -> Main variable to work on
-if isfield(Es,'VarInd')                  
-    Es.VarInd = Es.VarInd(1);
-else
-    Es.VarInd = 1;
-end;
+Es.RegPrm = [Es.RegPrm(:)' 0 0];    % buffer with zeros
+Es.VarInd = Es.VarInd(1);           % Main variable to work on
 
 % What are the min and max values of all of this?
 [md,mn,mx]=T_MinMax(Vs,Ps,Es);      

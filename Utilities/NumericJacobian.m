@@ -19,7 +19,7 @@ Es.JacMode=0;	% Just making sure we're not getting the analytical jacobian
 % Now start things off. First calcualte the current right-hand-side of the pde
 % After that, approximate derivatives, changing one point/site at a time
 
-if(Es.SmUse)   % Get the right-hand-side of the PDE (no time derivatives)
+if(Es.SpaMatUse)   % Get the right-hand-side of the PDE (no time derivatives)
     rhs0 = reshape(Ps.LocFunc(Vs,Ps,Es),syslen*Ps.VarNum,1) + Ps.SpaMat*Vs(:); 
 else        % if we don't use SM (spatial matrix) than use the spatial function directly
     rhs0 = reshape( Ps.LocFunc(Vs,Ps,Es) + Ps.SpaFunc(Vs,Ps,Es) ,syslen*Ps.VarNum,1);
@@ -28,10 +28,7 @@ end;
 for ii=1:syslen	% Go over each data point
     for jj=1:Ps.VarNum
     	Vs(ii,jj)=Vs(ii,jj)+delta;	% Change the value at one point by a small amount (delta)
-    	if Es.SmUpdate	
-            Ps.SpaMat = Ps.SpaFunc(Vs,Ps,Es);  % Use this if the spatial matrix needs to be updated online
-    	end;
-    	if(Es.SmUse)   % Get the right-hand-side of the PDE (no time derivatives)
+    	if(Es.SpaMatUse)   % Get the right-hand-side of the PDE (no time derivatives)
     	    rhs1 = reshape(Ps.LocFunc(Vs,Ps,Es),syslen*Ps.VarNum,1) + Ps.SpaMat*Vs(:); 
     	else        % if we don't use SM (spatial matrix) than use the spatial function directly
             rhs1 = reshape( Ps.LocFunc(Vs,Ps,Es) + Ps.SpaFunc(Vs,Ps,Es) ,syslen*Ps.VarNum,1);
@@ -42,11 +39,9 @@ for ii=1:syslen	% Go over each data point
 end;
 
 if(nargout>1) % Comparison of numerical jacobian to analytical one
-    Es.JacMode = 1;	% Delete this line soon, old version (still needs change across the board)
     Es.JacMode = 1;	% Request a jacobian
 
-    AnaJac = Ps.LocFunc(Vs,Ps,Es)+Ps.SpaFunc(Vs,Ps,Es);
-    
+    AnaJac = Ps.LocFunc(Vs,Ps,Es)+Ps.SpaFunc(Vs,Ps,Es);  
 end;
 
 end

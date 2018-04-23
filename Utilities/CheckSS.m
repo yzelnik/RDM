@@ -4,7 +4,7 @@ function [Out,Score]=CheckSS(Vs,Ps,Es,varargin)
 % Out=1: convergence
 
 % Update online if necessary
-[Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
+if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
 V1 = Vs(:,:,1);
 V2 = Vs(:,:,2);

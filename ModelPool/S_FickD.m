@@ -1,6 +1,7 @@
 function Out=S_FickD(Vs,Ps,Es)
 % Fick diffusion
 % Out=S_FickD(Vs,Ps,Es)
+
 if(~isfield(Ps,'Nld'))
     Ps.Nld=0;
 end;

@@ -10,9 +10,7 @@ function [tscale,timeused] = C_CalcConvergenceTimescale(Input,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-if(~isfield(Es,'BfFields'))
- 	Es.BfFields=[1,2];
-end;
+Es=InsertDefaultValues(Es,'BfFields',[1,2]);
 
 if(size(Input,3)>1)     % If we get state data, run the test on each state to form a history
     bfhist(1:size(Input,3)) = 1:size(Input,3);

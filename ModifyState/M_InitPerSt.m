@@ -10,12 +10,10 @@ function VsOut=M_InitPerSt(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-if(~isfield(Es,'InitPrm'))
-	Es.InitPrm = [4 1 0];
-end;
+Es=InsertDefaultValues(Es,'NonNeg',0,'InitPrm',[4 1 0]);
 
-NoPer = Es.InitPrm(1);	% Period number
-PerType = Es.InitPrm(2);	% Pattern type: 0=stripes, 1=spots, (-1)=holes
+NoPer   = Es.InitPrm(1);    % Period number
+PerType = Es.InitPrm(2);    % Pattern type: 0=stripes, 1=spots, (-1)=holes
 
 % prepare x and k
 x = linspace(0,Ps.Lx,Ps.Nx)';
@@ -40,7 +38,6 @@ else  % Assuming this is a 2D system
 	if(PerType<0)	% Flip u (to get holes, etc)
 		u = 1-u;
 	end;
-	%imagesc(u)
 	u = repmat(reshape(u',length(u(:)),1),1,Ps.VarNum);
 	
 end
@@ -59,8 +56,7 @@ else			% Use first 2 sets of Vs to build an initial state
 	VsOut = u .* Vs(:,:,1) + (1-u) .* Vs(:,:,2);
 end;
 
-% If we know variables are positive, make sure they remain so	
-if((isfield(Es,'NonNeg')) & (Es.NonNeg))
+if(Es.NonNeg) % make sure values are not negative, if relevant
 	VsOut = max(0,VsOut);
 end;
 

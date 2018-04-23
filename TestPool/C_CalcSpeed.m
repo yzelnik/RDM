@@ -1,12 +1,12 @@
 function speed = C_CalcSpeed(Input,Ps,Es,varargin)
 % Estimate the speed of change in some test function
+% Ad hoc parameters [minpoints,minfaction,smallchange]
+% with default [2,10,0.1] can be defined via Es.CalcSpeedPrm
 
 % Update online if necessary
 if(nargin>3) [~,Ps,Es]=UpdateParameters([],Ps,Es,varargin{:}); end;
 
-if(~isfield(Es,'BfFields') || isempty(Es.BfFields))
- 	Es.BfFields=[1,2];
-end;
+Es=InsertDefaultValues(Es,'BfFields',[1,2],'CalcSpeedPrm',[2,10,0.1]);
 
 % If we get state data, run the test on each state to form a history
 if(size(Input,3)>1)     
@@ -22,9 +22,9 @@ end;
 %plot(bfhist(:,1),bfhist(:,2))
 
 % ad-hoc constants
-minpoints = 2;
-minfaction = 10;
-smallchange = 0.1;
+minpoints = Es.CalcSpeedPrm(1); % def = 2
+minfaction = Es.CalcSpeedPrm(2); % def = 10;
+smallchange = Es.CalcSpeedPrm(3); % def = 0.1;
 
 % calculating some min's&max's
 buffersize = round(size(bfhist,1)/minfaction);
@@ -64,7 +64,7 @@ if((endloc-begloc)>mintime)
     speed=totval/tottime;
     %speed=(finsz-begsz)/(tlen);
 else
-    speed=0;    % Not enough data
+    speed=NaN;    % Not enough data
 end;
 
 end

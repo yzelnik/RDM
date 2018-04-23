@@ -31,16 +31,17 @@ per=out(:,:,end);
 %% Repeated singular events
 % define a recurring function for cutting down biomass:
 Es.RecurFunc=@M_CutVar;
-% parameters for this function: [cut down -2, of var 1, 0.08 part of space, randomly] 
+% parameters for this function: [cut down -2, of variable 1, 0.08 part of space, randomly] 
 Es.ModPrm=[-2 1 0.08 -1]; 
 
-% repeat disturbance every 40 frames, 50 times:
-recur = (1:50)*40;
+% repeat disturbance every 40 frames, 20 times:
+recur = (1:20)*40;
 out2 = runframes(per,Ps,Es,'Ps.a',1.015,'Es.Frames',frms,'Es.RecurFrames',recur);
 % dynamics of repeated disturbance and system response & recovery
+plotwf(out2,Ps,Es)
 
 %% Integrating with white noise
-%  for using white noise and similar types of temporal heteroneity,
+%  for using white noise and similar types of temporal heterogeneity,
 %  a different integration scheme needs to be used
 
 out3 = run2ss(per,Ps,Es,'Ps.NoiseType',[0.2;0.5;0],'Ps.IntegFunc',@I_NoiseDFM,'Es.TsSize',0.002);

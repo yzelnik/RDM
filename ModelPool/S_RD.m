@@ -5,11 +5,11 @@ function MatOut=S_RD(~,Ps,Es)
 % The array Ps.Ds is assumed to contain the diffusion rates of the different reactants 
 
 if(isfield(Es,'SetupMode') && Es.SetupMode)
-    % Pre caclculate spatial matrix, for future use
+    % Pre calculate spatial matrix, for future use
     MatOut = Ps;
     MatOut.SpaMat = CalcSM(Ps,Es);
 else  	 % Normal run
-   if(~isfield(Ps,'SpaMat'))    % Caclculate spatial matrix if needed
+   if(~isfield(Ps,'SpaMat'))    % Calculate spatial matrix if needed
         Ps.SpaMat = CalcSM(Ps,Es);
    end;
    
@@ -23,9 +23,10 @@ end
 function SM=CalcSM(Ps,Es)
    len=Ps.Nx*Ps.Ny;
    SM = sparse(len*Ps.VarNum,len*Ps.VarNum);	% Build the block-diagonal matrix
-   dsm2 = DervSM(2,Ps,Es);  
+   dsm2 = DervSM(2,Ps,Es);  % second derivative
    
-   if(size(Ps.Ds,2)==1) Ps.Ds=Ps.Ds'; end; % Make sure Ds is in a row shape
+   % Make sure Ds is in a row shape
+   if(size(Ps.Ds,2)==1) Ps.Ds=Ps.Ds'; end; 
    
    for ii=1:Ps.VarNum				% Put in derivative sub-matrix in a block-diagonal fashion
         SM((ii-1)*len+(1:len),(ii-1)*len+(1:len)) = dsm2.*Ps.Ds(:,ii);

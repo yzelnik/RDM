@@ -1,16 +1,9 @@
-function VsOut=L_MK(Vs,Ps,Es,varargin)
+function VsOut=L_MK(Vs,Ps,Es)
 % Modified Klausmeier model - Local terms
 % VsOut=L_MK(Vs,Ps,Es)
 % Given the state variables (Vs) and parameters (Ps), calculate the local terms of the model
 % Variables are: B(1) and W(2). 
 % Parameters are: a,m,D. (0.9,0.45,100)
-
-% Update online if necessary
-if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
-
-if(~isfield(Es,'JacMode'))
-   Es.JacMode=0;
-end;
 
 % Initilization
 

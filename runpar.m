@@ -58,6 +58,10 @@ BfData=[];
 StData=[];
 writeind = 1;
 
+if(Es.Verbose) % Print out info?
+    disp(sprintf('going through #%d parameter sets',length(whichruns)));
+end;
+
 % Main loop
 for ii=whichruns
    	% Update paramaters

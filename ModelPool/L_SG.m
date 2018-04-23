@@ -1,16 +1,9 @@
-function VsOut=L_SG(Vs,Ps,Es,varargin)
+function VsOut=L_SG(Vs,Ps,Es)
 % Simplfied Gilad (non-dimensional) model - Local terms
 % VsOut=L_SG(Vs,Ps,Es)
 % Given the state variables (Vs) and parameters (Ps), calculate the local terms of the model
 % Variables are: B(1),W(2),H(3). 
 % Parameters are: P,q,nu,alpha,eta,gamma,rho,f,DW,DH. (1,0.05 3.333 33.333 3.5 16.667  0.95 0.1,100,10000)
-
-% Update online if necessary
-if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
-
-if(~isfield(Es,'JacMode'))
-   Es.JacMode=0;
-end;
 
 % Initialization
 B=Vs(:,1); 

@@ -36,14 +36,15 @@ while (ind<Es.MaxNewtLoop) && (residual>Es.SsThresh)
     
     Vs = Vs - Es.NewtonRate*reshape(VsChange,syslen,Ps.VarNum);
 
-    if Es.NonNeg  % consider deleting
-        	Vs = max(0,Vs);
+    if Es.NonNeg  % make sure values are not negative, if relevant
+        Vs = max(0,Vs);
     end;
     ind = ind+1;
 
 end;
 
 VsOut = Vs;
+
 %disp([ind log10(residual)])% delete this line
 
 end

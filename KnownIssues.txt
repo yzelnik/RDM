@@ -1,5 +1,8 @@
 NeighborSM gives some wrong/extra sites when BC is not periodic (Ps.Bc<>0), due to the definition of StencilToSM
 
 U_RescaleParameters forcibly reinitializes Vs if Ps.Nx or Ps.Ny have been changed
+U_RescaleRes does the same
 
-setting up for runpar while runframes has a dynamical parameter, makes it impossible to run runframes as is with the same setup
+Setting up for runpar while runframes has a dynamical parameter, makes it impossible to run runframes as is with the same setup?
+
+Some strange issue with Es.PrmInCell, it being very long in cluster runs. Does not seem to affect anything.

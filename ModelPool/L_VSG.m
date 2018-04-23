@@ -6,10 +6,6 @@ function VsOut=L_VSG(Vs,Ps,Es)
 % Parameters for dimensional: P=100,eta=7,kappa=0.5,mu=0.25,nu=1.75,lambda=0.005,gamma=1.5,rho=0.5,DB=0.1,DW=5
 % Parameters for non-dimensional: P=1.1,eta=3.5,kappa=(1),mu=(1),nu=7,lambda=(7),gamma=3,rho=0.5,DB=(1),DW=50
 
-if(~isfield(Es,'JacMode'))
-   Es.JacMode=0;
-end;
-
 % Initialization
 B=Vs(:,1); 
 W=Vs(:,2); 

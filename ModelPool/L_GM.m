@@ -1,4 +1,4 @@
-function VsOut=L_GM(Vs,Ps,Es,varargin)
+function VsOut=L_GM(Vs,Ps,Es)
 % Gierer-Meinhardt model with Saturation - Local terms
 % VsOut=L_GM(Vs,Ps,Es)
 % Given the state variables (Vs) and parameters (Ps), calculate the local terms of the model
@@ -6,13 +6,6 @@ function VsOut=L_GM(Vs,Ps,Es,varargin)
 % Equations: da/dt = rho + a^2/(h*(1+del*a^2)) - mu*a + a'',  dh/dt = eps + a^2 - h + D*U''
 % Formulation based on paper: "Analytical Treatment of Pattern Formation
 % in the Gierer-Meinhardt Model of Morphogenesis" 
-
-% Update online if necessary
-[Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
-
-if(~isfield(Es,'JacMode'))
-   Es.JacMode=0;
-end;
 
 % Initilization
 a=Vs(:,1); 

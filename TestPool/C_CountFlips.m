@@ -20,7 +20,6 @@ else          % Or, assume we got a history
     bfhist = Input;
 end;
 
-
 data = bfhist(:,Es.BfFields(2));  % get data series
 tjmp = mean(diff(bfhist(:,Es.BfFields(1)))); % get avegrage time jump
 smoothcoeff = Es.FlipThresh(2)/tjmp;  % normalize the smoothing coefficient

@@ -17,7 +17,7 @@ if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 Es=InsertDefaultValues(Es,'NonNeg',0);
 
 % Setup the spatial matrix and auxiliary flags if not already done
-if(~isfield(Es,'SmUse'))
+if(~isfield(Es,'SpaMatUse') || Es.SpaMatUse<0)
     [Vs,Ps,Es]=SetupSpatialData(Vs,Ps,Es);
 end;
 
@@ -27,36 +27,31 @@ end;
 % how many steps of integration?
 totsteps = ceil(Es.TimeDst/Es.TsSize);
     
-    % Go through each time step
-    for ii=1:totsteps
-        % Get right-hand-side (without noise)
-        if(Es.SmUse)   % Integrate next time step
-            %[ii size(Ps.LocFunc(Vs,Ps,Es)) size(Vs) size(Ps.SpaMat)]
-            fx = (Ps.LocFunc(Vs,Ps,Es) + reshape(Ps.SpaMat*Vs(:),Ps.Nx*Ps.Ny,Ps.VarNum));
-         
-            if Es.SmUpdate
-                Ps.SpaMat = Ps.SpaFunc(Vs,Ps,Es);  % Use this if the spatial matrix needs to be updated online
-            end;
-        else        % if we don't use SM (spatial matrix) than use the spatial function directly
-            fx = (Ps.LocFunc(Vs,Ps,Es) + Ps.SpaFunc(Vs,Ps,Es)) ;
-        end;
-        
-        for jj=1:Ps.VarNum % calculate noise for this step
-            gx(:,jj) = noisefunc(Vs(:,jj),noiseparm(:,jj));
-            nextvar = Vs(:,jj) + fx(:,jj)*Es.TsSize + gx(:,jj)*sqrt(Es.TsSize);
-            gnext(:,jj) = noisefunc(nextvar,noiseparm(:,jj));
-        end;
-        Wnoise = sqrt(Es.TsSize)*randn(size(Vs));
-   
-        % Next time step
-        VsNew  = Vs + fx*Es.TsSize + gx.*Wnoise + (gnext-gx).*(Wnoise.^2)/(2*sqrt(Es.TsSize));
-        
-    	if Es.NonNeg  
-        	VsNew = max(0,VsNew);
-        end;
-    	Vs = VsNew;
-    end; 
+% Go through each time step
+for ii=1:totsteps
+	% Get right-hand-side (without noise)
+	if(Es.SpaMatUse)   % Integrate next time step   
+        fx = (Ps.LocFunc(Vs,Ps,Es) + reshape(Ps.SpaMat*Vs(:),Ps.Nx*Ps.Ny,Ps.VarNum));
+	else  % if we don't use SM (spatial matrix) than use the spatial function directly
+        fx = (Ps.LocFunc(Vs,Ps,Es) + Ps.SpaFunc(Vs,Ps,Es)) ;
+	end;
 
-    VsOut = Vs;
+    for jj=1:Ps.VarNum % calculate noise for this step
+        gx(:,jj) = noisefunc(Vs(:,jj),noiseparm(:,jj));
+        nextvar = Vs(:,jj) + fx(:,jj)*Es.TsSize + gx(:,jj)*sqrt(Es.TsSize);
+        gnext(:,jj) = noisefunc(nextvar,noiseparm(:,jj));
+	end;
+	Wnoise = sqrt(Es.TsSize)*randn(size(Vs));
+   
+	% Next time step
+	VsNew  = Vs + fx*Es.TsSize + gx.*Wnoise + (gnext-gx).*(Wnoise.^2)/(2*sqrt(Es.TsSize));
+        
+	if Es.NonNeg % make sure values are not negative, if relevant
+        VsNew = max(0,VsNew);
+	end;
+	Vs = VsNew;
+end; 
+VsOut = Vs;
 
 end
+

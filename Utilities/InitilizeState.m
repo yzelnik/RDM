@@ -5,8 +5,6 @@ function [Vs,Ps,Es]=InitilizeState(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-MinSysLen = 10;
-
 % Put in some default values of Es
 Es=InsertDefaultValues(Es,'InitActive',0,'InitFunc',@M_InitRndSt);
 

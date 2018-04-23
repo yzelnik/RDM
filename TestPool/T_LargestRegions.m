@@ -10,7 +10,7 @@ if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
 % Segment the state into positive and negative regions
 regs = SegmentRegions(Vs,Ps,Es);
-plot(regs)
+
 minmax = [min(regs) max(regs)];
 if(minmax(1)<0)
     negsizes=histcounts(regs,(minmax(1)-0.5):0);

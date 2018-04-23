@@ -12,13 +12,12 @@ if(nargin<5) namelist = Es.BfPrm; end;
 if(nargin<6) prmoffset = 0; end;
 
 % Do we have parameters whos values are given in cell-arrays?
-Es=InsertDefaultValues(Es,'PrmInCell',zeros(length(namelist),1));
+Es=InsertDefaultValues(Es,'PrmInCell',zeros(length(namelist)+2,1));
 Es.PrmInCell=[Es.PrmInCell(:) ; zeros(length(namelist),1)]; % buffer with zeros
 
 for jj=1:length(namelist)
     % Get value from vallist, one way or the other
 	if(Es.PrmInCell(jj+prmoffset))
-
         tmpval=Es.CellData{Es.PrmInCell(jj+prmoffset)}{vallist(jj)};
     elseif(iscell(vallist))
         tmpval=vallist{jj};

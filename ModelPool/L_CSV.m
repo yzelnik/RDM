@@ -1,4 +1,4 @@
-function VsOut=L_CSV(Vs,Ps,Es,varargin)
+function VsOut=L_CSV(Vs,Ps,Es)
 % Coastal Salinity Vegetation model - Local terms
 % VsOut=L_CSV(Vs,Ps,Es)
 % Given the state variables (Vs) and parameters (Ps), 
@@ -6,9 +6,6 @@ function VsOut=L_CSV(Vs,Ps,Es,varargin)
 % Variables are: N1(1),N2(2),S(3). 
 % Parameters are: p1,p2,a11,a12,a21,a22,b0,b1,m,k,e,g. 
 % (0.1,0.1,0.03,0.02,0.06,0.03,0.3,1,3.14,1.2,1.5,5)
-
-% Update online if necessary
-[Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
 
 % Initialization
 

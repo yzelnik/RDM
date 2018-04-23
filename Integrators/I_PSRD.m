@@ -10,7 +10,6 @@ if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
 Es=InsertDefaultValues(Es,'SetupMode',0,'NoWarning',0);
 
-
 if(Es.SetupMode)
     % Setup variables for integration in the future    
     Ps=GetSpaData(Vs,Ps,Es);    % Run subfunction (see at the end)
@@ -34,7 +33,6 @@ else        % Normal run
     % The basic time-step loop
     for n = 1:nmax
         t=n*Ps.SpaData.h;
-        
         
         for ii=1:VarNum   % Bring data back to real space and reshape
             Ts(:,ii)=reshape(ifftn(Us{ii}),tlen,1); 
@@ -80,7 +78,7 @@ else        % Normal run
 
     if(~Es.NoWarning)    % Check for problematic values
         if any(isnan(reshape(VsOut,1,numel(VsOut))))
-            warning('Matrix contains NaN')
+            warning('Matrix contains NaN.');
         end;
     end;
 end;

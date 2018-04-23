@@ -1,16 +1,8 @@
-function VsOut=L_ED(Vs,Ps,Es,varargin)
+function VsOut=L_ED(Vs,Ps,Es)
 % Exponential decay - Local terms
 % VsOut=L_ED(Vs,Ps,Es)
 % Given the state variables (Vs) and parameters (Ps), calculate the local terms of the model
-% Parameter is lambda for half-life
-
-% Update online if necessary
-if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
-
-if(~isfield(Es,'JacMode'))
-   Es.JacMode=0;
-end;
-
+% Parameter: lambda (half-life)
 
 if(Es.JacMode==0)      % Model equations
     VsOut = -Vs./Ps.lambda;

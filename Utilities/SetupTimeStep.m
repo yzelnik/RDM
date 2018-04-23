@@ -5,7 +5,7 @@ function [Vs,Ps,Es]=SetupTimeStep(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
-Es=InsertDefaultValues(Es,'TsSize',[]);
+Es=InsertDefaultValues(Es,'TsSize',[],'Verbose',0);
 
 if(length(Es.TsMode)<4)
     Es.TsMode=[];
@@ -22,16 +22,21 @@ else
         else
             error('Automatic time-step should have Es.TsMode be one of {auto/2,auto,auto*1.3}');
         end;
+        if(Es.Verbose)
+            disp(sprintf('ts = %e',Es.TsSize));
+        end;
     elseif(strcmp(Es.TsMode(1:4),'none')) 
         % did someone forget the define the time-step?
         if(isempty(Es.TsSize) || Es.TsSize==0)
             Es.TsSize = EvaluateTS(Vs,Ps,Es);
+            if(Es.Verbose)
+                disp(sprintf('No timestep was defined. using: ts = %e',Es.TsSize));
+            end;
         end;
     else
         error('Value of Es.TsMode is not recognized');
     end;
 end;
-
 
 end
 

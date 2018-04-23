@@ -19,6 +19,8 @@ function VsOut = M_CutVar(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
+Es=InsertDefaultValues(Es,'NonNeg',0);
+
 Es.ModPrm = [Es.ModPrm(:)' 0 0 0 0 0];
 
 if(Es.ModPrm(2)==0) % By default change the Es.VarInd variable
@@ -68,13 +70,9 @@ else  % gaussian distribution
     wid = min([Es.ModPrm(5) Es.ModPrm(3) 1-Es.ModPrm(3)]);
     cutsz = randn(1)*wid;
     
-    %if(abs(cutsz)>-wid) % apply cutoff
-    %    cutsz = wid * sign(cutsz);
-    %end;
     cutsz = cutsz + Es.ModPrm(3);
     if(cutsz<0) cutsz=0; end;
     if(cutsz>1) cutsz=1; end;
-    disp([wid cutsz])
 end;
 
 VsOut=Vs;
@@ -86,8 +84,7 @@ else % sz<1 is relative size, sz>1 is in real size (in "pixels")
     VsOut(reg,Es.ModPrm(2))= VsOut(reg,Es.ModPrm(2)) + cutval/regsz;
 end;
 
-% If we know variables are positive, make sure they remain so	
-if((isfield(Es,'NonNeg')) && (Es.NonNeg))
+if(Es.NonNeg)  % make sure values are not negative, if relevant
 	VsOut = max(0,VsOut);
 end;
 

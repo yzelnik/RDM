@@ -1,15 +1,8 @@
-function VsOut=L_SR(Vs,Ps,Es,varargin)
+function VsOut=L_SR(Vs,Ps,Es)
 % simple model for mid-way between logistic and allee-effect dynamics - Local terms
 % VsOut=L_SR(Vs,Ps,Es)
 % Variables are: N(1) : dN/dt = r*N* (1-N/K)*(N/K)^gamma + d* D^2(N))
 % Parameters are: r,K,gamma,d. (0.5,1,1,1)
-
-% Update online if necessary
-if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
-
-if(~isfield(Es,'JacMode'))
-   Es.JacMode=0;
-end;
 
 % Initialization
 N=Vs(:,1);

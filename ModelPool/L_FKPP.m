@@ -1,16 +1,9 @@
-function VsOut=L_FKPP(Vs,Ps,Es,varargin)
+function VsOut=L_FKPP(Vs,Ps,Es)
 % Fisher-Kolmogorov-Petrovsky-Piscounov equation - Local terms
 % VsOut=L_FKPP(Vs,Ps,Es)
 % Given the state variables (Vs) and parameters (Ps), calculate the local terms of the model
 % Variables are: U(1) : dU/dt = r*u* (1-u) + d* D^2(u))
-% Parameters are: r,d. (0.5,1)
-
-% Update online if necessary
-if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
-
-if(~isfield(Es,'JacMode'))
-   Es.JacMode=0;
-end;
+% Parameters are: r,d. Example of values: (0.5,1)
 
 % Initialization
 U=Vs(:,1); 

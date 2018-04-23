@@ -1,16 +1,9 @@
-function VsOut=L_LL(Vs,Ps,Es,varargin)
+function VsOut=L_LL(Vs,Ps,Es)
 % Lejeune-Lefever model - Local terms
 % VsOut=L_LL(Vs,Ps,Es)
 % Given the state variables (Vs) and parameters (Ps), calculate the local terms of the model
 % Variables are: B(1)
 % Parameters are: mu,Lambda,L. (1.02,1.2,0.2)
-
-% Update online if necessary
-[Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
-
-if(~isfield(Es,'JacMode'))
-   Es.JacMode=0;
-end;
 
 % Initialization
 

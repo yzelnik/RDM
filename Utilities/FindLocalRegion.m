@@ -28,9 +28,8 @@ else
     end;
 end;
 
-
-
-if(~isfield(Ps,'Bc'))
+% assume periodic boundary conditions by default
+if(~isfield(Ps,'Bc')) 
    Ps.Bc=0;
 end;
 
@@ -66,18 +65,19 @@ else % 2D case
     end;
 end;
 
-% now, run recursively using nearest neighbor, to get exact number
+% Now, run recursively using nearest neighbor, to get exact number
 nnsm=NeighborSM(1,Ps,Es);
 
-% create the region
-reg=false(Ps.Nx*Ps.Ny,1);
+% Create the region
+reg=zeros(Ps.Nx*Ps.Ny,1);
 reg(inds)=1;
 
 counter = sum(reg);
 maxiter = 1e4;
 exitind = 1;
-while counter<regprm(1) && exitind<maxiter  % iteratively find neighboring sites
-	tmpreg = logical(nnsm*reg);
+% Iteratively find neighboring sites
+while counter<regprm(1) && exitind<maxiter  
+    tmpreg = logical(nnsm*reg);
 	tmpreg = tmpreg - reg.*tmpreg;
 	reg = reg + tmpreg;
 	counter = sum(reg ~= 0);
@@ -85,6 +85,17 @@ while counter<regprm(1) && exitind<maxiter  % iteratively find neighboring sites
 end;
 if(exitind>=maxiter)
     warning('Reached maximum number of iterations while trying to find neighbors. Is network not connected?');
+    while counter<regprm(1) && exitind<maxiter*2  % iteratively find neighboring sites
+        loc=randi(Ps.Nx*Ps.Ny);
+        if(~reg(loc))
+            reg(loc)=1;
+            counter=counter+1;
+        end;
+        exitind = exitind+1;
+    end;
+    if(exitind>=maxiter*2)
+        warning('Could not find enough random locations either');
+    end;
 end;
 
 if(counter>regprm(1))    % make sure we have exactly the right number of sites

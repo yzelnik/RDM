@@ -1,16 +1,9 @@
-function VsOut=L_GKGS(Vs,Ps,Es,varargin)
+function VsOut=L_GKGS(Vs,Ps,Es)
 % Generalized Klausmeier-Gray-Scott model - Local terms
 % VsOut=L_GKGS(Vs,Ps,Es)
 % Given the state variables (Vs) and parameters (Ps), calculate the local terms of the model
 % Variables are: B(1) and W(2), Parameters are: a,m,c,D. (0.9,0.45,1,100)
 % Equations: dB/dt = W*B^2 - m*B + B'',  dW/dt = a - c*W - W*B^2 + D*W''
-
-% Update online if necessary
-[Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
-
-if(~isfield(Es,'JacMode'))
-   Es.JacMode=0;
-end;
 
 % Initilization
 B=Vs(:,1); 

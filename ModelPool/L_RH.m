@@ -5,10 +5,6 @@ function VsOut=L_RH(Vs,Ps,Es)
 % Variables are: B(1),W(2),H(3). 
 % Parameters are: P,mu,alpha,f,ni,gamma,DW,DH. (0.3,0.5,0.4,0.2,0.4,0.1,1,1000)
 
-if(~isfield(Es,'JacMode'))
-   Es.JacMode=0;
-end;
-
 % Initialization
 B=Vs(:,1); 
 W=Vs(:,2); 

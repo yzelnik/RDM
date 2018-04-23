@@ -97,8 +97,10 @@ if(~isempty(Es.RecurFunc))
             if(Es.RecurFrames(1)==0)
                 % Turn off RecurFunc as there are no frames
                 Es.RecurFunc = []; 
-            else % assume that this solve value is every how many frames to run RecurFunc 
-                Es.RecurFrames = Es.RecurFrames:Es.RecurFrames:length(Es.Frames); 
+            else % assume that this sole value is every how many frames to run RecurFunc 
+                temp = zeros(num,1); % Setup specific frames to use RecurFunc
+                temp(Es.RecurFrames:Es.RecurFrames:length(Es.Frames)) = 1;
+                Es.RecurFrames = temp;
             end;
         elseif(length(Es.RecurFrames)==num-1)
             Es.RecurFrames=[0;Es.RecurFrames]; % assume this is a binary yes/no values per frame
@@ -109,8 +111,6 @@ if(~isempty(Es.RecurFunc))
         end;
     end;
 end;
-
-
 
 % If no test was defined, but we are using online-draw, or history was
 % requested, make something up...

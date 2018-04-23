@@ -26,10 +26,6 @@ if(~isfield(Es,'JacNum'))
     Es.JacNum=0;
 end;
 
-%if(~Es.JacNum)
-%    Es.JacMode = 1;	% Request a jacobian
-%end;
-
 % If Matlab crashes (because of eigs) - we can try to deal with this:
 if( (isfield(Es,'AvoidErrors')) && Es.AvoidErrors)
 	flag = 1;

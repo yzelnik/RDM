@@ -1,5 +1,5 @@
 function Out=S_SG(Vs,Ps,Es)
-% Spatial function of Simplfied Gilad model, or similar model with d2(H^2) term
+% Spatial function of the Simplfied Gilad model, or a similar model with a d2(H^2) term
 % Out=S_SG(Vs,Ps,Es)
 % Given the state variables (Vs) and parameters (Ps), calculate the spatial terms of the model
 % The H variable is assumed to the be last one, unless specified with Ps.H2
@@ -14,7 +14,7 @@ end;
 if(size(Ps.Ds,2)==1) Ps.Ds=Ps.Ds'; end; % Make sure Ds is in a row shape
 
 if(isfield(Es,'SetupMode') && Es.SetupMode)
-    % Pre calculate spatial matrix, for future use
+   % Pre calculate spatial matrix, for future use
    Out = Ps;
    Out.Derv2Mat = DervSM(2,Ps,Es);
    if(Ps.Nld==0) % More direct way, just apply second derivative on H^2
@@ -72,9 +72,11 @@ else            % Normal run
                     part3=part3+2*sparse((grad{jj}*H)*ones(1,len)).*grad{jj};
                 end;
                 tmpout= 2* (part1 + part2 + part3);
+                disp(999)
             else
                 tmpout= Ps.Derv2Mat;
             end;
+            
             Out(len*(ind-1)+(1:len),len*(ind-1)+(1:len)) = tmpout*Ps.Ds(:,ind);
         end;
         

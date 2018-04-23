@@ -12,7 +12,7 @@ if(~mod(nargin,2)) error('No default extra-input exists for runcont.'); end;
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'BfMaxDiff',0,'TestFunc',@T_L2Norm,'ContUpdate',[],'ContMin',0);
+Es=InsertDefaultValues(Es,'BfMaxDiff',0,'TestFunc',@T_L2Norm,'ContUpdate',[],'ContMin',0,'Verbose',0);
 
 % By default, a stopping val is checked on the first column
 if(length(Es.BfMaxDiff)<2) ||  (Es.BfMaxDiff(2)<2)
@@ -130,7 +130,9 @@ while((ii<=length(parrange)) && (~stopflag))
 	if(WriteFlag)
 		dlmwrite(Es.BfOut,BfData,'precision',5);
 	end;
-    disp(sprintf('step %d: %s=%.4f, ext: %f',ii,parname,parrange(ii),ExtData(1)));
+    if(Es.Verbose)
+        disp(sprintf('step %d: %s=%.4f, ext: %f',ii,parname,parrange(ii),ExtData(1)));
+    end;
     ii=ii+1;
 	
 end;

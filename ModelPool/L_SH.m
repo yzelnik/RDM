@@ -5,10 +5,6 @@ function VsOut=L_SH(Vs,Ps,Es)
 % Variables are: U(1) : dU/dt = lambda*u + a2*u^2 + a3*u^3  + d2* D^2(u) + d4* D^4(u)
 % Parameters are: lambda,a2,a3,d2,d4. (-1,2,-1,-2,-1)
 
-if(~isfield(Es,'JacMode'))
-   Es.JacMode=0;
-end;
-
 % Initialization
 U=Vs(:,1); 
 

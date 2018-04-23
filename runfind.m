@@ -84,7 +84,6 @@ if(Es.Verbose)
     disp(testval);
 end;
 
-
 dist=0;
 if(~isempty(Es.PrmLim))
     outside = (curpars<Es.PrmLim(1,:)) | (curpars>Es.PrmLim(2,:));

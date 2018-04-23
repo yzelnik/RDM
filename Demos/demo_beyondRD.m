@@ -29,7 +29,7 @@ out3 = run2ss(1,Ps1,Es,'Es.OlDraw',1,'Ps.Nx',100,'Ps.Ny',100,'Es.St2Interp',1);
 %  When both Ps.Nx>1 and Ps.Ny>1, a 2D configuration is implicitly assumed
 
 %% We can also look at a Reaction-Diffusion-Advection model
-%  We use the GS model, see the demo_mainfuncs for more explanations
+%  We use the GS model (see the demo_mainfuncs for more explanations)
 
 Ps2 = struct('LocFunc',@L_GS,'SpaFunc',@S_RD,'IntegFunc',@I_FDCN,'f',0.06,'k',0.06,'Ds',[1 10],'VarNum',2,'Lx',200,'Ly',1,'Nx',200,'Ny',1);
 
@@ -54,6 +54,20 @@ try1 = run2ss([1;0],Ps3,Es,'Es.TsSize',2*1e-3,'Es.OlDraw',1,'Es.InitFunc',@M_Ini
 %  Note that the S_BE function returns a vector the size of Vs, not a spatial matrix
 
 %% Integral terms
-%  Using integral terms is typically quite heavy on computing time.
+%  Note: Using integral terms is typically quite heavy on computing time.
+%  A simple example is that of using a global competition term, (using the spatial function S_RDwGC)
 
+% First, run a normal reaction-diffusion (biomass with Allee-effect) simulation,
+% that creates a moving front with a constant speed
+Ps4=struct('LocFunc',@L_Allee,'SpaFunc',@S_RD,'IntegFunc',@I_FDE,'r',1,'A',0.2,'K',1,'Ds',1,'VarNum',1,'Lx',100,'Ly',1,'Nx',400,'Ny',1,'Bc',1);
+frnt0 = runframes([1;0],Ps4,Es,'Ps.IntegFunc',@I_FDE,'Es.TsSize',5*1e-3,'Es.OlDraw',1,'Es.InitFunc',@M_InitMixSt,'Es.StAxis',[0 1.1],'Es.InitPrm',0.1,'Es.Frames',1:80);
+
+%% Now, we can add some global competition, that will slow the front as it moves on
+%  Note, here we use a spatial matrix that is full (no zeros) due to the  competition term
+tic; frnt1 = runframes([1;0],Ps4,Es,'Ps.SpaFunc',@S_RDwGC,'Ps.GlobComp',1,'Ps.IntegFunc',@I_FDE,'Es.TsSize',5*1e-3,'Es.OlDraw',1,'Es.InitFunc',@M_InitMixSt,'Es.StAxis',[0 1.1],'Es.InitPrm',0.2,'Es.Frames',0:2:200); toc;
+
+%  We can also run the same simulation, but in a faster way, by using the spatial matrix only for dispersal, 
+%  and calculating the competition in a more efficient manner (by setting Es.SpaMatUse=-1)
+tic; frnt2 = runframes([1;0],Ps4,Es,'Es.SpaMatUse',-1,'Ps.SpaFunc',@S_RDwGC,'Ps.GlobComp',1,'Ps.IntegFunc',@I_FDE,'Es.TsSize',5*1e-3,'Es.OlDraw',1,'Es.InitFunc',@M_InitMixSt,'Es.StAxis',[0 1.1],'Es.InitPrm',0.2,'Es.Frames',0:2:200); toc;
+%  See more info inside the S_RDwGC function for the two methods
 

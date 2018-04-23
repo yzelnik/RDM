@@ -1,10 +1,12 @@
-function MatOut=S_NET(~,Ps,Es)
-% Spatial Matrix for (site-wise) dispersal across a network 
-% MatOut=S_NET(Vs,Ps,Es)
+function MatOut=S_NetDL(~,Ps,Es)
+% Spatial Matrix for dispersal (per-link) across a network 
+% MatOut=S_NetDL(Vs,Ps,Es)
 % Ps.Nx gives the number of sites, Ps.Ds the diffusion rates per agent type
 % The netork is either given by Ps.Net (Ps.Nx by Ps.Nx, diagonal set to zeros)
-% or use a default of all-connected. Sum of each column is normalized to 1,
-% so that the more connected sites get more incoming dispersal
+% or a default of all sites connected. 
+% Unlike S_NetDR, the sum of each column is not normalized.
+% Instead, each link moves agents in rate Ps.Ds so that for a chain network the dispersal 
+% is the same as for a 1D system with diffusion and Ps.Lx=Ps.Nx (and also for the S_NetDR)
 
 if(isfield(Es,'SetupMode') && Es.SetupMode)
     % Pre caclculate spatial matrix, for future use
@@ -12,7 +14,7 @@ if(isfield(Es,'SetupMode') && Es.SetupMode)
     MatOut.SpaMat = CalcSM(Ps,Es);
 
 else  	 % Normal run
-   if(~isfield(Ps,'SpaMat'))    % Caclculate spatial matrix if needed
+   if(~isfield(Ps,'SpaMat'))    % Calculate spatial matrix if needed
         Ps.SpaMat = CalcSM(Ps,Es);
    end;
    
@@ -27,16 +29,14 @@ end
 function SM=CalcSM(Ps,Es)
    len=Ps.Nx;
    if(~isfield(Ps,'Net') || length(Ps.Net)<=1)
-       Ps.Net = ones(len)-diag(ones(len,1));
+       Ps.Net = ones(len)-diag(ones(len,1)); % Default fully-connected
    end;
+   Net = logical(Ps.Net-diag(diag(Ps.Net))); % Setting diagonal to zero
+   sumnet = sum(Net,2);
+   Net = sparse(Net-diag(sumnet)); % Each column adds up to zero
    
-   Net = Ps.Net./repmat(max(1,sum(Ps.Net,1)),len,1); % Normalizing each row to one
-
-   Net = sparse(Net-diag(diag(Net)+ones(len,1)));
-
    for ii=1:Ps.VarNum	% Put in derivative sub-matrix in a block-diagonal fashion
         SM((ii-1)*len+(1:len),(ii-1)*len+(1:len)) = Net*Ps.Ds(ii);
    end;
-   %imagesc(SM); pause;
 end
 
