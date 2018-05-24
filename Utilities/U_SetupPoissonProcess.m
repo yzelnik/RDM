@@ -30,7 +30,7 @@ end;
 
 if(Es.PppPrm(2)==0) % regular Poisson process (no correlations)
     tmptms = cumsum(-avgjmp*log(rand(round(2*tottime/avgjmp),1)));
-    Es.RecurFrames = unique([1; ceil(tmptms/res)]);
+    Es.RecurFrames = unique([1; ceil(tmptms/res); 2*tottime/res]);
 else
     error('correlated events not implemented yet.');
 end;

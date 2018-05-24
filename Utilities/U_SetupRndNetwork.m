@@ -13,6 +13,6 @@ if(isempty(Es.RndNetFunc) || isempty(Es.RndNetPrm))
     error('Both Es.RndNetFunc and Es.RndNetPrm need to be defined for setup.');
 end; 
 
-Ps.Net = Es.RndNetFunc(Ps.Nx,Es.RndNetPrm);
+[Ps.Net,Ps.Locs] = Es.RndNetFunc(Ps.Nx,Es.RndNetPrm);
 
 end

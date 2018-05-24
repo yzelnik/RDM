@@ -5,7 +5,7 @@ function [Vs,Ps,Es]=U_SetupRndSpace(Vs,Ps,Es,varargin)
 % Es.RndSpaceVal should have a list of values
 % where the first column shows the width of distribution
 % and (a possible) second column the type of distribution
-% (0/none = uniform, 1=normal)
+% (0/none = uniform, 1=normal(gaussian))
 
 % Update online if necessary
 [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});

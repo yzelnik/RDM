@@ -7,7 +7,7 @@ function MatOut=S_NetDS(~,Ps,Es)
 % Unlike S_NetDL, the sum of each column is normalized to 2,
 % so that the more connected sites get more incoming dispersal
 % Normalization means that for a chain network the dispersal is the same as
-% for a 1D system with diffusion and  Ps.Lx=Ps.Nx (and also for the S_NetDL)
+% for a 1D system with diffusion and Ps.Lx=Ps.Nx (and also for the S_NetDL)
 
 if(isfield(Es,'SetupMode') && Es.SetupMode)
     % Pre caclculate spatial matrix, for future use

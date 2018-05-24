@@ -9,7 +9,7 @@ N=Vs(:,1);
 
 if(Es.JacMode==0)      % Model equations
 
-    dN = Ps.r.*N.*(1-N./Ps.K).*(N./Ps.A-1);
+    dN = Ps.r.*N.*(1-N./Ps.K).*(N./Ps.A-1).*Ps.K.*Ps.A.*(Ps.K-Ps.A).^-2;
     VsOut = dN;
 else                % Jacobian of equations
     
