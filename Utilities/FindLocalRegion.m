@@ -12,7 +12,7 @@ if(regprm(1)<1)
     regprm(1)=ceil(regprm(1)*Ps.Nx*Ps.Ny);
 end;
 
-if(Ps.Ny>1)
+if(Ps.Ny>1) % for 2d system
     if(length(regprm)<3)
         if(regprm(2)<1)
             regprm(2)=ceil(regprm(2)*Ps.Nx*Ps.Ny);
@@ -22,7 +22,7 @@ if(Ps.Ny>1)
     elseif(regprm(3)<1)
         regprm(3)=ceil(regprm(3)*Ps.Ny);
     end;
-else
+else % for 1d or network system
     if(regprm(2)<1)
         regprm(2)=ceil(regprm(2)*Ps.Nx);
     end;

@@ -10,7 +10,7 @@ if(isfield(Es,'SetupMode') && Es.SetupMode)
     MatOut = Ps;
     if(isfield(Es,'SpaMatUse') && Es.SpaMatUse==-1)
         Es.SetupMode=0;
-        MatOut.SpaData=S_RD(1,Ps,Es); % do not use proper spatial matrix
+        MatOut.SpaData= S_RD(1,Ps,Es); % do not use proper spatial matrix
     else    
         MatOut.SpaMat = CalcSM(Ps,Es);
     end;

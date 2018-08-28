@@ -7,6 +7,8 @@ function MakeStVideo(Vs,Ps,Es,varargin)
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
 
+Es=InsertDefaultValues(Es,'PlotFunc',@plotst);
+
 if(~isfield(Es,'VideoSpeed') || Es.VideoSpeed==0) % setup video speed?
 	Es.VideoSpeed=1;
 end;
@@ -49,7 +51,7 @@ fig=gcf;
 % Go over each frame
 for k=1:size(Vs,3)
     % plot the state
-    plotst(Vs(:,:,k),Ps,Es);
+    Es.PlotFunc(Vs(:,:,k),Ps,Es);
     if(Es.TitlesFrames(k)) % plot title if relevant
         title(Es.TitlesText{Es.TitlesFrames(k)});
     end;

@@ -27,7 +27,6 @@ while (ind<Es.MaxNewtLoop) && (residual>Es.SsThresh)
     
     % Use the inverse of the jac matrix on the rhs vector to update the state vector
     if(Es.InverseMatrix) % find inverse of matrix?
-        disp(999)
         invjac = inv(jac);
         VsChange = invjac * reshape(rhs,totlen,1); 
     else  % or use the faster direct matlab division operator

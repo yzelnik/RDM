@@ -29,7 +29,7 @@ end;
 if(size(Es.St2Color,1)<minst2colorlen)
 	Es.St2Color=interp1(0:(size(Es.St2Color,1)-1),Es.St2Color,(0:(defst2colorlen-1))/(defst2colorlen-1)*(size(Es.St2Color,1)-1),'cubic');
 end;
-if(size(Es.St1Color,1)<Ps.VarNum)
+if(~isempty(Es.St1Color) && (size(Es.St1Color,1)<Ps.VarNum))
     Es.St1Color=repmat(Es.St1Color,ceil(Ps.VarNum/size(Es.St1Color,1)),1);
 end;
 
@@ -48,7 +48,9 @@ if((Ps.Nx==1) || (Ps.Ny==1))
     end;
     data=reshape(Vs(:,Es.VarInd,Es.StInd),size(Vs,1),length(Es.VarInd)*length(Es.StInd));
     %set(gcf,'Colormap',Es.St2Color);
-    set(gcf,'DefaultAxesColorOrder',[Es.St1Color(Es.VarInd,:) ; Es.St1Color]);
+    if(~isempty(Es.St1Color))
+        set(gcf,'DefaultAxesColorOrder',[Es.St1Color(Es.VarInd,:) ; Es.St1Color]);
+    end;
     handle=plot((1:Ps.Nx)*(reallen/Ps.Nx),data,'lineWidth',Es.StLineWidth);
     %if (isfield(Es,'VarInd'))
 %	set(0,'DefaultAxesColorOrder',[Es.St1Color(Es.VarInd,:) ; Es.St1Color]);

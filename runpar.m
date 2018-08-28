@@ -117,7 +117,7 @@ if(isfield(Es,'RunsChoice') & Es.RunsChoice)
 
 	if(length(Es.RunsChoice)==2) % Es.RunsChoice = [partition-index partition-total-number]
         whichruns = ceil(size(totvals,1)*(Es.RunsChoice(1)-1)/Es.RunsChoice(2))+1 : ceil(size(totvals,1)*Es.RunsChoice(1)/Es.RunsChoice(2));
-    else % if Es.RunsChoice has one values, or more than 2, than assume these are just a list to run
+    else % if Es.RunsChoice has one value, or more than 2, than assume these are just a list to run
         % old version: whichruns = Es.RunsChoice;
         whichruns = Es.RunsChoice;
     end;

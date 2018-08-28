@@ -27,16 +27,25 @@ Es.JacMode=0;
 for ind = 1:size(InitVals,1)
     % run ODE integration
     [T,Y] = ode45(@ODE_shell,(0:4)*deftime/4,InitVals(ind,:),[],Ps,Es);
-    
-    if(sum(abs(Y(2,:)-Y(3,:))*slowchange<abs(Y(4,:)-Y(5,:))))
-        % It seems we are not converging still.
-        [~,Y2] = ode45(@ODE_shell,(0:4)*deftime/4,Y(5,:),[],Ps,Es);
-        %disp([abs(Y(1,:)-Y(5,:)) abs(Y2(1,:)-Y2(5,:))])
-        if((sum(abs(Y(1,:)-Y(5,:))*slowchange<abs(Y2(1,:)-Y2(5,:)))) && (~Es.NoWarning))
-            warning('Solution does not appear to converge.')
+    if(size(Y,1)<5)
+        state(ind,:)=NaN(1,size(InitVals,2));
+    else
+        if(sum(abs(Y(2,:)-Y(3,:))*slowchange<abs(Y(4,:)-Y(5,:))))
+         % It seems we are not converging still.
+            [~,Y2] = ode45(@ODE_shell,(0:4)*deftime/4,Y(5,:),[],Ps,Es);
+            if(size(Y2,1)<5)
+                state(ind,:)=NaN(1,size(InitVals,2));
+            else
+                %disp([abs(Y(1,:)-Y(5,:)) abs(Y2(1,:)-Y2(5,:))])
+                if((sum(abs(Y(1,:)-Y(5,:))*slowchange<abs(Y2(1,:)-Y2(5,:)))) && (~Es.NoWarning))
+                    warning('Solution does not appear to converge.')
+                end;
+                state(ind,:) = Y2(5,:);
+            end;
+        else
+            state(ind,:) = Y(5,:);
         end;
     end;
-	state(ind,:) = Y(5,:);
 end;
 %disp(state)
 end

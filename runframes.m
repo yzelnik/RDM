@@ -83,6 +83,14 @@ end;
 % Setup a recurring function information (function that operates every-so-often)
 % Es.RecurFrames can be given as [1 1 0 0 1 0] or [1 2 5] for getting the first, second and fifth out of six frames
 if(~isempty(Es.RecurFunc))
+    recfunctype=zeros(length(Es.RecurFunc),1);
+    % Check type of recurring functions
+    for ii=1:length(Es.RecurFunc)
+        txt = func2str(Es.RecurFunc{ii});
+        if(strcmp(txt(1:2),'U_'))
+            recfunctype(ii)=1;
+        end;
+    end;
     if(~isfield(Es,'RecurFrames'))
         Es.RecurFunc = []; % Turn off RecurFunc as there are no frames
         Es.RecurFrames = [];
@@ -161,13 +169,21 @@ for index=1:num
     if(~isempty(Es.RecurFunc))&&(Es.RecurFrames(index)) 
         if(Es.RecurFrames(index)>0) % In each frame, run all funcs together or none at all
             for funcind=1:length(Es.RecurFunc)
-                Vnext = Es.RecurFunc{funcind}(Vnow,Ps,Es);
+                if(recfunctype(funcind)==0)
+                    Vnext = Es.RecurFunc{funcind}(Vnow,Ps,Es);
+                else
+                    [Vnext,Ps,Es] = Es.RecurFunc{funcind}(Vnow,Ps,Es);
+                end;
                 Vnow = Vnext;
             end;
         else % Each function has a differnet timing set
             for funcind=1:length(Es.RecurFunc)
                 if(Es.RecurFramesExtra(index,funcind))
-                    Vnext = Es.RecurFunc{funcind}(Vnow,Ps,Es);
+                    if(recfunctype(funcind)==0)
+                        Vnext = Es.RecurFunc{funcind}(Vnow,Ps,Es);
+                    else
+                        [Vnext,Ps,Es] = Es.RecurFunc{funcind}(Vnow,Ps,Es);
+                    end;
                     Vnow = Vnext;
                 end;
             end;
@@ -201,7 +217,6 @@ for index=1:num
                 subplot(1,2,1);
            end;
            Es.PlotFunc(Vnow,Ps,Es);
-           %plotst(Vnow,Ps,Es);
            titletext = sprintf('step = %d',index);
            if(~isempty(Es.DynPrm) && ~iscell(Es.DynVal))
                titletext = sprintf('%s, %s = %.4f',titletext,Es.DynPrm{1},Es.DynVal(dynindex,1));
