@@ -17,7 +17,7 @@ if(~mod(nargin,2)) varargin = ['Es.Frames' varargin]; end;
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
 % Put in some default values of Es
-Es=InsertDefaultValues(Es,'DynPrm',[],'RecurFunc',[],'OlDraw',0,'TestFunc',[],'TsMode','none','FileOut',[],'BfPrm',[],'PlotFunc',@plotst,'RepDynVal',0);
+Es=InsertDefaultValues(Es,'DynPrm',[],'RecurFunc',[],'OlDraw',0,'TestFunc',[],'TsMode','none','FileOut',[],'BfPrm',[],'PlotFunc',@plotst,'RepDynVal',0,'BreakPrm',[]);
 % Initilize state if necessary
 [Vs,Ps,Es]=InitilizeState(Vs,Ps,Es);
 
@@ -227,8 +227,8 @@ for index=1:num
     if(~isempty(Es.FileOut))
         save(Es.FileOut);
     end;
-    % Option for breaking the loop
-    if(FlagStop~=0)
+    % Option for breaking the loop, either by GUI or prior condition (set by Es.Es.BreakPrm
+    if(FlagStop~=0) || (~isempty(Es.BreakPrm) && (abs(testres(Es.BreakPrm(1))-Es.BreakPrm(2))<=Es.BreakPrm(3)))
         frames = frames(:,:,1:frmind-1); % chop off the end of the data since it is blank
         if(~isempty(Es.TestFunc))
             history = history(1:frmind-1,:);

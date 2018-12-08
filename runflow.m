@@ -23,6 +23,7 @@ Es=InsertDefaultValues(Es,'MergeBfData',0,'TsMode','none','TestMultSt',0);
 [Vs,Ps,Es]=InitilizeState(Vs,Ps,Es);
 
 
+
 if(~isfield(Es,'FuncList') || isempty(Es.FuncList))
     if(isfield(Es,'TestFunc') && ~isempty(Es.TestFunc))
         if(iscell(Es.TestFunc))  % Allow a lazy-access to MultiTest
@@ -36,6 +37,9 @@ if(~isfield(Es,'FuncList') || isempty(Es.FuncList))
     end;
 end;
 
+if(~iscell(Es.FuncList))
+    Es.FuncList={Es.FuncList};
+end;
 
 % Figure out which function on the list takes which input and output
 if(~isfield(Es,'FuncSpec') || isempty(Es.FuncSpec))

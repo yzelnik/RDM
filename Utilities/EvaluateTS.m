@@ -16,8 +16,9 @@ Es=InsertDefaultValues(Es,'TsMax',1e+1,'TsMin',1e-7,'EvalTsPrm',[100 2 0.1]);
 Es.OlDraw = 0;      % Making sure we're not plotting anything
 Es.TsMode = 'none'; % Making sure this function does not call itself
 Es.RecurFrames =[]; % Simplyfing the runframes that we'll use
-Es.DynPrm = [];     % Simplyfing the runframes that we'll use
+Es.DynPrm   = [];   % Simplyfing the runframes that we'll use
 Es.TestFunc = [];   % Simplyfing the runframes that we'll use
+Es.BreakPrm = [];   % Simplyfing the runframes that we'll use
 
 % Initilize state if necessary
 [Vs,Ps,Es]=InitilizeState(Vs,Ps,Es);
@@ -29,12 +30,13 @@ factor  = Es.EvalTsPrm(2);	% Muliply ts by how much each time? (def=2)
 thresh  = Es.EvalTsPrm(3);	% Threshold of noise that is considered bad integration (def=0.1)
 
 % Start things by calculating integrating with slow time-step, and score=0
+
 Es.TsSize=mints;
 gs=runsim(Vs,Ps,Es,'Es.NoWarning',1,'Es.TimeDst',stepnum*Es.TsSize);
 
 score=0;
 while (score<thresh) && (Es.TsSize<maxts)
-	Es.TsSize=Es.TsSize*factor; % Increase time-step
+    Es.TsSize=Es.TsSize*factor; % Increase time-step
     twofrms = runframes(Vs,Ps,Es,'Es.NoWarning',1,'Es.Frames',[1/factor 1]*stepnum*Es.TsSize,'Es.FramesChoice',1:2);
     score = T_L2Norm(gs - twofrms(:,:,1),Ps,Es);  % Compare old run to new one
 

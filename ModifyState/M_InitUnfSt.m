@@ -5,6 +5,8 @@ function VsOut = M_InitUnfSt(Vs,Ps,Es,varargin)
 
 % Update online if necessary
 if(nargin>3) [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:}); end;
+% Make sure there's no spatial heterogenous parameter
+Ps=ForcePrmMeanField(Ps);
 
 % Should we actually do anything? (is the state ready already?)
 if(size(Vs,1)<(Ps.Nx*Ps.Ny))	

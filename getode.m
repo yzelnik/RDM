@@ -8,6 +8,8 @@ if(~mod(nargin,2)) error('No default extra-input exists for getode.'); end;
 [Vs,Ps,Es]=UpdateParameters(Vs,Ps,Es,varargin{:});
 % Make sure Ps parameters are properly setup
 [Vs,Ps,Es]=FillMissingPs(Vs,Ps,Es);
+% Make sure there's no spatial heterogenous parameter
+Ps=ForcePrmMeanField(Ps);
 
 if(size(Vs,2)<Ps.VarNum)	% Replicate values, for the lazy amongst us
 	tmp = repmat(Vs,1,Ps.VarNum);

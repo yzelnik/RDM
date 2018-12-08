@@ -8,3 +8,5 @@ Setting up for runpar while runframes has a dynamical parameter, makes it imposs
 Some strange issue with Es.PrmInCell, it being very long in cluster runs. Does not seem to affect anything.
 
 Stopping runframes mid-way (when using online display) can create an error if not many frames are to be returned
+
+It seems that run2ss does not save the time=0 frame that it claims it does

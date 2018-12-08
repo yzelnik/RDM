@@ -12,22 +12,22 @@ H=Vs(:,3);
 
 if(Es.JacMode==0)      % Model equations
 
-    dB = Ps.nu.*W.*B.*(1 + Ps.eta.*B).^2.*(1 - B) - B;
+    dB = Ps.lambda.*W.*B.*(1 + Ps.eta.*B).^2.*(1 - B) - Ps.mu*B;
     dW = Ps.alpha.*(B + Ps.q.*Ps.f)./(B + Ps.q).*H - Ps.nu*W.*(1 - Ps.rho*B) - Ps.gamma.*W.*(1 + Ps.eta.*B).^2.*B;
     dH = Ps.P - Ps.alpha.*(B + Ps.q.*Ps.f)./(B + Ps.q).*H;
 
     VsOut = [dB,dW,dH];
-else                % Jacobian of equations
+else                % Jacobian of equations % NEEDS TO BE CORRECTED!
     
-    BdB = -1-W.*(1+B.*Ps.eta).*(-1+2*B+B.*(-3+4*B).*Ps.eta).*Ps.nu;
-    BdW = -(-1+B).*B.*(1+B.*Ps.eta).^2.*Ps.nu;
-    BdH = 0.*B;
-    WdB = -((-1+Ps.f).*H.*Ps.q.*Ps.alpha)./((B+Ps.q).^2)-W.*Ps.gamma.*(1+B.*Ps.eta).*(1+3*B.*Ps.eta)+Ps.rho.*W.*Ps.nu;
-    WdW = -B.*Ps.gamma.*(1+B.*Ps.eta).^2+(-1+B.*Ps.rho).*Ps.nu;
-    WdH = ((B+Ps.f.*Ps.q).*Ps.alpha)./(B+Ps.q);
-    HdB = ((-1+Ps.f).*H.*Ps.q.*Ps.alpha)./((B+Ps.q).^2);
-    HdW = 0.*H;
-    HdH = -((B+Ps.f.*Ps.q).*Ps.alpha)./(B+Ps.q);
+    BdB = 0*   -1-W.*(1+B.*Ps.eta).*(-1+2*B+B.*(-3+4*B).*Ps.eta).*Ps.nu;
+    BdW = 0*   -(-1+B).*B.*(1+B.*Ps.eta).^2.*Ps.nu;
+    BdH = 0*   0.*B;
+    WdB = 0*   -((-1+Ps.f).*H.*Ps.q.*Ps.alpha)./((B+Ps.q).^2)-W.*Ps.gamma.*(1+B.*Ps.eta).*(1+3*B.*Ps.eta)+Ps.rho.*W.*Ps.nu;
+    WdW = 0*   -B.*Ps.gamma.*(1+B.*Ps.eta).^2+(-1+B.*Ps.rho).*Ps.nu;
+    WdH = 0*   ((B+Ps.f.*Ps.q).*Ps.alpha)./(B+Ps.q);
+    HdB = 0*   ((-1+Ps.f).*H.*Ps.q.*Ps.alpha)./((B+Ps.q).^2);
+    HdW = 0*   0.*H;
+    HdH = 0*   -((B+Ps.f.*Ps.q).*Ps.alpha)./(B+Ps.q);
 
     % written in a large sparse matrix format 
     VsOut = ArrangeJacobian([BdB BdW BdH;WdB WdW WdH; HdB HdW HdH],Ps,Es);

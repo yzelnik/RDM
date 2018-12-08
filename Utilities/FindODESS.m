@@ -2,51 +2,57 @@ function [state,T,Y] = FindODESS(InitVals,Ps,Es,varargin)
 % Find an ODE (uniform) Steady-State
 % state = FindODESS(InitVals,Ps,Es)
 
-% default values
-Es=InsertDefaultValues(Es,'TimeDst',0);
-% make sure there's no spatial heterogenous parameter
-Ps=ForcePrmMeanField(Ps);
+% Update online if necessary
+if(nargin>3) [~,Ps,Es]=UpdateParameters([],Ps,Es,varargin{:}); end;
+% Default values
+Es=InsertDefaultValues(Es,'TimeDst',0,'OdeTime',100,'MaxOdeTime',1000,'OdeThresh',1e-6,'NoWarning',0);
 
-slowchange = 0.01;  % Used to test that a solution is converging. 
-deftime = max(100,Es.TimeDst);
-if((isfield(Es,'OdeTime')) && Es.OdeTime)
-    deftime=Es.OdeTime;
-end;
-
-Es.InitActive = 1;      % make sure we don't have endless loops 
+% Baseline simulation time
+basetime = Es.OdeTime;
+ % Make sure we don't have endless loops 
+Es.InitActive = 1;     
 
 % Update online if necessary
 [~,Ps,Es]=UpdateParameters([],Ps,Es,varargin{:});
 
 if(isempty(InitVals))
-	InitVals = zeros(1,Ps.VarNum);
+	InitVals = ones(1,Ps.VarNum);
 end;
 Es.JacMode=0;
+%if(Es.NoWarning)
+%    opts = odeset('Stats','off');
+%else
+%    opts = odeset('Stats','on');
+%end;
 
 % Go over each set of initial values, and run the ODE integration
 for ind = 1:size(InitVals,1)
-    % run ODE integration
-    [T,Y] = ode45(@ODE_shell,(0:4)*deftime/4,InitVals(ind,:),[],Ps,Es);
-    if(size(Y,1)<5)
-        state(ind,:)=NaN(1,size(InitVals,2));
-    else
-        if(sum(abs(Y(2,:)-Y(3,:))*slowchange<abs(Y(4,:)-Y(5,:))))
-         % It seems we are not converging still.
-            [~,Y2] = ode45(@ODE_shell,(0:4)*deftime/4,Y(5,:),[],Ps,Es);
-            if(size(Y2,1)<5)
-                state(ind,:)=NaN(1,size(InitVals,2));
-            else
-                %disp([abs(Y(1,:)-Y(5,:)) abs(Y2(1,:)-Y2(5,:))])
-                if((sum(abs(Y(1,:)-Y(5,:))*slowchange<abs(Y2(1,:)-Y2(5,:)))) && (~Es.NoWarning))
-                    warning('Solution does not appear to converge.')
-                end;
-                state(ind,:) = Y2(5,:);
-            end;
+    start = InitVals(ind,:);
+    maxchange = inf;
+    % keep going while convergence is not good and we are not at max time
+    while(maxchange/basetime>Es.OdeThresh && basetime*2<Es.MaxOdeTime)
+        % run ODE integration
+        [T,Y] = ode45(@ODE_shell,(0:4)*basetime/4,start,[],Ps,Es);
+        % calculate change in last leg of simulation
+        if(size(Y,1)<5)
+            basetime=inf;
         else
-            state(ind,:) = Y(5,:);
+            maxchange = max(abs(Y(4,:)-Y(5,:)));
+            basetime=basetime*2;
+            start = Y(5,:); % ready for next iteration
         end;
     end;
+    if(maxchange/basetime>Es.OdeThresh) && (~Es.NoWarning)
+        warning('Solution does not appear to converge.')
+	end;
+    if(size(Y,1)<5)
+        state(ind,:)=NaN;
+    else
+        state(ind,:) = Y(5,:);
+    end;
 end;
-%disp(state)
+
 end
+
+
 
